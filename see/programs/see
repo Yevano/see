@@ -1,0 +1,78 @@
+local _, err = pcall(function(...)
+	local function copy(t)
+		local r = { }
+		for k, v in pairs(t) do
+			r[k] = v
+		end
+		return r
+	end
+
+	local natives = copy(_G)
+	local vm
+	local classPath
+
+	os.loadAPI("/see/apis/see")
+
+	local function loadClassesFromPath(path)
+		for _, name in pairs(fs.list(path)) do
+			local subPath = fs.combine(path, name)
+			if fs.isDir(subPath) then
+				loadClassesFromPath(subPath)
+			else
+				if name:sub(-4, -1) == ".lua" then
+					local relativePath = subPath:sub(#classPath + 2)
+					local class, err = vm:loadClassFromFile(subPath, relativePath:gsub("/", "."):sub(1, -5))
+
+					if not class then
+						print("Error loading class '" .. name .. "': " .. tostring(err))
+					end
+				end
+			end
+		end
+	end
+
+	local function runFromPath(classPath, mainClassName)
+		loadClassesFromPath(classPath, classes)
+		local MainClass = see.getByPackage(vm.classes, mainClassName)
+		-- TODO: Pass args to main method.
+		if not MainClass then error("Main class not found!") end
+		if not MainClass.main then error("Main method not found!") end
+		MainClass.main()
+	end
+
+	local USAGE = "Usage: see <-r <classPath> <mainClass>>|<-p <dir>>|<-u <archive>>|<-help>"
+	local args = {...}
+	local op = args[1]
+
+	if not op then
+		print(USAGE)
+	end
+
+	if op == "-r" then
+		--Run option.
+		vm = see.SeeVM.new(natives)
+		classPath = shell.resolve(args[2])
+		table.insert(vm.classPaths, classPath)
+		local mainClassName = args[3]
+		if fs.isDir(classPath) then
+			runFromPath(classPath, mainClassName)
+		else
+			-- TODO: Add archive reading.
+		end
+	elseif op == "-p" then
+		-- Pack option.
+		-- TODO
+	elseif op == "-u" then
+		-- Unpack option.
+		-- TODO
+	elseif op == "-help" then
+		-- Help option.
+		print(USAGE)
+	end
+end, ...)
+
+os.unloadAPI("/see/apis/see")
+
+if err then
+	error(err)
+end
