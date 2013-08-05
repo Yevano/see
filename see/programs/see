@@ -13,24 +13,6 @@ local _, err = pcall(function(...)
 
 	os.loadAPI("/see/apis/see")
 
-	local function loadClassesFromPath(path)
-		for _, name in pairs(fs.list(path)) do
-			local subPath = fs.combine(path, name)
-			if fs.isDir(subPath) then
-				loadClassesFromPath(subPath)
-			else
-				if name:sub(-4, -1) == ".lua" then
-					local relativePath = subPath:sub(#classPath + 2)
-					local class, err = vm:loadClassFromFile(subPath, relativePath:gsub("/", "."):sub(1, -5))
-
-					if not class then
-						print("Error loading class '" .. name .. "': " .. tostring(err))
-					end
-				end
-			end
-		end
-	end
-
 	local function runFromPath(classPath, mainClassName, args)
 		local MainClass = vm:loadClassFromAny(mainClassName)
 		if not MainClass then error("Main class not found! ") end

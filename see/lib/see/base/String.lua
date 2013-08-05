@@ -1,4 +1,7 @@
 --@native string
+--@native tostring
+--@import see.base.Array
+--@import see.base.System
 
 --[[
 	A mutable, Array-backed string. Faster and more memory efficient than native strings.
@@ -17,14 +20,20 @@ function String.__cast(value)
 end
 
 --[[
-	Constructs a new String which copies the given luaString.
-	@param string:luaString The string to be copied.
+	Constructs a new String which copies the given string.
+	@param string:str The string to be copied.
 ]]
-function String:init(luaString)
+function String:init(str)
 	self.charArray = Array.new()
-	if not luaString then return end
-	for i = 1, #luaString do
-		self.charArray[i] = luaString:sub(i, i):byte()
+	if not str then return end
+	if typeof(str) == "string" then
+		for i = 1, #str do
+			self.charArray[i] = str:sub(i, i):byte()
+		end
+	elseif typeof(str) == String then
+		for i = 1, str:length() do
+			self.charArray[i] = str.charArray[i]
+		end
 	end
 end
 
@@ -48,6 +57,19 @@ function String:length()
 	return self.charArray.length
 end
 
+function String:concat(str)
+	local ret = String.new(self)
+	local len = self:length()
+	for i = 1, str:length() do
+		ret.charArray[i + len] = str.charArray[i]
+	end
+	return ret
+end
+
+function String.__meta.__concat(a, b)
+	return a:concat(b)
+end
+
 --[[
 	Gets a substring of this String.
 	@param number:a Start index.
@@ -55,5 +77,11 @@ end
 	@return see.base.String A substring of this String.
 ]]
 function String:sub(a, b)
-	
+	if not b then b = self:length() end
+
+	-- TODO
+end
+
+function String:toString()
+	return self
 end

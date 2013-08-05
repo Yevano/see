@@ -523,7 +523,23 @@
 			"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/apis/see",
 			"settings":
 			{
-				"buffer_size": 7423,
+				"buffer_size": 8493,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/lib/see/util/Math.lua",
+			"settings":
+			{
+				"buffer_size": 0,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/lib/see/base/Exception.lua",
+			"settings":
+			{
+				"buffer_size": 172,
 				"line_ending": "Windows"
 			}
 		},
@@ -539,7 +555,7 @@
 			"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/lib/see/base/String.lua",
 			"settings":
 			{
-				"buffer_size": 1245,
+				"buffer_size": 1283,
 				"line_ending": "Windows"
 			}
 		},
@@ -579,7 +595,15 @@
 			"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/test/see/example/Test.lua",
 			"settings":
 			{
-				"buffer_size": 174,
+				"buffer_size": 313,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/lib/see/rt/RuntimeException.lua",
+			"settings":
+			{
+				"buffer_size": 224,
 				"line_ending": "Windows"
 			}
 		},
@@ -783,6 +807,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			")]]\n",
 			"print",
 			"getByPackage",
 			"Helper",
@@ -899,7 +924,7 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 3,
 			"sheets":
 			[
 				{
@@ -907,42 +932,15 @@
 					"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/apis/see",
 					"settings":
 					{
-						"buffer_size": 7423,
+						"buffer_size": 8493,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								6488,
-								6489
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Lua/Lua.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 3509.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/programs/see",
-					"settings":
-					{
-						"buffer_size": 1810,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1346,
-								1346
+								2542,
+								2542
 							]
 						],
 						"settings":
@@ -957,19 +955,46 @@
 					"type": "text"
 				},
 				{
-					"buffer": 2,
-					"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/lib/see/base/String.lua",
+					"buffer": 1,
+					"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/lib/see/util/Math.lua",
 					"settings":
 					{
-						"buffer_size": 1245,
+						"buffer_size": 0,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								533,
-								533
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"auto_name": "",
+							"syntax": "Packages/Lua/Lua.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/lib/see/base/Exception.lua",
+					"settings":
+					{
+						"buffer_size": 172,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								111,
+								111
 							]
 						],
 						"settings":
@@ -984,6 +1009,59 @@
 				},
 				{
 					"buffer": 3,
+					"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/programs/see",
+					"settings":
+					{
+						"buffer_size": 1810,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								21,
+								21
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Lua/Lua.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 630.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/lib/see/base/String.lua",
+					"settings":
+					{
+						"buffer_size": 1283,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1279,
+								1279
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Lua/Lua.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 270.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
 					"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/lib/see/base/Array.lua",
 					"settings":
 					{
@@ -1009,7 +1087,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 4,
+					"buffer": 6,
 					"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/lib/see/base/Object.lua",
 					"settings":
 					{
@@ -1035,7 +1113,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 5,
+					"buffer": 7,
 					"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/lib/see/concurrent/Thread.lua",
 					"settings":
 					{
@@ -1061,7 +1139,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 6,
+					"buffer": 8,
 					"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/lib/see/base/System.lua",
 					"settings":
 					{
@@ -1087,19 +1165,19 @@
 					"type": "text"
 				},
 				{
-					"buffer": 7,
+					"buffer": 9,
 					"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/test/see/example/Test.lua",
 					"settings":
 					{
-						"buffer_size": 174,
+						"buffer_size": 313,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								168,
-								168
+								111,
+								111
 							]
 						],
 						"settings":
@@ -1113,7 +1191,33 @@
 					"type": "text"
 				},
 				{
-					"buffer": 8,
+					"buffer": 10,
+					"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/lib/see/rt/RuntimeException.lua",
+					"settings":
+					{
+						"buffer_size": 224,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								224,
+								224
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Lua/Lua.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 11,
 					"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/test/see/example/Helper.lua",
 					"settings":
 					{
@@ -1139,7 +1243,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 9,
+					"buffer": 12,
 					"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/test/see/example/WellHelper.lua",
 					"settings":
 					{

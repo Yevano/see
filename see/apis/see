@@ -10,6 +10,7 @@ StandardGlobals = { }
 
 --[[
 	Creates a new anonymous class.
+	@param SeeVM:vm The VM to run this function for.
 	@param function:def The function used to define this class.
 	@param table:super The super class for this class. If nil, this class extends see.lang.Object.
 ]]
@@ -19,6 +20,7 @@ end
 
 --[[
 	Gets the type of a given value.
+	@param SeeVM:vm The VM to run this function for.
 	@param value:any The value to get the type of.
 	@return string|table The type identifier if value if primitive, or the class of value if value is an object.
 ]]
@@ -31,6 +33,7 @@ end
 
 --[[
 	Casts a value to a particular class.
+	@param SeeVM:vm The VM to run this function for.
 	@param any:value The value to cast.
 	@param string|table:castType The type to cast to.
 ]]
@@ -45,12 +48,13 @@ function StandardGlobals.cast(vm, value, castType)
 			if type(value) ~= "table" or not value.__type then
 				return tostring(value)
 			elseif value.__type then
-				return value.__type.__cast(value)
+				return value:toString():lstr()
 			end
 		else
 			-- TODO
 		end
 	else
+		return castType.__cast(value)
 		-- Casting to Object.
 		-- TODO
 	end
@@ -58,11 +62,43 @@ end
 
 --[[
 	Casts an object to a different class by setting its metatable.
+	@param SeeVM:vm The VM to run this function for.
 	@param see.base.Object value
 ]]
-function StandardGlobals.reinterpret_cast(value, castType)
+function StandardGlobals.reinterpret_cast(vm, value, castType)
 	if type(value) ~= "table" or not value.__type then error("Cannot use reinterpret_cast to cast a primitive type.") end
 	setmetatable(value, castType.__meta)
+end
+
+--[[
+	Throws an exception.
+	@param SeeVM:vm The VM to run this function for.
+	@param see.base.Exception The exception to throw.
+]]
+function StandardGlobals.throw(vm, exception)
+	vm.lastException = exception
+	error()
+end
+
+--[[
+	Tries to execute code until an error occurs. Calls catch code if an error occurs.
+	@param SeeVM:vm The VM to run this function for.
+	@param function:tryFunc Function to run and catch errors from.
+	@param function:catchFunc(see.base.Exception) Function to run on error.
+]]
+function StandardGlobals.try(vm, tryFunc, catchFunc)
+	local suc, err = pcall(tryFunc)
+	if suc then return end
+	if err then vm.lastException = vm:loadClassFromAny("see.rt.RuntimeException").new(err) end
+	catchFunc(vm.lastException)
+end
+
+--[[
+	Converts a Lua string to a see.base.String.
+	@param string:str
+]]
+function StandardGlobals.STR(vm, str)
+	return vm.base.String.new(str)
 end
 
 SeeVM = { }
@@ -73,6 +109,8 @@ SeeVM.__index = SeeVM
 ]]
 function SeeVM.new(natives)
 	local self = { }
+	setmetatable(self, SeeVM)
+
 	self.standardGlobals = { }
 	for k, v in pairs(StandardGlobals) do
 		self.standardGlobals[k] = function(...) return StandardGlobals[k](self, ...) end
@@ -82,8 +120,8 @@ function SeeVM.new(natives)
 	self.classes = { }
 	self.natives = natives
 	self.classPaths = { }
-	setmetatable(self, SeeVM)
 	self.base.Object = self:loadClassFromAny("see.base.Object")
+	self.base.Exception = self:loadClassFromAny("see.base.Exception")
 	self.base.System = self:loadClassFromAny("see.base.System")
 	self.base.Array  = self:loadClassFromAny("see.base.Array")
 	self.base.String = self:loadClassFromAny("see.base.String")
@@ -101,7 +139,6 @@ function getByPackage(t, package, del)
 	if not del then del = "%." end
 	local f = package:find(del)
 	if f then
-		print(package .. " contains " .. del)
 		return getByPackage(t[package:sub(1, f - 1)], package:sub(f + 1), del)
 	else
 		return t[package]
@@ -265,6 +302,7 @@ function SeeVM:loadClass(def, annotations, name)
 	class.__name = name
 
 	function class.new(...)
+		if not class.init then error("Could not instantiate class " .. name .. ". No init method.") end
 		local self = { }
 		self.__type = class
 		setmetatable(self, class.__meta)
@@ -274,7 +312,7 @@ function SeeVM:loadClass(def, annotations, name)
 
 	-- Extend Object by default.
 	if abool then
-		setmetatable(class, self.base.Object.__meta)
+		setmetatable(class, self.base.Object)
 	end
 
 	-- Import base classes.

@@ -2,6 +2,7 @@
 --@native pairs
 --@native setmetatable
 --@native getmetatable
+--@import see.base.String
 
 --[[
 	The super class for all classes loaded in the See Runtime.
@@ -29,5 +30,10 @@ function Object:getClass()
 end
 
 function Object:toString()
-	return tostring(self) .. ":" .. self:getClass().__name
+	return String.new(tostring(self) .. ":" .. self:getClass().__name)
+end
+
+-- TODO: Fix me.
+function Object.__concat(l, r)
+	return cast(l, String):concat(cast(r, String))
 end

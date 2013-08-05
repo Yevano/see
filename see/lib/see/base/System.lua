@@ -1,5 +1,6 @@
 --@native print
 --@native read
+--@native unpack
 
 --[[
 	A utility class for useful system operations.
@@ -20,11 +21,12 @@ end
 function System.print(...)
 	local args = {...}
 	for i = 1, #args do
-		args[i] = cast(str, "string")
+		args[i] = cast(args[i], "string")
 	end
-	print(...)
+	print(unpack(args))
 end
 
+-- TODO: Prevent from trashing global namespace.
 function System.loadNativeAPI(path)
 	os.loadAPI()
 end
