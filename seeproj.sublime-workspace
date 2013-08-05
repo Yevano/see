@@ -1,0 +1,1236 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"for",
+				"forp	for k,v in pairs()"
+			],
+			[
+				"corout",
+				"coroutine.yield"
+			],
+			[
+				"coroutine",
+				"coroutine.create"
+			],
+			[
+				"loadClassFr",
+				"loadClassFromAny"
+			],
+			[
+				"getPackage",
+				"getPackageComponents"
+			],
+			[
+				"loadClass",
+				"loadClassFromFile"
+			],
+			[
+				"bor",
+				"border-style"
+			],
+			[
+				"border-c",
+				"border-color"
+			],
+			[
+				"part",
+				"particles_3"
+			],
+			[
+				"margin",
+				"margin-bottom"
+			],
+			[
+				"WriteInt",
+				"net.WriteInt"
+			],
+			[
+				"net",
+				"net.Start"
+			],
+			[
+				"hook",
+				"hook.Add"
+			],
+			[
+				"math",
+				"mathx.sqrt"
+			],
+			[
+				"http",
+				"http.Fetch"
+			],
+			[
+				"hoo",
+				"hook.Add"
+			],
+			[
+				"input",
+				"input.WasKeyReleased"
+			],
+			[
+				"include",
+				"IncludeClientFile"
+			],
+			[
+				"get",
+				"getElementById"
+			],
+			[
+				"inn",
+				"innerWidth"
+			],
+			[
+				"last",
+				"lastH"
+			],
+			[
+				"int",
+				"intptr_t"
+			],
+			[
+				"train",
+				"trainSpeed"
+			],
+			[
+				"prox",
+				"proxySession"
+			],
+			[
+				"Packet",
+				"PacketRegistry"
+			],
+			[
+				"Pack",
+				"PacketRegistry"
+			],
+			[
+				"_p",
+				"_packetOpsMap"
+			],
+			[
+				"vec",
+				"vecRef"
+			],
+			[
+				"shar",
+				"shared_from_this"
+			],
+			[
+				"share",
+				"shared_from_this"
+			],
+			[
+				"c",
+				"class	class"
+			],
+			[
+				"Channel",
+				"ChannelAcceptor"
+			],
+			[
+				"uns",
+				"unsignedShort0"
+			],
+			[
+				"signe",
+				"signedShort1"
+			],
+			[
+				"read",
+				"checkRead"
+			],
+			[
+				"unsi",
+				"unsignedShort1"
+			],
+			[
+				"Buf",
+				"ByteBuffer"
+			],
+			[
+				"unsig",
+				"unsignedShort0"
+			],
+			[
+				"sign",
+				"signedShort0"
+			],
+			[
+				"sig",
+				"signedShort"
+			],
+			[
+				"S",
+				"SHORT_SIZED_SLOTS"
+			],
+			[
+				"ui",
+				"uint16_t"
+			],
+			[
+				"SHO",
+				"SHORT_SIZED_STRING16S"
+			],
+			[
+				"SHORT",
+				"SHORT_SIZED_BYTES"
+			],
+			[
+				"_",
+				"_packetOpsMap"
+			],
+			[
+				"serv",
+				"_serverPort"
+			],
+			[
+				"_ser",
+				"_serverHost"
+			],
+			[
+				"Ma",
+				"MagicException"
+			],
+			[
+				"server",
+				"serverPort"
+			],
+			[
+				"uint",
+				"uint8_t"
+			],
+			[
+				"size",
+				"size_t"
+			],
+			[
+				"ma",
+				"MAX_READ_SIZE"
+			],
+			[
+				"str_s",
+				"str_so"
+			],
+			[
+				"disk_get",
+				"disk_getlocations_ph"
+			],
+			[
+				"disk_",
+				"disk_getlocations"
+			],
+			[
+				"disk_read",
+				"disk_readtracks"
+			],
+			[
+				"draw_image",
+				"draw_image_cpysp"
+			],
+			[
+				"draw_ima",
+				"draw_image_cpysp"
+			],
+			[
+				"draw",
+				"draw_image_local_ptr"
+			],
+			[
+				"draw_im",
+				"draw_image_local_ptr"
+			],
+			[
+				"ito",
+				"itos_hex"
+			],
+			[
+				"dr",
+				"draw_rect_yloop"
+			],
+			[
+				"draw_",
+				"draw_rect_yloop"
+			],
+			[
+				"str_",
+				"str_buff"
+			],
+			[
+				"str_l",
+				"str_len_end"
+			],
+			[
+				"buf",
+				"str_buff"
+			],
+			[
+				"itos_",
+				"itos_hex"
+			],
+			[
+				"itos_1",
+				"itos_1hex"
+			],
+			[
+				"cons",
+				"constr	constructor"
+			],
+			[
+				"constr",
+				"constructor"
+			],
+			[
+				"func",
+				"function	function"
+			],
+			[
+				"x",
+				"x"
+			],
+			[
+				"ast_va",
+				"ast_declarevar_init"
+			],
+			[
+				"TOKEN_EA",
+				"TOKEN_EQUALS"
+			],
+			[
+				"symbo",
+				"symbol_token"
+			],
+			[
+				"de",
+				"declarevar"
+			],
+			[
+				"ast_statement_",
+				"ast_statement_SIZE"
+			],
+			[
+				"ast",
+				"ast_statement"
+			],
+			[
+				"stat",
+				"statements"
+			],
+			[
+				"get_",
+				"get_token"
+			],
+			[
+				"nex",
+				"next_token"
+			],
+			[
+				"zcpuc_par",
+				"zcpuc_parser"
+			],
+			[
+				"zcpuc",
+				"zcpuc_token"
+			],
+			[
+				"ast_pr",
+				"ast_program_SIZE"
+			],
+			[
+				"char_is",
+				"char_isdigit"
+			],
+			[
+				"next",
+				"next_tokens"
+			],
+			[
+				"char_",
+				"char_isalpha"
+			],
+			[
+				"zcpuc_parser",
+				"zcpuc_parser_run"
+			],
+			[
+				"zcp",
+				"zcpuc_parser"
+			],
+			[
+				"program",
+				"zcpuc_ast_program"
+			],
+			[
+				"zc",
+				"zcpuc_parser"
+			],
+			[
+				"zcpuc_",
+				"zcpuc_tokenizer"
+			],
+			[
+				"zcpuc_tokeniz",
+				"zcpuc_tokenizer_init"
+			],
+			[
+				"zcpuc_tok",
+				"zcpuc_tokens"
+			],
+			[
+				"HASH",
+				"HASHMAP_ENTRY_STRUCT_SIZE"
+			],
+			[
+				"hash",
+				"hashmap"
+			],
+			[
+				"serialin",
+				"serialin_read_byte"
+			],
+			[
+				"inst",
+				"serial_instream"
+			],
+			[
+				"seri",
+				"serial_instream"
+			],
+			[
+				"serial_wri",
+				"serial_write_bytes"
+			],
+			[
+				"data",
+				"data_lines"
+			],
+			[
+				"rea",
+				"read_ready_ptr"
+			],
+			[
+				"data_",
+				"data_ptr"
+			],
+			[
+				"buffer",
+				"buffer_size"
+			],
+			[
+				"buff",
+				"buffer_len"
+			],
+			[
+				"write_ready",
+				"write_ready_ptr"
+			],
+			[
+				"Dista",
+				"Distance	:Distance"
+			],
+			[
+				"Init",
+				"Initialize"
+			],
+			[
+				"GetDT",
+				"GetDTInt	:GetDTInt"
+			],
+			[
+				"file",
+				"file.Exists"
+			],
+			[
+				"team",
+				"team.SetUp"
+			],
+			[
+				"OnDam",
+				"OnTakeDamage"
+			],
+			[
+				"Register",
+				"vgui.Register"
+			],
+			[
+				"table",
+				"table.remove"
+			],
+			[
+				"player",
+				"player.GetAll"
+			],
+			[
+				"TIMER_PA",
+				"TIMER_PADDING_DOWN"
+			],
+			[
+				"TIMER_PADDING",
+				"TIMER_PADDING_RIGHT"
+			],
+			[
+				"recei",
+				"net.Receive"
+			],
+			[
+				"pro",
+				"protocol"
+			],
+			[
+				"getPlayerBannedD",
+				"getPlayerBannedDatas"
+			],
+			[
+				"ivt-pl",
+				"ivt-player-clientmute"
+			],
+			[
+				"ivt-mapli",
+				"ivt-maplist-load"
+			],
+			[
+				"ivt-map",
+				"ivt-maplist-request"
+			],
+			[
+				"ivt-",
+				"ivt-playerlist-update"
+			],
+			[
+				"BroadC",
+				"net.Broadcast"
+			],
+			[
+				"fun",
+				"function	function"
+			],
+			[
+				"IsPl",
+				"IsPlayer	:IsPlayer"
+			],
+			[
+				"ivt-player",
+				"ivt-playerlist-remove"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/apis/see",
+			"settings":
+			{
+				"buffer_size": 7423,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/programs/see",
+			"settings":
+			{
+				"buffer_size": 1810,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/lib/see/base/String.lua",
+			"settings":
+			{
+				"buffer_size": 1245,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/lib/see/base/Array.lua",
+			"settings":
+			{
+				"buffer_size": 2053,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/lib/see/base/Object.lua",
+			"settings":
+			{
+				"buffer_size": 592,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/lib/see/concurrent/Thread.lua",
+			"settings":
+			{
+				"buffer_size": 1056,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/lib/see/base/System.lua",
+			"settings":
+			{
+				"buffer_size": 553,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/test/see/example/Test.lua",
+			"settings":
+			{
+				"buffer_size": 174,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/test/see/example/Helper.lua",
+			"settings":
+			{
+				"buffer_size": 124,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/test/see/example/WellHelper.lua",
+			"settings":
+			{
+				"buffer_size": 254,
+				"line_ending": "Windows"
+			}
+		}
+	],
+	"build_system": "Packages/User/fasm.sublime-build",
+	"command_palette":
+	{
+		"height": 392.0,
+		"selected_items":
+		[
+			[
+				"c++",
+				"Set Syntax: C++"
+			],
+			[
+				"syn c",
+				"Set Syntax: C"
+			],
+			[
+				"synt c",
+				"Set Syntax: C"
+			]
+		],
+		"width": 400.0
+	},
+	"console":
+	{
+		"height": 0.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/C/Users/James/projects/see/test",
+		"/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/lib/see/rt/Class.lua",
+		"/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/test/Test.lua",
+		"/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/test/Helper.lua",
+		"/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/lib/see/util/System.lua",
+		"/C/Users/James/projects/see/lib/see/util/System.lua",
+		"/C/Users/James/projects/see/test/Test.lua",
+		"/C/Users/James/projects/see/programs/see.lua",
+		"/C/Users/James/projects/see/apis/see.lua",
+		"/C/Users/James/AppData/Roaming/.ccdesk/ops.txt",
+		"/C/Users/James/data/save.txt",
+		"/C/Users/James/data/links.txt",
+		"/C/kernel.ocl",
+		"/C/Users/James/projects/see/lib/see/io/InputStream.lua",
+		"/C/Users/James/projects/see/lib/see/io/LineInputStream.lua",
+		"/C/Users/James/projects/hotr_golf.lua",
+		"/C/Users/James/projects/see/lib/see/io/InputStream",
+		"/C/Users/James/games/Capitalism-0.5.1/readme.txt",
+		"/C/Users/James/games/papers-please/mods/MakingMods.txt",
+		"/D/Steam/steamapps/common/GarrysMod/garrysmod/addons/motd/lua/autorun/main.lua",
+		"/C/Users/James/data/frankie.txt",
+		"/C/Users/James/games/papers-please/mods/sample/_mod.xml",
+		"/C/Users/James/games/papers-please/Readme.txt",
+		"/D/Steam/steamapps/common/GarrysMod/garrysmod/addons/motd/addon.txt",
+		"/D/Steam/steamapps/common/GarrysMod/garrysmod/addons/motd/lua/autorun/hooks.lua",
+		"/C/Users/James/data/extract.py",
+		"/C/Users/James/projects/cc-threading/Thread.lua",
+		"/C/Users/James/Documents/ArmA 2/ArmA2OA.cfg",
+		"/C/Users/James/data/out.txt",
+		"/C/Users/James/AppData/Local/Temp/7zO2492.tmp/README.TXT",
+		"/C/Users/James/projects/freezetag/gamemode/init.lua",
+		"/C/Users/James/projects/dayzpanel/html/index.html",
+		"/C/Users/James/data/omegle.txt",
+		"/C/Users/James/projects/freezetag/gamemode/cl_init.lua",
+		"/C/Users/James/Desktop/ProtectThePresident/gamemode/server/player.lua",
+		"/C/Users/James/Desktop/ProtectThePresident/gamemode/client/hud.lua",
+		"/C/Users/James/Desktop/ProtectThePresident/gamemode/shared/util.lua",
+		"/C/Users/James/games/Pioneer v0.01/Change Log v0.01 - Pre Alpha",
+		"/C/Users/James/games/Pioneer v0.01/Data/Enemies.rvdata",
+		"/C/Users/James/data/index.html",
+		"/D/workspace/Particle System/out/artifacts/Particle_System_jar/index.html",
+		"/C/Users/James/data/BufferedImage.java",
+		"/C/Users/James/AppData/Local/Temp/7zO99FD.tmp/README.TXT",
+		"/C/Minetest/mods/mods_here.txt",
+		"/D/Downloads/GRID.2_RELOADED/reloaded.nfo",
+		"/C/Users/James/AppData/Local/Temp/7zO4B20.tmp/Tsunami.txt",
+		"/D/Downloads/The Walking Dead Season 3 Complete(Ep 1-8) HDTV x264 [VectoR]/Read Me-Important.txt",
+		"/C/Users/James/Desktop/ProtectThePresident/gamemode/client/net.lua",
+		"/C/Users/James/Desktop/ProtectThePresident/gamemode/server/net.lua",
+		"/C/Users/James/Desktop/ProtectThePresident/gamemode/cl_init.lua",
+		"/C/Users/James/Desktop/ProtectThePresident/gamemode/init.lua",
+		"/C/Users/James/projects/freeze-tag/gamemode/shared.lua",
+		"/C/Users/James/projects/freeze-tag/gamemode/client.lua",
+		"/C/Users/James/projects/freeze-tag/lua/autorun",
+		"/C/Users/James/Desktop/ProtectThePresident/ProtectThePresident.txt",
+		"/C/Users/James/projects/moonlisp/Tokenizer.lua",
+		"/C/KSP/buildID.txt",
+		"/C/KSP/readme.txt",
+		"/C/Users/James/AppData/Local/Temp/7zO79BF.tmp/PLANET EXPLORERS README A0.53.txt",
+		"/G/99FXAUD3.F9",
+		"/C/Users/James/Documents/Visual Studio 2012/Projects/Winput/Winput/obj/Debug/test.lua",
+		"/C/Users/James/libs/NLua/Run/Debug/test.lua",
+		"/C/Users/James/libs/NLua/autogen.sh",
+		"/C/Users/James/AppData/Local/Temp/7zO39AD.tmp/mcmod.info",
+		"/C/Users/James/data/tf_preview.jpg",
+		"/C/FTB/Ultimate/minecraft/saves/Test World/computer/0/apis/debug",
+		"/C/Users/James/tools/cpp-env/msys/share/doc/gettext/0.18.1.1/examples/hello-clisp/hello.lisp.in",
+		"/C/Users/James/projects/xgui/startup",
+		"/C/Users/James/projects/xgui/apis/include",
+		"/C/Users/James/projects/xgui/apis/import",
+		"/C/FTB/Ultimate/minecraft/config/ComputerCraft.cfg",
+		"/C/FTB/Ultimate/minecraft/saves/Test World/computer/0/apis/require",
+		"/C/Users/James/projects/xgui/Component.lua",
+		"/C/Users/James/projects/xgui/Container.lua",
+		"/C/Users/James/projects/xgui/testbed.lua",
+		"/C/FTB/Ultimate/minecraft/saves/Test World/computer/0/testbed",
+		"/C/Users/James/projects/xgui/require.lua",
+		"/C/FTB/Direwolf20/minecraft/saves/Turtle Testing/computer/1/apis/include",
+		"/C/Users/James/projects/xgui/Frame.lua",
+		"/C/Users/James/projects/xgui/DrawContext.lua",
+		"/C/Users/James/projects/xgui/DrawBuffer.lua",
+		"/C/FTB/Direwolf20/minecraft/saves/Turtle Testing/computer/1/swarm/master/test",
+		"/C/FTB/Direwolf20/minecraft/saves/Turtle Testing/computer/1/swarm/master/Swarm.lua",
+		"/C/FTB/Direwolf20/minecraft/saves/Turtle Testing/computer/1/swarm/master/Hook.lua",
+		"/C/FTB/Direwolf20/minecraft/saves/Turtle Testing/computer/1/swarm/master/NetManager.lua",
+		"/C/FTB/Direwolf20/minecraft/saves/Turtle Testing/computer/1/swarm/master/Turtle.lua",
+		"/C/FTB/Direwolf20/minecraft/saves/Turtle Testing/computer/17/swarm/slave/NetManager.lua",
+		"/C/FTB/Direwolf20/minecraft/saves/Turtle Testing/computer/17/swarm/slave/Swarm.lua",
+		"/C/FTB/Direwolf20/minecraft/saves/Turtle Testing/computer/17/swarm/slave/test",
+		"/C/FTB/Direwolf20/minecraft/saves/Turtle Testing/computer/1/swarm/master/ThreadPool.lua",
+		"/C/FTB/Direwolf20/minecraft/saves/Turtle Testing/computer/17/swarm/slave/ThreadPool.lua",
+		"/C/FTB/Direwolf20/minecraft/saves/Turtle Testing/computer/1/swarm/slave/threadpool.lua",
+		"/C/FTB/Direwolf20/minecraft/saves/Turtle Testing/computer/1/swarm/slave/Swarm.lua",
+		"/C/FTB/Direwolf20/minecraft/saves/Turtle Testing/computer/0/swarm/slave/Swarm.lua",
+		"/C/FTB/Direwolf20/minecraft/saves/Turtle Testing/computer/0/swarm/slave/Navigation.lua",
+		"/C/FTB/Direwolf20/minecraft/saves/Turtle Testing/computer/0/swarm/slave/navtest",
+		"/C/FTB/Direwolf20/minecraft/saves/Turtle Testing/computer/0/swarm/slave/test",
+		"/C/FTB/Direwolf20/minecraft/saves/Turtle Testing/computer/0/swarm/slave/ThreadPool.lua",
+		"/C/FTB/Direwolf20/minecraft/saves/Turtle Testing/computer/0/swarm/slave/NetManager.lua",
+		"/C/FTB/Direwolf20/minecraft/saves/Turtle Testing/computer/1/swarm/master/Task.lua",
+		"/C/FTB/Direwolf20/minecraft/saves/Turtle Testing/computer/1/swarm/master/Util.lua",
+		"/C/FTB/Direwolf20/minecraft/saves/Turtle Testing/computer/0/swarm/slave/Util.lua",
+		"/C/FTB/Direwolf20/minecraft/saves/Turtle Testing/computer/17/swarm/slave/navtest",
+		"/C/FTB/Direwolf20/minecraft/saves/Turtle Testing/computer/17/swarm/slave/Navigation.lua",
+		"/C/FTB/Direwolf20/minecraft/saves/Turtle Testing/computer/2/swarm/slave/Util.lua",
+		"/C/FTB/Direwolf20/minecraft/saves/Turtle Testing/computer/17/swarm/slave/Util.lua",
+		"/C/FTB/Direwolf20/minecraft/saves/Turtle Testing/computer/1/swarm/master/tt",
+		"/C/FTB/Direwolf20/minecraft/config/ComputerCraft.cfg",
+		"/C/Users/James/Desktop/t.txt",
+		"/C/FTB/Direwolf20/minecraft/saves/Turtle Testing/computer/1/swarm/master/tp",
+		"/C/Users/James/Desktop/fix/out.txt",
+		"/C/Users/James/Desktop/fix/fix.txt",
+		"/C/Users/James/tools/fluidic-0.1/Resources/Illuminate.cg",
+		"/C/Users/James/games/df_34_11_win/raw/graphics/graphics_example.txt",
+		"/C/Users/James/Desktop/ptp.bak/gamemode/client/vgui/help_frame.lua",
+		"/C/Users/James/Desktop/ptp.bak/gamemode/client/vgui/buy_frame.lua",
+		"/C/Users/James/Desktop/ptp.bak/gamemode/server/player.lua",
+		"/C/Users/James/Desktop/ptp.bak/gamemode/client/client.lua",
+		"/C/Users/James/Desktop/ptp.bak/gamemode/client/game.lua",
+		"/C/Users/James/Desktop/ptp.bak/gamemode/client/ui.lua",
+		"/C/Users/James/Desktop/ProtectThePresident/gamemode/client/vgui/buy_frame.lua",
+		"/C/Users/James/Desktop/ProtectThePresident/gamemode/client/game.lua",
+		"/C/Users/James/Desktop/ProtectThePresident/gamemode/client/ui.lua",
+		"/C/Users/James/Desktop/ProtectThePresident/gamemode/client/player.lua",
+		"/C/Users/James/Desktop/ProtectThePresident/gamemode/client/client.lua",
+		"/C/Users/James/Desktop/pass.txt",
+		"/C/Users/James/Desktop/test/include/BigInteger.hh",
+		"/C/Users/James/Desktop/test/bigint/run-testsuite"
+	],
+	"find":
+	{
+		"height": 32.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+			"src/",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"print",
+			"getByPackage",
+			"Helper",
+			" ...)",
+			"tostring",
+			"stand",
+			"if",
+			"]\n",
+			"setRGB\\(",
+			"=\"\">",
+			"HUD\\.",
+			"()\n",
+			"\n    ",
+			"Globals::",
+			"=",
+			" - ",
+			"}\n",
+			"Welcome to",
+			"Welcome to the best place to play games and have fun with your friends online. Get started now by playing a game. It's free!",
+			"cout",
+			"error",
+			"cout",
+			"signedShort",
+			"error",
+			"entityMetaData",
+			"item",
+			"stringSized16",
+			"shortSized",
+			"shortSizedDoubled",
+			"jump",
+			" \\)",
+			"\\}",
+			"}",
+			"opPairs",
+			"\"\"",
+			" }",
+			"())",
+			"add\\(",
+			"SpaceRP",
+			"list",
+			"SetSize",
+			"vgui.Create(\"ClassPanel\", self)",
+			"drag",
+			"next_tokens",
+			"zcpuc_tokens",
+			"zcpuc_ast_program",
+			"free\\(",
+			"realloc",
+			"malloc",
+			"memalloc",
+			"port",
+			"Port",
+			"read_ready_port",
+			"write_ready_port",
+			"data_port",
+			"bytes",
+			"nigga",
+			"ready_port",
+			"write_ready_port",
+			"ready_port",
+			"send_port",
+			"HelpFrame",
+			"ptp_weapon",
+			"Player",
+			"GetTeam",
+			"GetC",
+			"conf",
+			"GetTeam",
+			"GetSpectateType",
+			"spectateType",
+			"SetSpectateType",
+			"screenH",
+			"screenW",
+			"IncludeClientFile",
+			"www.",
+			"http://",
+			"www.",
+			"log_errors = On",
+			"include_path",
+			"mute",
+			":on",
+			"\\.on",
+			"getPlayerBannedDatas",
+			"ivt-player-mute",
+			"sql",
+			"print",
+			"3",
+			"Int",
+			"UInt",
+			"Send",
+			"con",
+			"env",
+			"			;",
+			"remove",
+			"login",
+			"typedef([^S])*OCKET",
+			"typedef[^S]*OCKET",
+			"open"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": true,
+		"replace_history":
+		[
+			"{...}[1]"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": false
+	},
+	"groups":
+	[
+		{
+			"selected": 1,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/apis/see",
+					"settings":
+					{
+						"buffer_size": 7423,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6488,
+								6489
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Lua/Lua.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 3509.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/programs/see",
+					"settings":
+					{
+						"buffer_size": 1810,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1346,
+								1346
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Lua/Lua.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/lib/see/base/String.lua",
+					"settings":
+					{
+						"buffer_size": 1245,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								533,
+								533
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Lua/Lua.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/lib/see/base/Array.lua",
+					"settings":
+					{
+						"buffer_size": 2053,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1438,
+								1438
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Lua/Lua.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 450.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/lib/see/base/Object.lua",
+					"settings":
+					{
+						"buffer_size": 592,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								592,
+								592
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Lua/Lua.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/lib/see/concurrent/Thread.lua",
+					"settings":
+					{
+						"buffer_size": 1056,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1056,
+								1056
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Lua/Lua.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/lib/see/base/System.lua",
+					"settings":
+					{
+						"buffer_size": 553,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								430,
+								430
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Lua/Lua.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/test/see/example/Test.lua",
+					"settings":
+					{
+						"buffer_size": 174,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								168,
+								168
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Lua/Lua.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/test/see/example/Helper.lua",
+					"settings":
+					{
+						"buffer_size": 124,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								124,
+								124
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Lua/Lua.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "/C/Users/James/AppData/Roaming/.ccdesk/computer/0/see/test/see/example/WellHelper.lua",
+					"settings":
+					{
+						"buffer_size": 254,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								169,
+								169
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Lua/Lua.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 32.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 100.0
+	},
+	"replace":
+	{
+		"height": 60.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+			[
+				"con",
+				"ptp-config.cfg"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 290.0,
+	"status_bar_visible": true
+}
