@@ -1,1 +1,1 @@
-shell.run("/see/programs/see", "-r", "/see/test/", "Test")
+shell.run("/see/programs/see", "-r", "/see/test/", "see.example.Test", "Yevano")

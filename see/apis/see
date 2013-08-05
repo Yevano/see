@@ -109,15 +109,6 @@ function getByPackage(t, package, del)
 end
 
 --[[
-	Check if a package name is valid.
-	@param string:package Package name to validate.
-	@return boolean True if valid, false if invalid.
-]]
-function isPackageValid(package)
-	-- TODO
-end
-
---[[
 	Get package end.
 	@param string:package The package to compute the name for.
 	@return string:name Name of the package, or nil if invalid or empty package.
@@ -175,8 +166,8 @@ function SeeVM:loadClassFromAny(name)
 
 	-- Load from custom class paths
 	for _, classPath in pairs(self.classPaths) do
-		class = self:loadClassFromFile(fs.combine(classPath, name:gsub("%.", "/") .. ".lua"), name)
-		if class then break end
+		class, err = self:loadClassFromFile(fs.combine(classPath, name:gsub("%.", "/") .. ".lua"), name)
+		if class then return class end
 	end
 
 	if not class then
