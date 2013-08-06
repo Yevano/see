@@ -13,26 +13,39 @@
 ]]
 function String.__cast(value)
 	local type = typeof(value)
-	if typeof(type) == "table" then
+	if typeof(type) == "table" and value.__type then
 		return value:toString()
 	end
-	return String.new(tostring(value))
+	
+	local str = tostring(value)
+	local ret = String.new()
+
+	for i = 1, #str do
+		ret.charArray[i] = str:sub(i, i):byte()
+	end
+
+	return ret
 end
 
 --[[
 	Constructs a new String which copies the given string.
-	@param string:str The string to be copied.
+	@param strings:str... The strings to be copied.
 ]]
-function String:init(str)
+function String:init(...)
+	local args = {...}
 	self.charArray = Array.new()
-	if not str then return end
-	if typeof(str) == "string" then
-		for i = 1, #str do
-			self.charArray[i] = str:sub(i, i):byte()
-		end
-	elseif typeof(str) == String then
-		for i = 1, str:length() do
-			self.charArray[i] = str.charArray[i]
+
+	for i = 1, #args do
+		local str = cast(args[i], String)
+		if not str then return end
+		if typeof(str) == "string" then
+			for i = 1, #str do
+				self.charArray:add(str:sub(i, i):byte())
+			end
+		elseif typeof(str) == String then
+			for i = 1, str:length() do
+				self.charArray:add(str.charArray[i])
+			end
 		end
 	end
 end
@@ -57,11 +70,13 @@ function String:length()
 	return self.charArray.length
 end
 
-function String:concat(str)
-	local ret = String.new(self)
-	local len = self:length()
-	for i = 1, str:length() do
-		ret.charArray[i + len] = str.charArray[i]
+function String.concat(a, b)
+	a = cast(a, String)
+	b = cast(b, String)
+	local ret = String.new(a)
+	local len = a:length()
+	for i = 1, b:length() do
+		ret.charArray[i + len] = b.charArray[i]
 	end
 	return ret
 end

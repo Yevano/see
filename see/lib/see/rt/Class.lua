@@ -1,3 +1,7 @@
 function Class:getName()
-	return self.__name
+	return String.new(self.__name)
+end
+
+function Class:toString()
+	return self:getName()
 end
