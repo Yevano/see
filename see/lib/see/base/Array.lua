@@ -32,6 +32,7 @@ end
 function Array.__meta:__newindex(index, value)
 	if typeof(index) == "number" then
 		self:set(index, value)
+		return
 	end
 	rawset(self, index, value)
 end
@@ -43,9 +44,6 @@ end
 	@return any The value of the given index.
 ]]
 function Array:get(index)
-	if typeof(index) ~= "number" then
-		return rawget(self, index)
-	end
 	if index < 0 then
 		index = self.length + index + 1
 	end
@@ -61,15 +59,13 @@ end
 	@param any:value The value to set the given index to.
 ]]
 function Array:set(index, value)
-	if typeof(index) ~= "number" then
-		rawset(t, index, value)
-		return
-	end
 	if index < 0 then
 		index = self.length + index + 1
 	end
 	if index <= self.length + 1 and index > 0 then
-		self.length = self.length + 1
+		if index == self.length + 1 then
+			self.length = self.length + 1
+		end
 		self.luaArray[index] = value
 	end
 end

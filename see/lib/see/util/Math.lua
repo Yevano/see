@@ -1,8 +1,10 @@
 --@native math
 --@import see.util.ArgumentUtils
 
-Math.HUGE = math.huge
-Math.PI = math.pi
+function Math.__static()
+	Math.HUGE = math.huge
+	Math.PI = math.pi
+end
 
 function Math.abs(x)
 	ArgumentUtils.check(1, x, "number")

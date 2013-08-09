@@ -288,18 +288,6 @@ end
 	@param string:name The name of this class, including the full package.
 ]]
 function SeeVM:loadClass(def, annotations, name)
-	local abool = true
-	if self.base.Object then
-		for _, annotation in pairs(annotations) do
-			if annotation:sub(1, 7) == "extends" then
-				abool = false
-				break
-			end
-		end
-	else
-		abool = false
-	end
-
 	local className = getPackageName(name)
 
 	if self.classes[name] then
@@ -327,11 +315,6 @@ function SeeVM:loadClass(def, annotations, name)
 		return self
 	end
 
-	-- Extend Object by default.
-	if abool then
-		setmetatable(class, self.base.Object)
-	end
-
 	-- Import base classes.
 	for k, class in pairs(self.base) do
 		env[k] = class
@@ -340,11 +323,33 @@ function SeeVM:loadClass(def, annotations, name)
 	-- Setup class environment.
 	env[className] = class
 	setfenv(def, env)
+	def()
+	self.classes[name] = class
+
 	for _, annotation in pairs(annotations) do
 		self:executeAnnotation(env, class, annotation)
 	end
-	def()
-	self.classes[name] = class
+
+	local abool = true
+	if self.base.Object then
+		for _, annotation in pairs(annotations) do
+			if annotation:sub(1, 7) == "extends" then
+				abool = false
+				break
+			end
+		end
+	else
+		abool = false
+	end
+
+	-- Extend Object by default.
+	if abool then
+		setmetatable(class, self.base.Object)
+	end
+
+	if class.__static then
+		class.__static()
+	end
 
 	return class
 end

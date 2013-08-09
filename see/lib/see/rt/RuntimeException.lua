@@ -1,3 +1,4 @@
+--@import see.base.Exception
 --@extends see.base.Exception
 
 --[[

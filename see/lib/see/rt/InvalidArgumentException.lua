@@ -1,4 +1,5 @@
 --@import see.rt.RuntimeException
+--@import see.base.String
 --@extends see.rt.RuntimeException
 
 function InvalidArgumentException:init(n, expected, got)

@@ -1,7 +1,11 @@
 --@native string
 --@native tostring
+--@native rawget
+--@native rawset
+
 --@import see.base.Array
 --@import see.base.System
+--@import see.util.ArgumentUtils
 
 --[[
 	A mutable, Array-backed string. Faster and more memory efficient than native strings.
@@ -16,7 +20,7 @@ function String.__cast(value)
 	if typeof(type) == "table" and value.__type then
 		return value:toString()
 	end
-	
+
 	local str = tostring(value)
 	local ret = String.new()
 
@@ -50,6 +54,26 @@ function String:init(...)
 	end
 end
 
+local oldindex = String.__meta.__index
+
+function String.__meta:__index(index)
+	if typeof(index) == "number" then
+		return self.charArray[index]
+	end
+	return oldindex[index]
+end
+
+function String.__meta:__newindex(index, value)
+	if typeof(index) == "number" then
+		if typeof(value) == "string" then
+			value = string.byte(value)
+		end
+		self.charArray[index] = value
+		return
+	end
+	rawset(self, index, value)
+end
+
 --[[
 	Gets a Lua string from this String.
 	@return string The Lua string.
@@ -57,7 +81,7 @@ end
 function String:lstr()
 	local str = ""
 	for i = 1, self.charArray.length do
-		str = str .. string.char(self.charArray:get(i))
+		str = str .. string.char(self.charArray[i])
 	end
 	return str
 end
@@ -94,7 +118,7 @@ end
 function String:sub(a, b)
 	if not b then b = self:length() end
 
-	-- TODO
+
 end
 
 function String:toString()
