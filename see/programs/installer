@@ -1,0 +1,106 @@
+local REPO_URL = "https://raw.github.com/Yevano/see/master/see/"
+local SUPPORTS_COLOR = term.isColor()
+
+local MAKE_PATHS = {
+	"apis/",
+	"lib/",
+	"lib/see/",
+	"lib/see/base/",
+	"lib/see/concurrent/",
+	"lib/see/rt/",
+	"lib/see/util/",
+	"programs/"
+}
+
+local DL_PATHS = {
+	"apis/see",
+	"lib/see/base/Array.lua",
+	"lib/see/base/Exception.lua",
+	"lib/see/base/Object.lua",
+	"lib/see/base/String.lua",
+	"lib/see/base/System.lua",
+	"lib/see/concurrent/Thread.lua",
+	"lib/see/rt/Class.lua",
+	"lib/see/rt/InvalidArgumentException.lua",
+	"lib/see/rt/RuntimeException.lua",
+	"lib/see/util/ArgumentUtils.lua",
+	"lib/see/util/Math.lua",
+	"programs/see"
+}
+
+local function fail(err)
+	if SUPPORTS_COLOR then
+		term.setTextColor(colors.red)
+	end
+
+	print(err)
+
+	if SUPPORTS_COLOR then
+		term.setTextColor(colors.white)
+	end
+
+	while true do
+		write("Retry installation? (y/n): ")
+		local response = read()
+		if string.lower(response):gsub("%s", "") == "y" then
+			print("")
+			return true
+		elseif string.lower(response):gsub("%s", "") == "n" then
+			return false
+		end
+		print("Invalid input.")
+	end
+end
+
+while true do
+	while true do
+		local downloaded = 0
+
+		write("SEE Installer\nChoose an install path: ")
+		local installPath = shell.resolve(read())
+
+		local suc, err = pcall(fs.makeDir, installPath)
+		if not suc then
+			if fail("Could not create installation directory.") then break end
+			return
+		end
+
+		print("Setting up directory structure.")
+
+		for i = 1, #MAKE_PATHS do
+			fs.makeDir(fs.combine(installPath, MAKE_PATHS[i]))
+		end
+
+		print("Downloading SEE files from repository.")
+
+		local url, httpFail
+		for i = 1, #DL_PATHS do
+			url = REPO_URL .. DL_PATHS[i]
+			print("Downloading " .. DL_PATHS[i])
+			local readHandle = http.get(url)
+			if readHandle.getResponseCode() ~= 200 then
+				httpFail = true
+				break
+			end
+
+			local _, relativePathStart = url:find(REPO_URL, 1, true)
+			local writePath = fs.combine(installPath, url:sub(relativePathStart + 1))
+
+			local writeHandle = fs.open(writePath, "w")
+			writeHandle.write(readHandle.readAll())
+
+			readHandle.close()
+			writeHandle.close()
+		end
+
+		if httpFail then
+			if fail("File download failed for url " .. url .. ".") then
+				break
+			end
+		else
+			print("SEE was installed successfully.")
+		end
+
+		return
+	end
+end

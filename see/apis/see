@@ -115,9 +115,10 @@ SeeVM.__index = SeeVM
 --[[
 	Creates a new SeeVM
 ]]
-function SeeVM.new(natives)
+function SeeVM.new(natives, seePath)
 	local self = { }
 	setmetatable(self, SeeVM)
+	self.seePath = seePath
 
 	self.standardGlobals = { }
 	for k, v in pairs(StandardGlobals) do
@@ -207,7 +208,8 @@ function SeeVM:loadClassFromAny(name)
 	if class then return class end
 
 	-- Load from the standard library.
-	class, err = self:loadClassFromFile(fs.combine("/see/lib/", name:gsub("%.", "/") .. ".lua"), name)
+	local p = name:gsub("%.", "/")
+	class, err = self:loadClassFromFile(fs.combine(fs.combine(self.seePath, "/lib/"), p) .. ".lua", name)
 
 	if class then return class end
 
@@ -309,8 +311,8 @@ function SeeVM:loadClass(def, annotations, name)
 	function class.new(...)
 		if not class.init then error("Could not instantiate class " .. name .. ". No init method.") end
 		local self = { }
-		self.__type = class
 		setmetatable(self, class.__meta)
+		self.__type = class
 		self:init(...)
 		return self
 	end

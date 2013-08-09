@@ -20,7 +20,7 @@ local _, err = pcall(function(...)
 		MainClass.main(args)
 	end
 
-	local USAGE = "Usage: see <-r <classPath> <mainClass>>|<-p <dir>>|<-u <archive>>|<-help>"
+	local USAGE = "Usage: see <-r <seePath> <classPath> <mainClass> <args>>|<-p <dir>>|<-u <archive>>|<-help>"
 	local args = {...}
 	local op = args[1]
 
@@ -30,12 +30,12 @@ local _, err = pcall(function(...)
 
 	if op == "-r" then
 		--Run option.
-		vm = see.SeeVM.new(natives)
-		classPath = shell.resolve(args[2])
+		vm = see.SeeVM.new(natives, shell.resolve(args[2]))
+		classPath = shell.resolve(args[3])
 		table.insert(vm.classPaths, classPath)
-		local mainClassName = args[3]
+		local mainClassName = args[4]
 		local programArgs = { }
-		for i = 4, #args do
+		for i = 5, #args do
 			table.insert(programArgs, args[i])
 		end
 
