@@ -1,3 +1,61 @@
+function traceback(err, level, b)
+	local errors = { }
+  	local ok, err
+  	local j = level or 2
+  	while j < 256 do
+    	j = j + 1
+    	ok, err = pcall(_G.error, '', j)
+    	local name = err:match("^[^:]+")
+    	if not b and name == "bios" or name == "see" then break end
+    	table.insert(errors, err)
+  	end
+
+  	return errors
+end
+
+function formatTraceback(err, errors, level)
+	if not err then err = "" end
+	local f = "Error: " .. err
+	local j = 1
+	for _, err in pairs(errors) do
+		if j == level then
+			f = f .. "\n... and " .. (#errors - level) .. " more."
+			break
+		end
+
+		local ls = err:find(":")
+		if ls then ls = ls + 1 end
+		local le = err:find(":", ls)
+		if le then le = le - 1 end
+		local line = ls and le and err:sub(ls, le)
+		local location = ls and err:sub(1, ls - 2) or err
+		f = f .. "\n@ line " .. (le and line or "?") .. " in " .. location
+		j = j + 1
+	end
+	return f
+end
+
+local function error(err, level)
+	if term.isColor() then
+		term.setTextColor(colors.red)
+	end
+	print(formatTraceback(err, traceback(err, level, b), 10))
+	if term.isColor() then
+		term.setTextColor(colors.white)
+	end
+	_G.error()
+end
+
+function errorHandler(err)
+	if term.isColor() then
+		term.setTextColor(colors.red)
+	end
+	print(see.formatTraceback(err, see.traceback(err, 3, true), 10))
+	if term.isColor() then
+		term.setTextColor(colors.white)
+	end
+end
+
 local function copy(t)
 	local r = { }
 	for k, v in pairs(t) do
@@ -85,7 +143,7 @@ function StandardGlobals.throw(vm, exception)
 	else
 		vm.lastException = vm:loadClassFromAny("see.rt.RuntimeException").new("Invalid argument to throw.")
 	end
-	error()
+	error("Uncaught exception " .. exception.__type.__name .. ': "' .. exception.message:lstr() .. '"', 4, true)
 end
 
 --[[
@@ -129,6 +187,7 @@ function SeeVM.new(natives, seePath)
 	self.rt = { }
 	self.classes = { }
 	self.natives = natives
+	self.natives.error = error
 	self.classPaths = { }
 	self.base.Object = self:loadClassFromAny("see.base.Object")
 	self.rt = self:loadClassFromAny("see.rt.Class")
@@ -210,13 +269,18 @@ function SeeVM:loadClassFromAny(name)
 	-- Load from the standard library.
 	local p = name:gsub("%.", "/")
 	class, err = self:loadClassFromFile(fs.combine(fs.combine(self.seePath, "/lib/"), p) .. ".lua", name)
+	local lerr = err
 
 	if class then return class end
 
 	-- Load from custom class paths
 	for _, classPath in pairs(self.classPaths) do
-		class = self:loadClassFromFile(fs.combine(classPath, name:gsub("%.", "/") .. ".lua"), name)
+		class, err = self:loadClassFromFile(fs.combine(classPath, name:gsub("%.", "/") .. ".lua"), name)
 		if class then return class end
+	end
+
+	if not lerr:find("Could not read file.") then
+		err = lerr
 	end
 
 	if not class then

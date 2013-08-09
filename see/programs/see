@@ -17,10 +17,10 @@ local _, err = pcall(function(...)
 		local MainClass = vm:loadClassFromAny(mainClassName)
 		if not MainClass then error("Main class not found! ") end
 		if not MainClass.main then error("Main method not found!") end
-		MainClass.main(args)
+		xpcall(function() MainClass.main(args) end, see.errorHandler)
 	end
 
-	local USAGE = "Usage: see <-r <seePath> <classPath> <mainClass> <args>>|<-p <dir>>|<-u <archive>>|<-help>"
+	local USAGE = "Usage: see <-r <seePath> <classPath> <mainClass> <args>>|<-help>"
 	local args = {...}
 	local op = args[1]
 
@@ -44,12 +44,6 @@ local _, err = pcall(function(...)
 		else
 			-- TODO: Add archive reading.
 		end
-	elseif op == "-p" then
-		-- Pack option.
-		-- TODO
-	elseif op == "-u" then
-		-- Unpack option.
-		-- TODO
 	elseif op == "-help" then
 		-- Help option.
 		print(USAGE)

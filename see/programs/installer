@@ -21,6 +21,7 @@ local DL_PATHS = {
 	"lib/see/base/System.lua",
 	"lib/see/concurrent/Thread.lua",
 	"lib/see/rt/Class.lua",
+	"lib/see/rt/IndexOutOfBoundsException.lua",
 	"lib/see/rt/InvalidArgumentException.lua",
 	"lib/see/rt/RuntimeException.lua",
 	"lib/see/util/ArgumentUtils.lua",

@@ -14,6 +14,7 @@
 --[[
 	Casts a value to a String.
 	@param any:value The value to be casted.
+	@return see.base.String The casted value.
 ]]
 function String.__cast(value)
 	local type = typeof(value)
@@ -29,6 +30,15 @@ function String.__cast(value)
 	end
 
 	return ret
+end
+
+--[[
+	Converts a byte to a single-char String.
+	@param number:byte The byte to convert.
+	@return see.base.String A string representation of the given byte.
+]]
+function String.char(byte)
+	return String.new(string.char(byte))
 end
 
 --[[
@@ -48,7 +58,7 @@ function String:init(...)
 			end
 		elseif typeof(str) == String then
 			for i = 1, str:length() do
-				self.charArray:add(str.charArray[i])
+				self.charArray:add(str[i])
 			end
 		end
 	end
@@ -81,7 +91,7 @@ end
 function String:lstr()
 	local str = ""
 	for i = 1, self.charArray.length do
-		str = str .. string.char(self.charArray[i])
+		str = str .. string.char(self[i])
 	end
 	return str
 end
@@ -100,7 +110,7 @@ function String.concat(a, b)
 	local ret = String.new(a)
 	local len = a:length()
 	for i = 1, b:length() do
-		ret.charArray[i + len] = b.charArray[i]
+		ret[i + len] = b[i]
 	end
 	return ret
 end
@@ -117,8 +127,68 @@ end
 ]]
 function String:sub(a, b)
 	if not b then b = self:length() end
+	ArgumentUtils.check(1, a, "number")
+	ArgumentUtils.check(2, b, "number")
 
+	if a > b then
+		local c = b
+		b = a
+		a = c
+	end
 
+	local substring = String.new()
+	for i = a, b do
+		substring[i - a + 1] = self[i]
+	end
+	return substring
+end
+
+--[[
+	Finds a given substring in this string.
+	@param see.base.String:str The string to search for.
+	@param number:init The index to start searching from. Defaults to 1.
+	@return number The index that the substring occurs.
+]]
+function String:find(str, init)
+	local t = typeof(str)
+	str = cast(str, String)
+	if not init then init = 1 end
+	ArgumentUtils.check(2, init, "number")
+
+	local j = 1
+	for i = init, self:length() do
+		if self[i] == str[j] then
+			if j == str:length() then
+				return i - j + 1
+			end
+			j = j + 1
+		else
+			j = 1
+		end
+	end
+end
+
+-- TODO: Reimplement as non-native solution.
+--[[
+	Formats this String using the native string.format.
+	@param native:values... The values to pass to string.format.
+	@return see.base.String The formatted string.
+]]
+function String:format(...)
+	return String.new(self:lstr():format(...))
+end
+
+--[[
+	Replaces all instances of str with rep.
+	@param see.base.String:str The string to be replaced.
+	@param see.base.String:rep The string to replace with.
+]]
+function String:replace(str, rep)
+	local found = self:find(str)
+	while found do
+
+		found = self:find(str)
+	end
 end
 
 function String:toString()

@@ -4,7 +4,7 @@
 
 function InvalidArgumentException:init(n, expected, got)
 	if not isprimitive(expected) then
-		expected = exepected:getName()
+		expected = expected.__name
 	end
 	if not isprimitive(got) then
 		got = got:getName()

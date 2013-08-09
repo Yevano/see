@@ -1,7 +1,11 @@
 --@native table.remove
+--@native table.insert
 --@native rawget
 --@native rawset
 --@native tostring
+
+--@import see.rt.IndexOutOfBoundsException
+--@import see.base.System
 
 --[[
 	A table-backed, infinite array.
@@ -47,9 +51,10 @@ function Array:get(index)
 	if index < 0 then
 		index = self.length + index + 1
 	end
-	if index <= self.length + 1 and index > 0 then
+	if index <= self.length and index > 0 then
 		return self.luaArray[index]
 	end
+	throw(IndexOutOfBoundsException.new(index))
 end
 
 --[[
@@ -67,7 +72,9 @@ function Array:set(index, value)
 			self.length = self.length + 1
 		end
 		self.luaArray[index] = value
+		return
 	end
+	throw(IndexOutOfBoundsException.new(index))
 end
 
 --[[
@@ -88,7 +95,23 @@ function Array:remove(index)
 	if index < 0 then
 		index = self.length + index + 1
 	end
+	if index <= self.length and index > 0 then
+		return table.remove(self.luaArray, index)
+	end
+	throw(IndexOutOfBoundsException.new(index))
+end
+
+--[[
+	Inserts a value into this Array at the given index, sliding elements forward if needed.
+	@param number:index The index to insert at.
+	@param any:value The value to insert.
+]]
+function Array:insert(index, value)
+	if index < 0 then
+		index = self.length + index + 1
+	end
 	if index <= self.length + 1 and index > 0 then
 		return table.remove(self.luaArray, index)
 	end
+	throw(IndexOutOfBoundsException.new(index))
 end
