@@ -1,57 +1,57 @@
 local _, err = pcall(function(...)
-	local function copy(t)
-		local r = { }
-		for k, v in pairs(t) do
-			r[k] = v
-		end
-		return r
-	end
+    local function copy(t)
+        local r = { }
+        for k, v in pairs(t) do
+            r[k] = v
+        end
+        return r
+    end
 
-	local natives = copy(_G)
-	local vm
-	local classPath
+    local natives = copy(_G)
+    local vm
+    local classPath
 
-	os.loadAPI("/see/apis/see")
+    os.loadAPI("/see/apis/see")
 
-	local function runFromPath(classPath, mainClassName, args)
-		local MainClass = vm:loadClassFromAny(mainClassName)
-		if not MainClass then error("Main class not found! ") end
-		if not MainClass.main then error("Main method not found!") end
-		xpcall(function() MainClass.main(args) end, see.errorHandler)
-	end
+    local function runFromPath(classPath, mainClassName, args)
+        local MainClass = vm:loadClassFromAny(mainClassName)
+        if not MainClass then error("Main class not found! ") end
+        if not MainClass.main then error("Main method not found!") end
+        xpcall(function() MainClass.main(args) end, see.errorHandler)
+    end
 
-	local USAGE = "Usage: see <-r <seePath> <classPath> <mainClass> <args>>|<-help>"
-	local args = {...}
-	local op = args[1]
+    local USAGE = "Usage: see <-r <seePath> <classPath> <mainClass> <args>>|<-help>"
+    local args = {...}
+    local op = args[1]
 
-	if not op then
-		print(USAGE)
-	end
+    if not op then
+        print(USAGE)
+    end
 
-	if op == "-r" then
-		--Run option.
-		vm = see.SeeVM.new(natives, shell.resolve(args[2]))
-		classPath = shell.resolve(args[3])
-		table.insert(vm.classPaths, classPath)
-		local mainClassName = args[4]
-		local programArgs = { }
-		for i = 5, #args do
-			table.insert(programArgs, args[i])
-		end
+    if op == "-r" then
+        --Run option.
+        vm = see.SeeVM.new(natives, shell.resolve(args[2]))
+        classPath = shell.resolve(args[3])
+        table.insert(vm.classPaths, classPath)
+        local mainClassName = args[4]
+        local programArgs = { }
+        for i = 5, #args do
+            table.insert(programArgs, args[i])
+        end
 
-		if fs.isDir(classPath) then
-			runFromPath(classPath, mainClassName, programArgs)
-		else
-			-- TODO: Add archive reading.
-		end
-	elseif op == "-help" then
-		-- Help option.
-		print(USAGE)
-	end
+        if fs.isDir(classPath) then
+            runFromPath(classPath, mainClassName, programArgs)
+        else
+            -- TODO: Add archive reading.
+        end
+    elseif op == "-help" then
+        -- Help option.
+        print(USAGE)
+    end
 end, ...)
 
 os.unloadAPI("/see/apis/see")
 
 if err then
-	error(err)
+    error(err)
 end

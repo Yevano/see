@@ -2,13 +2,17 @@
 --@import see.base.String
 --@extends see.rt.RuntimeException
 
-function InvalidArgumentException:init(n, expected, got)
-	if not isprimitive(expected) then
-		expected = expected.__name
-	end
-	if not isprimitive(got) then
-		got = got:getName()
-	end
+--[[
+    Describes an exception which occurs while processing arguments.
+]]
 
-	RuntimeException.init(self, String.new("Invalid argument #", n, ". Expected ", expected, ", got ", got, "."))
+function InvalidArgumentException:init(n, expected, got)
+    if not isprimitive(expected) then
+        expected = expected.__name
+    end
+    if not isprimitive(got) then
+        got = got:getName()
+    end
+
+    RuntimeException.init(self, String.new("Invalid argument #", n, ". Expected ", expected, ", got ", got, "."))
 end

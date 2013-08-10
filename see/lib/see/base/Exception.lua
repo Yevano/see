@@ -2,14 +2,18 @@
 --@import see.base.System
 
 --[[
-	Constructs a new Exception.
-	@param string:message The error message.
+    Describes any error that occurs.
+]]
+
+--[[
+    Constructs a new Exception.
+    @param string:message The error message.
 ]]
 function Exception:init(message)
-	message = cast(message, String)
-	self.message = message
+    message = cast(message, String)
+    self.message = message
 end
 
 function Exception:toString()
-	return "[" .. self:getClass():getName() .. "]" .. self.message
+    return "[" .. self:getClass():getName() .. "]" .. self.message
 end

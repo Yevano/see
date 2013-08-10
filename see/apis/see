@@ -1,421 +1,421 @@
 function traceback(err, level, b)
-	local errors = { }
-  	local ok, err
-  	local j = level or 2
-  	while j < 256 do
-    	j = j + 1
-    	ok, err = pcall(_G.error, '', j)
-    	local name = err:match("^[^:]+")
-    	if not b and name == "bios" or name == "see" then break end
-    	table.insert(errors, err)
-  	end
+    local errors = { }
+    local ok, err
+    local j = level or 2
+    while j < 256 do
+        j = j + 1
+        ok, err = pcall(_G.error, '', j)
+        local name = err:match("^[^:]+")
+        if not b and name == "bios" or name == "see" then break end
+        table.insert(errors, err)
+    end
 
-  	return errors
+    return errors
 end
 
 function formatTraceback(err, errors, level)
-	if not err then err = "" end
-	local f = "Error: " .. err
-	local j = 1
-	for _, err in pairs(errors) do
-		if j == level then
-			f = f .. "\n... and " .. (#errors - level) .. " more."
-			break
-		end
+    if not err then err = "" end
+    local f = "Error: " .. err
+    local j = 1
+    for _, err in pairs(errors) do
+        if j == level then
+            f = f .. "\n... and " .. (#errors - level) .. " more."
+            break
+        end
 
-		local ls = err:find(":")
-		if ls then ls = ls + 1 end
-		local le = err:find(":", ls)
-		if le then le = le - 1 end
-		local line = ls and le and err:sub(ls, le)
-		local location = ls and err:sub(1, ls - 2) or err
-		f = f .. "\n@ line " .. (le and line or "?") .. " in " .. location
-		j = j + 1
-	end
-	return f
+        local ls = err:find(":")
+        if ls then ls = ls + 1 end
+        local le = err:find(":", ls)
+        if le then le = le - 1 end
+        local line = ls and le and err:sub(ls, le)
+        local location = ls and err:sub(1, ls - 2) or err
+        f = f .. "\n@ line " .. (le and line or "?") .. " in " .. location
+        j = j + 1
+    end
+    return f
 end
 
 local function error(err, level)
-	if term.isColor() then
-		term.setTextColor(colors.red)
-	end
-	print(formatTraceback(err, traceback(err, level, b), 10))
-	if term.isColor() then
-		term.setTextColor(colors.white)
-	end
-	_G.error()
+    if term.isColor() then
+        term.setTextColor(colors.red)
+    end
+    print(formatTraceback(err, traceback(err, level, b), 10))
+    if term.isColor() then
+        term.setTextColor(colors.white)
+    end
+    _G.error()
 end
 
 function errorHandler(err)
-	if term.isColor() then
-		term.setTextColor(colors.red)
-	end
-	print(see.formatTraceback(err, see.traceback(err, 3, true), 10))
-	if term.isColor() then
-		term.setTextColor(colors.white)
-	end
+    if term.isColor() then
+        term.setTextColor(colors.red)
+    end
+    print(see.formatTraceback(err, see.traceback(err, 3, true), 10))
+    if term.isColor() then
+        term.setTextColor(colors.white)
+    end
 end
 
 local function copy(t)
-	local r = { }
-	for k, v in pairs(t) do
-		r[k] = v
-	end
-	return r
+    local r = { }
+    for k, v in pairs(t) do
+        r[k] = v
+    end
+    return r
 end
 
 StandardGlobals = { }
 
 --[[
-	Creates a new anonymous class.
-	@param SeeVM:vm The VM to run this function for.
-	@param function:def The function used to define this class.
-	@param table:super The super class for this class. If nil, this class extends see.lang.Object.
+    Creates a new anonymous class.
+    @param SeeVM:vm The VM to run this function for.
+    @param function:def The function used to define this class.
+    @param table:super The super class for this class. If nil, this class extends see.lang.Object.
 ]]
 function StandardGlobals.class(vm, def)
-	-- TODO
+    -- TODO
 end
 
 --[[
-	Gets the type of a given value.
-	@param SeeVM:vm The VM to run this function for.
-	@param value:any The value to get the type of.
-	@return string|table The type identifier if value if primitive, or the class of value if value is an object.
+    Gets the type of a given value.
+    @param SeeVM:vm The VM to run this function for.
+    @param value:any The value to get the type of.
+    @return string|table The type identifier if value if primitive, or the class of value if value is an object.
 ]]
 function StandardGlobals.typeof(vm, value)
-	if type(value) == "table" then
-		return value.__type or "table"
-	end
-	return type(value)
+    if type(value) == "table" then
+        return value.__type or "table"
+    end
+    return type(value)
 end
 
 function StandardGlobals.isprimitive(vm, t)
-	return type(t) == "string"
+    return type(t) == "string"
 end
 
 --[[
-	Casts a value to a particular class.
-	@param SeeVM:vm The VM to run this function for.
-	@param any:value The value to cast.
-	@param string|table:castType The type to cast to.
+    Casts a value to a particular class.
+    @param SeeVM:vm The VM to run this function for.
+    @param any:value The value to cast.
+    @param string|table:castType The type to cast to.
 ]]
 function StandardGlobals.cast(vm, value, castType)
-	if StandardGlobals.typeof(vm, value) == castType then
-		return value
-	end
+    if StandardGlobals.typeof(vm, value) == castType then
+        return value
+    end
 
-	if type(castType) == "string" then
-		-- Casting to primitive.
-		if castType == "string" then
-			if type(value) ~= "table" or not value.__type then
-				return tostring(value)
-			elseif value.__type then
-				return value:toString():lstr()
-			end
-		else
-			-- TODO
-		end
-	else
-		return castType.__cast(value)
-		-- Casting to Object.
-		-- TODO
-	end
+    if type(castType) == "string" then
+        -- Casting to primitive.
+        if castType == "string" then
+            if type(value) ~= "table" or not value.__type then
+                return tostring(value)
+            elseif value.__type then
+                return value:toString():lstr()
+            end
+        else
+            -- TODO
+        end
+    else
+        return castType.__cast(value)
+        -- Casting to Object.
+        -- TODO
+    end
 end
 
 --[[
-	Casts an object to a different class by setting its metatable.
-	@param SeeVM:vm The VM to run this function for.
-	@param see.base.Object value
+    Casts an object to a different class by setting its metatable.
+    @param SeeVM:vm The VM to run this function for.
+    @param see.base.Object value
 ]]
 function StandardGlobals.reinterpret_cast(vm, value, castType)
-	if type(value) ~= "table" or not value.__type then error("Cannot use reinterpret_cast to cast a primitive type.") end
-	setmetatable(value, castType.__meta)
+    if type(value) ~= "table" or not value.__type then error("Cannot use reinterpret_cast to cast a primitive type.") end
+    setmetatable(value, castType.__meta)
 end
 
 --[[
-	Throws an exception.
-	@param SeeVM:vm The VM to run this function for.
-	@param see.base.Exception The exception to throw.
+    Throws an exception.
+    @param SeeVM:vm The VM to run this function for.
+    @param see.base.Exception The exception to throw.
 ]]
 function StandardGlobals.throw(vm, exception)
-	if exception then
-		vm.lastException = exception
-	else
-		vm.lastException = vm:loadClassFromAny("see.rt.RuntimeException").new("Invalid argument to throw.")
-	end
-	error("Uncaught exception " .. exception.__type.__name .. ': "' .. exception.message:lstr() .. '"', 4, true)
+    if exception then
+        vm.lastException = exception
+    else
+        vm.lastException = vm:loadClassFromAny("see.rt.RuntimeException").new("Invalid argument to throw.")
+    end
+    error("Uncaught exception " .. exception.__type.__name .. ': "' .. exception.message:lstr() .. '"', 4, true)
 end
 
 --[[
-	Tries to execute code until an error occurs. Calls catch code if an error occurs.
-	@param SeeVM:vm The VM to run this function for.
-	@param function:tryFunc Function to run and catch errors from.
-	@param function:catchFunc(see.base.Exception) Function to run on error.
+    Tries to execute code until an error occurs. Calls catch code if an error occurs.
+    @param SeeVM:vm The VM to run this function for.
+    @param function:tryFunc Function to run and catch errors from.
+    @param function:catchFunc(see.base.Exception) Function to run on error.
 ]]
 function StandardGlobals.try(vm, tryFunc, catchFunc)
-	local suc, err = pcall(tryFunc)
-	if suc then return end
-	if err then vm.lastException = vm:loadClassFromAny("see.rt.RuntimeException").new(err) end
-	catchFunc(vm.lastException)
+    local suc, err = pcall(tryFunc)
+    if suc then return end
+    if err then vm.lastException = vm:loadClassFromAny("see.rt.RuntimeException").new(err) end
+    catchFunc(vm.lastException)
 end
 
 --[[
-	Converts a Lua string to a see.base.String.
-	@param string:str
+    Converts a Lua string to a see.base.String.
+    @param string:str
 ]]
 function StandardGlobals.STR(vm, str)
-	return vm.base.String.new(str)
+    return vm.base.String.new(str)
 end
 
 SeeVM = { }
 SeeVM.__index = SeeVM
 
 --[[
-	Creates a new SeeVM
+    Creates a new SeeVM
 ]]
 function SeeVM.new(natives, seePath)
-	local self = { }
-	setmetatable(self, SeeVM)
-	self.seePath = seePath
+    local self = { }
+    setmetatable(self, SeeVM)
+    self.seePath = seePath
 
-	self.standardGlobals = { }
-	for k, v in pairs(StandardGlobals) do
-		self.standardGlobals[k] = function(...) return StandardGlobals[k](self, ...) end
-	end
+    self.standardGlobals = { }
+    for k, v in pairs(StandardGlobals) do
+        self.standardGlobals[k] = function(...) return StandardGlobals[k](self, ...) end
+    end
 
-	self.base = { }
-	self.rt = { }
-	self.classes = { }
-	self.natives = natives
-	self.natives.error = error
-	self.classPaths = { }
-	self.base.Object = self:loadClassFromAny("see.base.Object")
-	self.rt = self:loadClassFromAny("see.rt.Class")
-	self.base.Exception = self:loadClassFromAny("see.base.Exception")
-	self.base.System = self:loadClassFromAny("see.base.System")
-	self.base.Array  = self:loadClassFromAny("see.base.Array")
-	self.base.String = self:loadClassFromAny("see.base.String")
-	return self
+    self.base = { }
+    self.rt = { }
+    self.classes = { }
+    self.natives = natives
+    self.natives.error = error
+    self.classPaths = { }
+    self.base.Object = self:loadClassFromAny("see.base.Object")
+    self.rt = self:loadClassFromAny("see.rt.Class")
+    self.base.Exception = self:loadClassFromAny("see.base.Exception")
+    self.base.System = self:loadClassFromAny("see.base.System")
+    self.base.Array  = self:loadClassFromAny("see.base.Array")
+    self.base.String = self:loadClassFromAny("see.base.String")
+    return self
 end
 
 --[[
-	Gets a value out of a table using a valid package string.
-	@param table:t The table to search.
-	@param string:package The package to look for.
-	@param string:del The delimiter to use for the package. default='.'
-	@return any The value found.
+    Gets a value out of a table using a valid package string.
+    @param table:t The table to search.
+    @param string:package The package to look for.
+    @param string:del The delimiter to use for the package. default='.'
+    @return any The value found.
 ]]
 function getByPackage(t, package, del)
-	if not del then del = "%." end
-	local f = package:find(del)
-	if f then
-		return getByPackage(t[package:sub(1, f - 1)], package:sub(f + 1), del)
-	else
-		return t[package]
-	end
+    if not del then del = "%." end
+    local f = package:find(del)
+    if f then
+        return getByPackage(t[package:sub(1, f - 1)], package:sub(f + 1), del)
+    else
+        return t[package]
+    end
 end
 
 --[[
-	Get package end.
-	@param string:package The package to compute the name for.
-	@return string:name Name of the package, or nil if invalid or empty package.
+    Get package end.
+    @param string:package The package to compute the name for.
+    @return string:name Name of the package, or nil if invalid or empty package.
 ]]
 function getPackageName(package, del)
-	if not del then del = "." end
-	for i = #package, 0, -1 do
-		if i == 0 or package:sub(i, i) == del then
-			return package:sub(i + 1)
-		end
-	end
+    if not del then del = "." end
+    for i = #package, 0, -1 do
+        if i == 0 or package:sub(i, i) == del then
+            return package:sub(i + 1)
+        end
+    end
 end
 
 --[[
-	Get the components of a package.
-	@param string:package The package to extract components from.
-	@return table[string] The components of the given package.
+    Get the components of a package.
+    @param string:package The package to extract components from.
+    @return table[string] The components of the given package.
 ]]
 function getPackageComponents(package)
-	local components = { }
-	for component in package:gmatch("%w[%w%d]*") do
-		table.insert(components, component)
-	end
-	return components
+    local components = { }
+    for component in package:gmatch("%w[%w%d]*") do
+        table.insert(components, component)
+    end
+    return components
 end
 
 --[[
-	Finds all annotations in the given code string.
-	@param string:code The code to search for annotations in.
-	@return table List of annotation strings.
+    Finds all annotations in the given code string.
+    @param string:code The code to search for annotations in.
+    @return table List of annotation strings.
 ]]
 function getAnnotations(code)
-	local annotations = { }
-	for annotation in code:gmatch("%-%-@[^\n]*") do
-		table.insert(annotations, annotation:sub(4))
-	end
-	return annotations
+    local annotations = { }
+    for annotation in code:gmatch("%-%-@[^\n]*") do
+        table.insert(annotations, annotation:sub(4))
+    end
+    return annotations
 end
 
 --[[
-	Loads a class by trying the standard library first, then from class paths.
-	@param string:name
-	@return table The class loaded.
+    Loads a class by trying the standard library first, then from class paths.
+    @param string:name
+    @return table The class loaded.
 ]]
 function SeeVM:loadClassFromAny(name)
-	local class = self.classes[name]
-	local err
+    local class = self.classes[name]
+    local err
 
-	if class then return class end
+    if class then return class end
 
-	-- Load from the standard library.
-	local p = name:gsub("%.", "/")
-	class, err = self:loadClassFromFile(fs.combine(fs.combine(self.seePath, "/lib/"), p) .. ".lua", name)
-	local lerr = err
+    -- Load from the standard library.
+    local p = name:gsub("%.", "/")
+    class, err = self:loadClassFromFile(fs.combine(fs.combine(self.seePath, "/lib/"), p) .. ".lua", name)
+    local lerr = err
 
-	if class then return class end
+    if class then return class end
 
-	-- Load from custom class paths
-	for _, classPath in pairs(self.classPaths) do
-		class, err = self:loadClassFromFile(fs.combine(classPath, name:gsub("%.", "/") .. ".lua"), name)
-		if class then return class end
-	end
+    -- Load from custom class paths
+    for _, classPath in pairs(self.classPaths) do
+        class, err = self:loadClassFromFile(fs.combine(classPath, name:gsub("%.", "/") .. ".lua"), name)
+        if class then return class end
+    end
 
-	if not lerr:find("Could not read file.") then
-		err = lerr
-	end
+    if not lerr:find("Could not read file.") then
+        err = lerr
+    end
 
-	if not class then
-		error("Could not load class " .. name .. ". " .. err)
-	end
+    if not class then
+        error("Could not load class " .. name .. ". " .. err)
+    end
 end
 
 --[[
-	Executes annotations onto an environment.
-	@param table:env The function environment.
-	@param table:annotation Annotation to execute.
+    Executes annotations onto an environment.
+    @param table:env The function environment.
+    @param table:annotation Annotation to execute.
 ]]
 function SeeVM:executeAnnotation(env, class, annotation)
-	local pindex = annotation:find("%s")
-	local aname = annotation:sub(1, pindex - 1)
+    local pindex = annotation:find("%s")
+    local aname = annotation:sub(1, pindex - 1)
 
-	if aname == "import" then
-		local name = annotation:sub(pindex + 1):gsub("%s", "")
-		local class = self:loadClassFromAny(name)
-		if not class then error("Failed to import class.") end
-		env[getPackageName(name)] = class
-	elseif aname == "native" then
-		local name = annotation:sub(pindex + 1):gsub("%s", "")
-		local keys = getPackageComponents(name)
-		local lk
-		local v = self.natives
-		local w = env
-		local nativeValue = ""
-		for _, key in pairs(keys) do
-			nativeValue = nativeValue .. key .. "."
-			if not v[key] then error("Could not find native value " .. nativeValue) end
-			v = v[key]
-			if not w[key] or type(w) ~= "table" then
-				w[key] = { }
-			end
-			lw = w
-			w = w[key]
-			lk = key
-		end
-		lw[lk] = v
-	elseif aname == "extends" then
-		local name = annotation:sub(pindex + 1):gsub("%s", "")
-		setmetatable(class, env[getPackageName(name)])
-	end
+    if aname == "import" then
+        local name = annotation:sub(pindex + 1):gsub("%s", "")
+        local class = self:loadClassFromAny(name)
+        if not class then error("Failed to import class.") end
+        env[getPackageName(name)] = class
+    elseif aname == "native" then
+        local name = annotation:sub(pindex + 1):gsub("%s", "")
+        local keys = getPackageComponents(name)
+        local lk
+        local v = self.natives
+        local w = env
+        local nativeValue = ""
+        for _, key in pairs(keys) do
+            nativeValue = nativeValue .. key .. "."
+            if not v[key] then error("Could not find native value " .. nativeValue) end
+            v = v[key]
+            if not w[key] or type(w) ~= "table" then
+                w[key] = { }
+            end
+            lw = w
+            w = w[key]
+            lk = key
+        end
+        lw[lk] = v
+    elseif aname == "extends" then
+        local name = annotation:sub(pindex + 1):gsub("%s", "")
+        setmetatable(class, env[getPackageName(name)])
+    end
 end
 
 --[[
-	Load a class from a file.
-	@param string:path The path to the class to load.
-	@param string:name The full name of the class to load.
-	@return table The loaded class.
+    Load a class from a file.
+    @param string:path The path to the class to load.
+    @param string:name The full name of the class to load.
+    @return table The loaded class.
 ]]
 function SeeVM:loadClassFromFile(path, name)
-	local fileHandle = fs.open(path, "r")
-	if not fileHandle then
-		return nil, "Could not read file."
-	end
-	local code = fileHandle.readAll()
-	-- Setup class execution environment
-	local def, err = loadstring(code, name)
-	if not def then
-		return nil, err
-	end
-	return self:loadClass(def, getAnnotations(code), name)
+    local fileHandle = fs.open(path, "r")
+    if not fileHandle then
+        return nil, "Could not read file."
+    end
+    local code = fileHandle.readAll()
+    -- Setup class execution environment
+    local def, err = loadstring(code, name)
+    if not def then
+        return nil, err
+    end
+    return self:loadClass(def, getAnnotations(code), name)
 end
 
 --[[
-	Load a class from a definition function.
-	@param function:def Class definition for loading.
-	@param table[string]:annotations Table of annotation strings.
-	@param string:name The name of this class, including the full package.
+    Load a class from a definition function.
+    @param function:def Class definition for loading.
+    @param table[string]:annotations Table of annotation strings.
+    @param string:name The name of this class, including the full package.
 ]]
 function SeeVM:loadClass(def, annotations, name)
-	local className = getPackageName(name)
+    local className = getPackageName(name)
 
-	if self.classes[name] then
-		return self.classes[name]
-	end
-	local env = copy(self.standardGlobals)
+    if self.classes[name] then
+        return self.classes[name]
+    end
+    local env = copy(self.standardGlobals)
 
-	-- Setup class inheritance model.
-	local class = { }
-	class.__meta = { __index = class }
-	class.__name = name
+    -- Setup class inheritance model.
+    local class = { }
+    class.__meta = { __index = class }
+    class.__name = name
 
-	if not self.rt.Class then
-		class.__type = class
-	else
-		class.__type = self.rt.Class
-	end
+    if not self.rt.Class then
+        class.__type = class
+    else
+        class.__type = self.rt.Class
+    end
 
-	function class.new(...)
-		if not class.init then error("Could not instantiate class " .. name .. ". No init method.") end
-		local self = { }
-		setmetatable(self, class.__meta)
-		self.__type = class
-		self:init(...)
-		return self
-	end
+    function class.new(...)
+        if not class.init then error("Could not instantiate class " .. name .. ". No init method.") end
+        local self = { }
+        setmetatable(self, class.__meta)
+        self.__type = class
+        self:init(...)
+        return self
+    end
 
-	-- Import base classes.
-	for k, class in pairs(self.base) do
-		env[k] = class
-	end
+    -- Import base classes.
+    for k, class in pairs(self.base) do
+        env[k] = class
+    end
 
-	-- Setup class environment.
-	env[className] = class
-	setfenv(def, env)
-	def()
-	self.classes[name] = class
+    -- Setup class environment.
+    env[className] = class
+    setfenv(def, env)
+    def()
+    self.classes[name] = class
 
-	for _, annotation in pairs(annotations) do
-		self:executeAnnotation(env, class, annotation)
-	end
+    for _, annotation in pairs(annotations) do
+        self:executeAnnotation(env, class, annotation)
+    end
 
-	local abool = true
-	if self.base.Object then
-		for _, annotation in pairs(annotations) do
-			if annotation:sub(1, 7) == "extends" then
-				abool = false
-				break
-			end
-		end
-	else
-		abool = false
-	end
+    local abool = true
+    if self.base.Object then
+        for _, annotation in pairs(annotations) do
+            if annotation:sub(1, 7) == "extends" then
+                abool = false
+                break
+            end
+        end
+    else
+        abool = false
+    end
 
-	-- Extend Object by default.
-	if abool then
-		setmetatable(class, self.base.Object)
-	end
+    -- Extend Object by default.
+    if abool then
+        setmetatable(class, self.base.Object)
+    end
 
-	if class.__static then
-		class.__static()
-	end
+    if class.__static then
+        class.__static()
+    end
 
-	return class
+    return class
 end
