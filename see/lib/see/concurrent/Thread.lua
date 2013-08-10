@@ -1,4 +1,5 @@
 --@native coroutine
+--@native threadpool
 
 Thread.SUSPENDED = "suspended"
 Thread.RUNNING = "running"
@@ -13,21 +14,17 @@ function Thread.yield(...)
     return coroutine.yield(...)
 end
 
+function Thread.current()
+    return threadpool.current
+end
+
 --[[
     Constructs a new Thread.
     @param function:func The function to run in a new thread.
 ]]
 function Thread:init(func)
-    self.co = coroutine.create(func)
-end
-
---[[
-    Resumes this Thread. Passes the given arguments to the thread as it is resumed.
-    @param any... Arguments to pass to the thread.
-    @return any... Values passed from the thread.
-]]
-function Thread:resume(...)
-    return coroutine.resume(self.co, ...)
+    self.func = func
+    self.id = threadpool:add(self)
 end
 
 --[[

@@ -2,7 +2,7 @@
 --@native table.insert
 --@native rawget
 --@native rawset
---@native tostring
+--@native unpack
 
 --@import see.util.ArgumentUtils
 --@import see.rt.IndexOutOfBoundsException
@@ -118,6 +118,10 @@ function Array:insert(index, value)
         return table.insert(self.luaArray, index, value)
     end
     throw(IndexOutOfBoundsException.new(index))
+end
+
+function Array:unpack()
+    return unpack(self.luaArray)
 end
 
 --[[

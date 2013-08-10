@@ -7,6 +7,7 @@ local MAKE_PATHS = {
     "lib/see/",
     "lib/see/base/",
     "lib/see/concurrent/",
+    "lib/see/hook/",
     "lib/see/rt/",
     "lib/see/util/",
     "programs/"
@@ -20,6 +21,8 @@ local DL_PATHS = {
     "lib/see/base/String.lua",
     "lib/see/base/System.lua",
     "lib/see/concurrent/Thread.lua",
+    "lib/see/hook/Hook.lua",
+    "lib/see/hook/Hooks.lua",
     "lib/see/rt/Class.lua",
     "lib/see/rt/IndexOutOfBoundsException.lua",
     "lib/see/rt/InvalidArgumentException.lua",

@@ -1,5 +1,6 @@
 --@native print
 --@native read
+--@native write
 --@native unpack
 
 --[[
@@ -24,6 +25,18 @@ function System.print(...)
         args[i] = cast(args[i], "string")
     end
     print(unpack(args))
+end
+
+--[[
+    Writes a string to the shell.
+    @param see.base.String The string to write.
+]]
+function System.write(...)
+    local args = {...}
+    for i = 1, #args do
+        args[i] = cast(args[i], "string")
+    end
+    write(unpack(args))
 end
 
 -- TODO: Prevent from trashing global namespace.

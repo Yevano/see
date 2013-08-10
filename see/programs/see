@@ -17,6 +17,12 @@ local _, err = pcall(function(...)
         local MainClass = vm:loadClassFromAny(mainClassName)
         if not MainClass then error("Main class not found! ") end
         if not MainClass.main then error("Main method not found!") end
+        --[[xpcall(function()
+            vm.natives.threadpool:add(vm:loadClassFromAny("see.concurrent.Thread").new(function()
+                MainClass.main(args)
+            end))
+            vm.natives.threadpool:waitForAll()
+        end, see.errorHandler)]]
         xpcall(function() MainClass.main(args) end, see.errorHandler)
     end
 
