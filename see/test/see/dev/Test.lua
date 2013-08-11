@@ -1,21 +1,18 @@
+--@import see.io.Path
 --@import see.io.FileOutputStream
 --@import see.io.FileInputStream
---@import see.io.Path
---@import see.io.Files
+--@import see.io.DataOutputStream
+--@import see.io.DataInputStream
+--@import see.io.ArrayOutputStream
+--@import see.io.ArrayInputStream
 
 function Test.main()
-    local path = Path.new("/fostest")
+    local path = Path.new("/filetest")
+    local array = Array.new()
 
-    if not Files.exists(path) then
-        System.print("File does not exist!")
-        return
-    end
+    local dos = DataOutputStream.new(ArrayOutputStream.new(array))
+    dos:writeString("Hello!\n")
+    local dis = DataInputStream.new(ArrayInputStream.new(array))
 
-    local fos = FileOutputStream.new(path)
-    fos:write(133)
-    fos:close()
-
-    local fis = FileInputStream.new(path)
-    System.print(fis:read())
-    fis:close()
+    System.write(dis:readString(array:length()))
 end

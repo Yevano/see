@@ -167,79 +167,6 @@ function StandardGlobals.STR(vm, str)
     return vm.base.String.new(str)
 end
 
-ThreadPool = { }
-ThreadPool.__index = ThreadPool
-
---[[
-    Creates a new ThreadPool.
-]]
-function ThreadPool.new()
-    local self = { }
-    setmetatable(self, ThreadPool)
-    self.threads = { }
-    self.current = { }
-    self.eventFilters = { }
-    self.eventData = { }
-    return self
-end
-
---[[
-    Runs a thread in this ThreadPool.
-]]
-function ThreadPool:runThread(i)
-    self.current = self.threads[i]
-    local co = self.threads[i].co
-
-    if not self.eventFilters[co] or self.eventFilters[co] == self.eventData[1] or self.eventData[1] == "terminate" then
-        local ok, param = coroutine.resume(co, unpack(self.eventData))
-  
-        if ok then
-            self.eventFilters[co] = param
-        else
-            table.remove(self.threads, i)
-        end
-
-        if coroutine.status(co) == "dead" then
-            self.threads[i].id = -1
-            self.threads[i].co = nil
-            table.remove(self.threads, i)
-        end
-    end
-end
-
---[[
-    Runs the threads, passing event data to each one.
-]]
-function ThreadPool:waitForAll()
-    while #self.threads > 0 do
-        self:runOnce()
-    end
-end
-
---[[
-    Runs the threads once and returns.
-]]
-function ThreadPool:runOnce()
-    for i = 1, #self.threads do
-        self:runThread(i)
-    end
-
-    self.eventData = {os.pullEventRaw()}
-end
-
---[[
-    Adds a thread to this ThreadPool.
-]]
-function ThreadPool:add(thread)
-    thread.co = coroutine.create(function()
-        xpcall(thread.func, errorHandler)
-    end)
-    table.insert(self.threads, thread)
-    local id = #self.threads
-    self:runThread(id)
-    return id
-end
-
 SeeVM = { }
 SeeVM.__index = SeeVM
 
@@ -261,7 +188,6 @@ function SeeVM.new(natives, seePath)
     self.classes = { }
     self.natives = natives
     self.natives.error = error
-    self.natives.threadpool = ThreadPool.new()
     self.classPaths = { }
     self.base.Object = self:loadClassFromAny("see.base.Object")
     self.rt = self:loadClassFromAny("see.rt.Class")
