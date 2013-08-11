@@ -1,21 +1,21 @@
---@import see.hook.Hooks
+--@import see.io.FileOutputStream
+--@import see.io.FileInputStream
+--@import see.io.Path
+--@import see.io.Files
 
 function Test.main()
-    local hook
-    local input = true
-    local str = String.new()
-    hook = Hooks.add("char", function(c)
-        if c == "z" then
-            input = false
-            Hooks.remove(hook)
-        else
-            str:add(c)
-        end
-    end)
+    local path = Path.new("/fostest")
 
-    while input do
-        Hooks.run()
+    if not Files.exists(path) then
+        System.print("File does not exist!")
+        return
     end
 
-    System.print(str)
+    local fos = FileOutputStream.new(path)
+    fos:write(133)
+    fos:close()
+
+    local fis = FileInputStream.new(path)
+    System.print(fis:read())
+    fis:close()
 end
