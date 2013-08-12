@@ -3,15 +3,15 @@
 --@extends see.io.InputStream
 
 --[[
-	Wraps around an array to read from.
-	@param Array:wrap The array to wrap around.
+    Wraps around an array to read from.
+    @param Array:wrap The array to wrap around.
 ]]
 function ArrayInputStream:init(wrap)
-	self.wrap = wrap
-	self.position = 1
+    self.wrap = wrap
+    self.position = 1
 end
 
 function ArrayInputStream:read()
-	self.position = self.position + 1
-	return self.wrap[self.position - 1]
+    self.position = self.position + 1
+    return self.wrap[self.position - 1]
 end
