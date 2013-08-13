@@ -1,3 +1,4 @@
+local apiPath
 local _, err = pcall(function(...)
     local function copy(t)
         local r = { }
@@ -11,18 +12,10 @@ local _, err = pcall(function(...)
     local vm
     local classPath
 
-    os.loadAPI("/see/apis/see")
-
     local function runFromPath(classPath, mainClassName, args)
         local MainClass = vm:loadClassFromAny(mainClassName)
         if not MainClass then error("Main class not found! ") end
         if not MainClass.main then error("Main method not found!") end
-        --[[xpcall(function()
-            vm.natives.threadpool:add(vm:loadClassFromAny("see.concurrent.Thread").new(function()
-                MainClass.main(args)
-            end))
-            vm.natives.threadpool:waitForAll()
-        end, see.errorHandler)]]
         xpcall(function() MainClass.main(args) end, see.errorHandler)
     end
 
@@ -36,6 +29,8 @@ local _, err = pcall(function(...)
 
     if op == "-r" then
         --Run option.
+        apiPath = fs.combine(shell.resolve(args[2]), "apis/see")
+        os.loadAPI(apiPath)
         vm = see.SeeVM.new(natives, shell.resolve(args[2]))
         classPath = shell.resolve(args[3])
         table.insert(vm.classPaths, classPath)
@@ -56,7 +51,7 @@ local _, err = pcall(function(...)
     end
 end, ...)
 
-os.unloadAPI("/see/apis/see")
+os.unloadAPI(apiPath)
 
 if err then
     error(err)
