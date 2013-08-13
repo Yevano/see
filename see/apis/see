@@ -339,6 +339,7 @@ function SeeVM:loadClassFromFile(path, name)
         return nil, "Could not read file."
     end
     local code = fileHandle.readAll()
+    fileHandle.close()
     -- Setup class execution environment
     local def, err = loadstring(code, name)
     if not def then
