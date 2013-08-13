@@ -161,10 +161,10 @@ end
 
 --[[
     Converts a Lua string to a see.base.String.
-    @param string:str
+    @param see.base.String... Strings to concatenate.
 ]]
-function StandardGlobals.STR(vm, str)
-    return vm.base.String.new(str)
+function StandardGlobals.STR(vm, ...)
+    return vm.base.String.new(...)
 end
 
 SeeVM = { }

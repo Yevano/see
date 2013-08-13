@@ -131,6 +131,9 @@ function String:sub(a, b)
     ArgumentUtils.check(1, a, "number")
     ArgumentUtils.check(2, b, "number")
 
+    a = a < 0 and self:length() + a + 1 or a
+    b = b < 0 and self:length() + b + 1 or b
+
     if a > b then a, b = b, a end
 
     local substring = String.new()

@@ -22,5 +22,5 @@ end
 ]]
 function Http.async(url, postData)
     if postData then postData = cast(postData, "string") end
-    http.request(url, postData)
+    http.request(url.string:lstr(), postData)
 end

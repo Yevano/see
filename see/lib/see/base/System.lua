@@ -3,6 +3,8 @@
 --@native write
 --@native unpack
 
+--@import see.base.String
+
 --[[
     A utility class for useful system operations.
 ]]
