@@ -120,11 +120,13 @@ local _, err = pcall(function(...)
         setfenv(configFunc, config)
         configFunc()
         fileHandle.close()
+
         apiPath = fs.combine(config.install_dir, "apis/see")
         os.loadAPI(apiPath)
         vm = see.SeeVM.new(natives, config.install_dir)
         classPath = shell.resolve(args[2])
         table.insert(vm.classPaths, classPath)
+        
         local mainClassName = args[3]
         local programArgs = { }
         for i = 4, #args do
