@@ -1,4 +1,5 @@
 local apiPath
+local config = { }
 local _, err = pcall(function(...)
     local function copy(t)
         local r = { }
@@ -104,7 +105,7 @@ local _, err = pcall(function(...)
         readHandle.close()
     end
 
-    local USAGE = "Usage: see <-r <seePath> <classPath> <mainClass> <args>>|<-p <src> <dest>>|<-u <src> <dest>>|<-help>"
+    local USAGE = "Usage: see <-r <classPath> <mainClass> <args>>|<-p <src> <dest>>|<-u <src> <dest>>|<-help>"
     local args = {...}
     local op = args[1]
 
@@ -114,14 +115,19 @@ local _, err = pcall(function(...)
 
     if op == "-r" then
         --Run option.
-        apiPath = fs.combine(shell.resolve(args[2]), "apis/see")
+        local fileHandle = fs.open("/.see", "r")
+        local configFunc = loadstring(fileHandle.readAll())
+        setfenv(configFunc, config)
+        configFunc()
+        fileHandle.close()
+        apiPath = fs.combine(config.install_dir, "apis/see")
         os.loadAPI(apiPath)
-        vm = see.SeeVM.new(natives, shell.resolve(args[2]))
-        classPath = shell.resolve(args[3])
+        vm = see.SeeVM.new(natives, config.install_dir)
+        classPath = shell.resolve(args[2])
         table.insert(vm.classPaths, classPath)
-        local mainClassName = args[4]
+        local mainClassName = args[3]
         local programArgs = { }
-        for i = 5, #args do
+        for i = 4, #args do
             table.insert(programArgs, args[i])
         end
 

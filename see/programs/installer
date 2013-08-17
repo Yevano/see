@@ -80,7 +80,11 @@ while true do
         local downloaded = 0
 
         write("SEE Installer\nChoose an install path: ")
-        local installPath = shell.resolve(read())
+        local installPath = "/" .. shell.resolve(read())
+
+        local configHandle = fs.open("/.see", "w")
+        configHandle.write("install_dir = " .. installPath)
+        configHandle.close()
 
         local suc, err = pcall(fs.makeDir, installPath)
         if not suc then
