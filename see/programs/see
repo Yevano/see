@@ -19,6 +19,16 @@ local _, err = pcall(function(...)
         xpcall(function() MainClass.main(vm.base.Array.new(unpack(args))) end, see.errorHandler)
     end
 
+    local function runFromArchive(classPath, mainClassName, args)
+        local fileHandle = fs.open(classPath, "r")
+        vm.archives[classPath] = fileHandle.readAll()
+        fileHandle.close()
+        local MainClass = vm:loadClassFromAny(mainClassName)
+        if not MainClass then error("Main class not found! ") end
+        if not MainClass.main then error("Main method not found!") end
+        xpcall(function() MainClass.main(vm.base.Array.new(unpack(args))) end, see.errorHandler)
+    end
+
     local function getSubDirectories(path)
         local paths = { }
         for _, name in pairs(fs.list(path)) do
@@ -118,7 +128,7 @@ local _, err = pcall(function(...)
         if fs.isDir(classPath) then
             runFromPath(classPath, mainClassName, programArgs)
         else
-            -- TODO: Add archive reading.
+            runFromArchive(classPath, mainClassName, programArgs)
         end
     elseif op == "-p" then
         -- Pack option.
