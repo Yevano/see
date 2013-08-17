@@ -23,33 +23,29 @@ local _, err = pcall(function(...)
         local paths = { }
         for _, name in pairs(fs.list(path)) do
             local it = fs.combine(path, name)
+            table.insert(paths, it)
             if fs.isDir(it) then
                 local sub = getSubDirectories(it)
-                if type(sub) == "table" then
-                    for i = 1, #sub do
-                        table.insert(paths, sub[i])
-                    end
-                else
-                    table.insert(paths, sub)
+                for i = 1, #sub do
+                    table.insert(paths, sub[i])
                 end
-            else
-                return it
             end
         end
+        return paths
     end
 
     local function packArchive(src, dest)
         local readHandle
-        local writeHandle = fs.open(dest, "wb")
+        local writeHandle = fs.open(dest, "w")
         local paths = getSubDirectories(src)
 
         for i = 1, #paths do
             local path = paths[i]
             if fs.isDir(path) then
-                writeHandle.write("D" .. path:sub(#src) .. "\0")
+                writeHandle.write("D" .. path:sub(#src + 2) .. "\0")
             else
                 readHandle = fs.open(path, "r")
-                writeHandle.write("F" .. path:sub(#src) .. "\0" .. readHandle.readAll() .. "\0")
+                writeHandle.write("F" .. path:sub(#src + 2) .. "\0" .. readHandle.readAll() .. "\0")
                 readHandle.close()
             end
         end
@@ -58,7 +54,7 @@ local _, err = pcall(function(...)
         writeHandle.close()
     end
 
-    local function readZeroTerminated()
+    local function readZeroTerminated(readHandle)
         local c = readHandle.read()
         local path = ""
         repeat
@@ -77,13 +73,12 @@ local _, err = pcall(function(...)
             local b = readHandle.read()
             if b == 0 then break end
 
+            local path = fs.combine(dest, readZeroTerminated(readHandle))
             if string.char(b) == "D" then
                 -- Directory entry.
-                local path = readZeroTerminated(readHandle)
                 fs.makeDir(path)
             elseif string.char(b) == "F" then
                 -- File entry.
-                local path = readZeroTerminated(readHandle)
                 local name = fs.getName(path)
                 local parent = path:sub(1, -#name - 1)
 
