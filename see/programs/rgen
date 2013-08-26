@@ -1,0 +1,79 @@
+-- rgen <classArchive> <mainClass> <target>
+local config = { }
+local _, err = pcall(function(...)
+    local fileHandle = fs.open("/.see", "r")
+    local configFunc, err = loadstring(fileHandle.readAll())
+    if err then print("Config err " .. err) end
+    setfenv(configFunc, config)
+    configFunc()
+    fileHandle.close()
+
+    os.loadAPI(fs.combine(config.install_dir, "apis/see"))
+
+    local args = { ... }
+    local classArchive = "/" .. shell.resolve(args[1])
+    local mainClass = args[2]
+    local target = "/" .. shell.resolve(args[3])
+
+    local archiveHandle = fs.open(classArchive, "r")
+    local archiveBytes = archiveHandle.readAll()
+    archiveHandle.close()
+
+    -- Insert $ in places to pass arguments.
+    local code =
+[[
+local config = { }
+local _, err = pcall(function(...)
+    local args = {...}
+    local archiveBytes = '$'
+    local mainClass = "$"
+    local classPath = "FROM_MEMORY"
+
+    local natives = { }
+    for k, v in pairs(_G) do
+        natives[k] = v
+    end
+
+    local fileHandle = fs.open("/.see", "r")
+    local configFunc = loadstring(fileHandle.readAll())
+    setfenv(configFunc, config)
+    configFunc()
+    fileHandle.close()
+
+    os.loadAPI(fs.combine(config.install_dir, "apis/see"))
+
+    local vm = see.SeeVM.new(natives, config.install_dir)
+    table.insert(vm.classPaths, classPath)
+    vm.archives[classPath] = archiveBytes
+
+    local MainClass = vm:loadClassFromAny(mainClass)
+    if not MainClass then error("Main class not found!") end
+    if not MainClass.main then error("Main method not found!") end
+    xpcall(function() MainClass.main(vm.base.Array.new(unpack(args))) end, see.errorHandler)
+end, ...)
+
+os.unloadAPI(fs.combine(config.install_dir, "apis/see"))
+
+if err then
+    error(err)
+end
+]]
+
+    local f = code:find("$", 1, true)
+    code = code:sub(1, f - 1) .. archiveBytes:
+        gsub("\0", "\\0"):
+        gsub("\n", "\\n"):
+        gsub("'", "\\'") .. code:sub(f + 1)
+    f = code:find("$", f + #archiveBytes, true)
+    code = code:sub(1, f - 1) .. mainClass .. code:sub(f + 1)
+
+    local out = fs.open(target, "w")
+    out.write(code)
+    out.close()
+end, ...)
+
+os.unloadAPI(fs.combine(config.install_dir, "apis/see"))
+
+if err then
+    error(err)
+end
