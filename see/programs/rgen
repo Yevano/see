@@ -59,12 +59,16 @@ if err then
 end
 ]]
 
+    local archiveTable = { }
+    for i = 1, #archiveBytes do
+        archiveTable[i] = "\\" .. archiveBytes:sub(i, i):byte()
+    end
+
+    local archiveConverted = table.concat(archiveTable)
+
     local f = code:find("$", 1, true)
-    code = code:sub(1, f - 1) .. archiveBytes:
-        gsub("\0", "\\0"):
-        gsub("\n", "\\n"):
-        gsub("'", "\\'") .. code:sub(f + 1)
-    f = code:find("$", f + #archiveBytes, true)
+    code = code:sub(1, f - 1) .. archiveConverted .. code:sub(f + 1)
+    f = code:find("$", f + #archiveConverted, true)
     code = code:sub(1, f - 1) .. mainClass .. code:sub(f + 1)
 
     local out = fs.open(target, "w")
