@@ -49,3 +49,7 @@ function Terminal.getPos()
     local x, y = term.getCursorPos()
     return {x = x, y = y}
 end
+
+function Terminal.isColor()
+    return term.isColor()
+end

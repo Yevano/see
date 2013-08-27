@@ -48,6 +48,7 @@ local DL_PATHS = {
     "lib/see/rt/RuntimeException.lua",
     "lib/see/util/ArgumentUtils.lua",
     "lib/see/util/Bit.lua",
+    "lib/see/util/Color.lua",
     "lib/see/util/Math.lua",
     "programs/see"
 }
