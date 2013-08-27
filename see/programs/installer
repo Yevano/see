@@ -38,6 +38,7 @@ local DL_PATHS = {
     "lib/see/io/Path.lua",
     "lib/see/io/Peripheral.lua",
     "lib/see/io/Redstone.lua",
+    "lib/see/io/Terminal.lua",
     "lib/see/net/Http.lua",
     "lib/see/net/HttpResponse.lua",
     "lib/see/net/Url.lua",
