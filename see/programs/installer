@@ -85,7 +85,7 @@ while true do
         local installPath = "/" .. shell.resolve(read())
 
         local configHandle = fs.open("/.see", "w")
-        configHandle.write("install_dir = " .. installPath)
+        configHandle.write('install_dir = "' .. installPath .. '"')
         configHandle.close()
 
         local suc, err = pcall(fs.makeDir, installPath)

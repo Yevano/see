@@ -4,12 +4,14 @@ local _, err = pcall(function(...)
     local function copy(t)
         local r = { }
         for k, v in pairs(t) do
+            if k == "shell" then print("shell!") end
             r[k] = v
         end
         return r
     end
 
     local natives = copy(_G)
+    natives.shell = shell
     local vm
     local classPath
 

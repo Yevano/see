@@ -2,8 +2,10 @@
 --@native read
 --@native write
 --@native unpack
+--@native shell
 
 --@import see.base.String
+--@import see.io.Path
 
 --[[
     A utility class for useful system operations.
@@ -13,13 +15,13 @@
     Reads a line from the shell.
     @return see.base.String The line that was read.
 ]]
-function System.read(str)
+function System.read()
     return cast(read(), String)
 end
 
 --[[
     Prints a line to the shell.
-    @param see.base.String The line to print.
+    @param see.base.String... The lines to print.
 ]]
 function System.print(...)
     local args = {...}
@@ -31,7 +33,7 @@ end
 
 --[[
     Writes a string to the shell.
-    @param see.base.String The string to write.
+    @param see.base.String... The strings to write.
 ]]
 function System.write(...)
     local args = {...}
@@ -41,11 +43,26 @@ function System.write(...)
     write(unpack(args))
 end
 
--- TODO: Prevent from trashing global namespace.
+--[[
+    Loads a native API into a given table.
+    @param see.io.Path:path The path to load from.
+    @return table The API table.
+]]
 function System.loadNativeAPI(path)
-    os.loadAPI()
+    local g = { }
+    local function f()
+        os.loadAPI(path.pathString:lstr())
+    end
+    setfenv(f, g)
+    f()
+    return g[path:getName():lstr()]
 end
 
-function System.unloadNativeAPI(path)
-    os.unloadAPI(path)
+--[[
+    Resolves a path relative to the the working directory.
+    @param see.io.Path:path The path to resolve.
+    @return see.io.Path The absolute path.
+]]
+function System.resolve(path)
+    return Path.new(shell.resolve(path.pathString:lstr()))
 end
