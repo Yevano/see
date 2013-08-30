@@ -23,6 +23,7 @@ local DL_PATHS = {
     "lib/see/base/String.lua",
     "lib/see/base/System.lua",
     "lib/see/concurrent/Thread.lua",
+    "lib/see/concurrent/ThreadPool.lua",
     "lib/see/hook/Hook.lua",
     "lib/see/hook/Hooks.lua",
     "lib/see/io/ArrayInputStream.lua",
