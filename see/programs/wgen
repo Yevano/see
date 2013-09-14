@@ -1,0 +1,29 @@
+local _, err = pcall(function(...)
+    local USAGE = "wgen <url> <target>"
+
+    local args = {...}
+
+    local url = args[1]
+    local target = "/" .. shell.resolve(args[2])
+
+    local code =
+[[
+print("Downloading script from " .. '$' .. ".")
+local s = loadstring(http.get('$').readAll())
+setfenv(s, setmetatable({ shell = shell }, { __index = _G }))
+s()
+]]
+
+    local f = code:find("$", 1, true)
+    code = code:sub(1, f - 1) .. url .. code:sub(f + 1)
+    f = code:find("$", f + #url, true)
+    code = code:sub(1, f - 1) .. url .. code:sub(f + 1)
+
+    local targetWrite = fs.open(target, "w")
+    targetWrite.write(code)
+    targetWrite.close()
+end, ...)
+
+if err then
+    error(err)
+end
