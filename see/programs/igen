@@ -1,0 +1,83 @@
+local _, err = pcall(function(...)
+    local USAGE = "Usage: igen <runnable> <name> <target>"
+
+    local args = { ... }
+    if #args < 3 then print(USAGE) end
+
+    local code =
+[[
+local _, err = pcall(function(...)
+    local programName = '$'
+
+    if not fs.exists("/.see") then
+        print(programName .. " requires SEE to be installed. Downloading SEE installer...")
+        local installerCode = http.get("https://raw.github.com/Yevano/see/master/see/programs/installer").readAll()
+        
+        while true do
+            print("Running installer.")
+            local inst = loadstring(installerCode)
+            setfenv(inst, setmetatable({ shell = shell }, { __index = _G }))
+            local _, err = pcall(inst)
+            if err then print(err) end
+
+            if fs.exists("/.see") then
+                break
+            end
+
+            write("SEE was not installed. Quit installation? (y/n) ")
+            while true do
+                local response = read()
+                if string.lower(response):gsub("%s", "") == "y" then
+                    return
+                elseif string.lower(response):gsub("%s", "") == "n" then
+                    break
+                else
+                    print("Invalid input.")
+                end
+            end
+        end
+    end
+
+    local runnableBytes = '$'
+
+    write("Choose an install path for " .. programName .. ": ")
+    local installPath = "/" .. shell.resolve(read())
+
+    local out = fs.open(installPath, "w")
+    out.write(runnableBytes)
+    out.close()
+
+    print(programName .. " was installed successfully.")
+end, ...)
+
+if err then
+    error(err)
+end
+]]
+
+    local runnableRead = fs.open("/" .. shell.resolve(args[1]), "r")
+    local runnableBytes = runnableRead.readAll()
+    runnableRead.close()
+    local name = args[2]
+    local target = "/" .. shell.resolve(args[3])
+
+    local runnableTable = { }
+    for i = 1, #runnableBytes do
+        runnableTable[i] = "\\" .. runnableBytes:sub(i, i):byte()
+    end
+
+    local runnableConverted = table.concat(runnableTable)
+
+    local f = code:find("$", 1, true)
+    code = code:sub(1, f - 1) .. name .. code:sub(f + 1)
+    f = code:find("$", f + #name, true)
+    code = code:sub(1, f - 1) .. runnableConverted .. code:sub(f + 1)
+
+    local targetWrite = fs.open(target, "w")
+    targetWrite.write(code)
+    targetWrite.close()
+end, ...)
+
+if err then
+    error(err)
+end

@@ -66,3 +66,12 @@ end
 function System.resolve(path)
     return Path.new(shell.resolve(path.pathString:lstr()))
 end
+
+function System.run(path, ...)
+    local args = Array.new(...)
+    for i = 1, args:length() do
+        System.print("h")
+        args[i] = cast(args[i], "string")
+    end
+    shell.run(path.pathString:lstr(), args:unpack())
+end

@@ -7,7 +7,6 @@
 --@import see.base.System
 --@import see.util.ArgumentUtils
 
--- TODO: Look at possibly making this object purely mutable.
 --[[
     An Array-backed string. Faster and more memory efficient than native strings.
 ]]
