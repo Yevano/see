@@ -51,7 +51,11 @@ local DL_PATHS = {
     "lib/see/util/Bit.lua",
     "lib/see/util/Color.lua",
     "lib/see/util/Math.lua",
-    "programs/see"
+    "programs/see",
+    "programs/installer",
+    "programs/igen",
+    "programs/rgen",
+    "programs/wgen"
 }
 
 local function fail(err)
