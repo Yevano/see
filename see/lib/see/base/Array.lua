@@ -24,6 +24,15 @@ function Array:init(...)
     end
 end
 
+--[[
+    Wrap around a Lua table.
+    @param table:t Table to wrap around.
+    @return see.base.Array Array that wraps around the given table.
+]]
+function Array.wrap(t)
+    return Array.new(unpack(t))
+end
+
 local oldindex = Array.__meta.__index
 
 function Array.__meta:__index(index)

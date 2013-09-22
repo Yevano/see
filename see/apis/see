@@ -194,6 +194,7 @@ function SeeVM.new(natives, seePath)
     self.rt = self:loadClassFromAny("see.rt.Class")
     self.base.Exception = self:loadClassFromAny("see.base.Exception")
     self.base.System = self:loadClassFromAny("see.base.System")
+    self.base.Iterators = self:loadClassFromAny("see.base.Iterators")
     self.base.Array  = self:loadClassFromAny("see.base.Array")
     self.base.String = self:loadClassFromAny("see.base.String")
     return self
