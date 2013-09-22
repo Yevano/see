@@ -19,6 +19,7 @@ local DL_PATHS = {
     "apis/see",
     "lib/see/base/Array.lua",
     "lib/see/base/Exception.lua",
+    "lib/see/base/Iterators.lua",
     "lib/see/base/Object.lua",
     "lib/see/base/String.lua",
     "lib/see/base/System.lua",
