@@ -1,4 +1,5 @@
 --@native coroutine
+--@native sleep
 
 Thread.SUSPENDED = "suspended"
 Thread.RUNNING = "running"
@@ -11,6 +12,14 @@ Thread.DEAD = "dead"
 ]]
 function Thread.yield(...)
     return coroutine.yield(...)
+end
+
+--[[
+    Sleeps for s seconds.
+    @param number:s Seconds.
+]]
+function Thread.sleep(s)
+    sleep(s)
 end
 
 --[[

@@ -47,11 +47,10 @@ function Files.delete(path)
 end
 
 function Files.readAll(path)
-    System.print(typeof(path))
-    System.print(cast("hello", String))
-    System.print(path.pathString:lstr())
+    System.print(STR"hi":lstr())
     local handle = fs.open(path.pathString:lstr(), "r")
-    local ret = String.new(handle.readAll())
+    System.print(handle.readAll())
+    --local ret = String.new(handle.readAll())
     handle.close()
     return ret
 end
