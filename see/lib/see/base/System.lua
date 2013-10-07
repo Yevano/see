@@ -3,6 +3,7 @@
 --@native write
 --@native unpack
 --@native shell
+--@native os
 
 --@import see.base.String
 --@import see.io.Path
@@ -74,4 +75,8 @@ function System.run(path, ...)
         args[i] = cast(args[i], "string")
     end
     shell.run(path.pathString:lstr(), args:unpack())
+end
+
+function System.getID()
+    return os.getComputerID()
 end
