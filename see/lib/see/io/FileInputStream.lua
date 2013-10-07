@@ -9,10 +9,6 @@ function FileInputStream:init(path)
     self.handle = fs.open(path.pathString:lstr(), "rb")
 end
 
-function FileInputStream.__meta:__gc()
-    self:close()
-end
-
 function FileInputStream:read()
     local ret
     try (function()

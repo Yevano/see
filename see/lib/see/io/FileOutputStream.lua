@@ -9,10 +9,6 @@ function FileOutputStream:init(path)
     self.handle = fs.open(path.pathString:lstr(), "wb")
 end
 
-function FileOutputStream.__meta:__gc()
-    self:close()
-end
-
 function FileOutputStream:write(b)
     try (function()
         self.handle.write(b)
