@@ -1,3 +1,7 @@
+--@native os.queueEvent
+
+--@import see.concurrent.Thread
+
 --@import see.event.impl.CharEvent
 --@import see.event.impl.KeyPressEvent
 --@import see.event.impl.TimerEvent
@@ -51,9 +55,9 @@ function Events.register(ident, eventClass)
 end
 
 function Events.queue(event)
-	
+	os.queueEvent(event.ident, event)
 end
 
 function Events.pull(...)
-	
+	return Thread.yield(...)
 end
