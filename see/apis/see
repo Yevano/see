@@ -257,6 +257,60 @@ function getAnnotations(code)
     return annotations
 end
 
+function SeeVM:start(mainClass, ...)
+    local Events = self:loadClassFromAny("see.event.Events")
+    local UnknownEvent = self:loadClassFromAny("see.event.UnknownEvent")
+    local args = self.base.Array.new(...)
+    local threads = { coroutine.create(function() mainClass.main(args) end) }
+    local threadFilters = { }
+    local wantedIdents = { }
+
+    while true do
+        local eventData = { coroutine.yield() }
+        local eventParams = { }
+
+        for i = 2, #eventData do
+            eventParams[i - 1] = eventData[i]
+        end
+
+        local event
+        if type(eventData[1]) == "string" then
+            local EventClass = Events.getEventClass(eventData[1])
+            if EventClass == UnknownEvent then
+                event = EventClass.new(unpack(eventData))
+            else
+                event = EventClass.new(unpack(eventParams))
+            end
+        else
+            event = eventData[2]
+        end
+
+        if not eventQueue[event.ident] then
+            eventQueue[event.ident] = { }
+        end
+        table.insert(eventQueue[event.ident], event)
+
+        for i = 1, #threads do
+            local threadData
+            if --[[ TODO: Check if event passed filter. ]] then
+                threadData = coroutine.resume(threads[i], --[[ TODO: Pass event here. ]])
+            else
+                threadData = coroutine.resume(threads[i])
+            end
+
+            if not threadData[1] then
+                error(threadData[2], 2)
+                table.remove(threads, i)
+                i = i - 1
+            else
+                for i = 2, #threadData then
+                    thread
+                end
+            end
+        end
+    end
+end
+
 --[[
     Loads a class by trying the standard library first, then from class paths.
     @param string:name

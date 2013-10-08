@@ -1,5 +1,7 @@
 --@import see.event.Event
 
+--@extends see.event.Event
+
 --[[
 	For compatibility's sake only. Use ModemMessageEvent instead.
 ]]

@@ -1,5 +1,7 @@
 --@import see.event.Event
 
+--@extends see.event.Event
+
 function MousePressEvent:init(button, x, y)
 	Event.init(self, "mouse_click")
 	self.button = button

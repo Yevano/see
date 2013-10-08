@@ -22,6 +22,7 @@
 --@import see.event.impl.MonitorTouchEvent
 --@import see.event.impl.MonitorResizeEvent
 --@import see.event.impl.TurtleInventoryEvent
+--@import see.event.impl.UnknownEvent
 
 local registeredEvents
 
@@ -52,6 +53,10 @@ end
 
 function Events.register(ident, eventClass)
 	registeredEvents[ident] = eventClass
+end
+
+function Events.getEventClass(ident)
+	return registeredEvents[ident] or UnknownEvent
 end
 
 function Events.queue(event)
