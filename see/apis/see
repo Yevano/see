@@ -291,11 +291,22 @@ function SeeVM:start(mainClass, ...)
         table.insert(eventQueue[event.ident], event)
 
         for i = 1, #threads do
+            local passEvent = false
+
+            if threadFilters[i] then
+                for j = 1, #threadFilters[i] do
+                    if threadFilters[i][j] == event.ident then
+                        passEvent = true
+                        break
+                    end
+                end
+            end
+
             local threadData
-            if --[[ TODO: Check if event passed filter. ]] then
-                threadData = coroutine.resume(threads[i], --[[ TODO: Pass event here. ]])
+            if passEvent then
+                threadData = { coroutine.resume(threads[i], event) }
             else
-                threadData = coroutine.resume(threads[i])
+                threadData = { coroutine.resume(threads[i]) }
             end
 
             if not threadData[1] then
@@ -303,9 +314,7 @@ function SeeVM:start(mainClass, ...)
                 table.remove(threads, i)
                 i = i - 1
             else
-                for i = 2, #threadData then
-                    thread
-                end
+                threadFilters[i] = threadData
             end
         end
     end
