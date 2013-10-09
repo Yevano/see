@@ -39,7 +39,7 @@ local function error(err, level)
     if term.isColor() then
         term.setTextColor(colors.red)
     end
-    --print(formatTraceback(err, traceback(err, level, b), 10))
+    print(formatTraceback(err, traceback(err, level, b), 10))
     if term.isColor() then
         term.setTextColor(colors.white)
     end
@@ -50,7 +50,7 @@ function errorHandler(err)
     if term.isColor() then
         term.setTextColor(colors.red)
     end
-    --print(see.formatTraceback(err, see.traceback(err, 3, true), 10))
+    print(formatTraceback(err, traceback(err, 2, true), 10))
     if term.isColor() then
         term.setTextColor(colors.white)
     end
@@ -264,12 +264,9 @@ function getAnnotations(code)
 end
 
 function SeeVM:spawnThread(func)
-    --print("spawn")
     local thread = coroutine.create(function() xpcall(func, errorHandler) end)
     table.insert(self.threads, thread)
     self.threadFilters[#self.threads] = { coroutine.resume(thread) }
-    ----print(#self.threadFilters[#self.threads])
-    --error("b")
     return thread
 end
 
@@ -285,7 +282,6 @@ function SeeVM:start(mainClass, ...)
     threadFilters[1] = { coroutine.resume(threads[1], args) }
     local cycle = 1
     while true do
-        --print("CYCLE" .. cycle)
         local threadDeaths = { }
         for i = 1, #threads do
             local dead = false

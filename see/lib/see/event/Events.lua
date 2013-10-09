@@ -52,17 +52,22 @@ function Events.__static()
 end
 
 function Events.register(ident, eventClass)
-	registeredEvents[ident] = eventClass
+	registeredEvents[cast(ident, "string")] = eventClass
 end
 
 function Events.getEventClass(ident)
-	return registeredEvents[ident] or UnknownEvent
+	return registeredEvents[cast(ident, "string")] or UnknownEvent
 end
 
 function Events.queue(event)
-	os.queueEvent(event.ident, event)
+	os.queueEvent(cast(event.ident, "string"), event)
 end
 
 function Events.pull(...)
-	return Thread.yield(...)
+	local args = Array.new(...)
+	local casted = Array.new()
+	for arg in args:iAll() do
+		casted:add(cast(arg, "string"))
+	end
+	return Thread.yield(casted:unpack())
 end
