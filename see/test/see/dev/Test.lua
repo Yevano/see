@@ -2,22 +2,27 @@
 --@import see.dev.TestEvent
 --@import see.util.Math
 
---@native os.queueEvent
-
 function Test.main()
-    System.print("Hello World!")
     Events.register("test", TestEvent)
+    System.print("Hello World!")
 
-    Thread.new(function()
-        System.print("Hello Thread!")
-        for i = 1, 8 do
+    for i = 1, 4 do
+        Thread.new(function()
+            System.print("Hello from thread " .. i .. "!")
+
             local event = Events.pull("test")
-            System.print("T2[" .. i .. "] " .. event.message)
-        end
-    end):start()
+            local message = event.message
+            repeat
+                System.print("T[" .. i .. "] " .. message)
+                event = Events.pull("test")
+                message = event.message
+            until message == "stop"
+        end):start()
+    end
 
-    while true do
-        Thread.sleep(1)
+    for i = 1, 3 do
         Events.queue(TestEvent.new(Math.random()))
     end
+
+    Events.queue(TestEvent.new("stop"))
 end

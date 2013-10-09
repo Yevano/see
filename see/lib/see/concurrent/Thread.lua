@@ -56,3 +56,7 @@ end
 function Thread:isRunning()
     return coroutine.running(self.co)
 end
+
+function Thread:isAlive()
+    return self:status() ~= Thread.DEAD
+end

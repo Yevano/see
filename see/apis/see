@@ -286,77 +286,55 @@ function SeeVM:start(mainClass, ...)
     local cycle = 1
     while true do
         --print("CYCLE" .. cycle)
+        local threadDeaths = { }
         for i = 1, #threads do
             local dead = false
 
-            local breakFor = false
-            while type(threads[i]) == "nil" do
-                i = i + 1
-                if i > #threads then
-                    breakFor = true
-                    break
-                end
-            end
-
-            if breakFor then break end
-
             if coroutine.status(threads[i]) == "dead" then
-                table.remove(threads, i)
-                --i = i - 1
+                table.insert(threadDeaths, i)
                 dead = true
             end
 
             if not dead and event then
-                --print("thread" .. i .. " " .. event.ident)
-
                 if event.ident == "terminate" then
                     error("terminate")
                 end
 
                 local passEvent = false
 
-                --print("threadFilters[" .. i .. "] = " .. tostring(threadFilters[i]))
-
-                if threadFilters[i] then
-                    if #threadFilters[i] == 1 then
-                        --print("NOEVENTS")
-                        passEvent = true
-                    else
-                        --print(#threadFilters[i])
-                        for j = 2, #threadFilters[i] do
-                            --print("::" .. threadFilters[i][j])
-                            if threadFilters[i][j] == event.ident then
-                                passEvent = true
-                                break
-                            else
-                                --print(threadFilters[i][j] .. "~=" .. event.ident)
-                            end
+                if #threadFilters[i] == 1 then
+                    passEvent = true
+                else
+                    for j = 2, #threadFilters[i] do
+                        if threadFilters[i][j] == event.ident then
+                            passEvent = true
+                            break
                         end
                     end
                 end
 
                 if passEvent then
-                    --print("passed!")
                     local threadData = { coroutine.resume(threads[i], event) }
 
                     if not threadData[1] then
                         error(threadData[2], 2)
-                        table.remove(threads, i)
-                        --i = i - 1
+                        table.insert(threadDeaths, i)
                     end
                 else
-                    --print("not passed!")
                     threadFilters[i] = threadData or threadFilters[i]
                 end
 
-                --threadFilters[i] = threadData
-
                 if coroutine.status(threads[i]) == "dead" then
-                    table.remove(threads, i)
+                    table.insert(threadDeaths, i)
                     i = i - 1
                     dead = true
                 end
             end
+        end
+
+        for i = #threadDeaths, 1, -1 do
+            table.remove(threads, threadDeaths[i])
+            table.remove(threadFilters, threadDeaths[i])
         end
 
         if #threads == 0 then break end
@@ -370,9 +348,7 @@ function SeeVM:start(mainClass, ...)
 
         if type(eventData[2]) == "table" and eventData[2].__type then
             event = eventData[2]
-            ----print("EVENT IS " .. tostring(event))
         else
-            --print(eventData[1])
             local EventClass = Events.getEventClass(eventData[1])
             if EventClass == UnknownEvent then
                 event = EventClass.new(unpack(eventData))
@@ -380,8 +356,6 @@ function SeeVM:start(mainClass, ...)
                 event = EventClass.new(unpack(eventParams))
             end
         end
-        
-        cycle = cycle + 1
     end
 end
 
