@@ -347,9 +347,9 @@ function SeeVM:start(mainClass, ...)
         else
             local EventClass = Events.getEventClass(eventData[1])
             if EventClass == UnknownEvent then
-                event = EventClass.new(unpack(eventData))
+                event = xpcall(function() EventClass.new(unpack(eventData)) end, errorHandler)
             else
-                event = EventClass.new(unpack(eventParams))
+                event = xpcall(function () EventClass.new(unpack(eventParams)) end, errorHandler)
             end
         end
     end

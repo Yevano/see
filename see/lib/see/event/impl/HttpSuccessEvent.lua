@@ -6,6 +6,6 @@
 function HttpSuccessEvent:init(url, responseHandle)
 	Event.init(self, "http_success")
 	self.url = url
-	self.response = HttpResponse.new(responseHandle.getAll(), responseHandle.getResponseCode())
+	self.response = HttpResponse.new(responseHandle.readAll(), responseHandle.getResponseCode())
 	responseHandle.close()
 end
