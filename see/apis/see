@@ -284,14 +284,9 @@ function SeeVM:start(mainClass, ...)
     while true do
         local threadDeaths = { }
         for i = 1, #threads do
-            local dead = false
-
             if coroutine.status(threads[i]) == "dead" then
                 table.insert(threadDeaths, i)
-                dead = true
-            end
-
-            if not dead and event then
+            elseif event then
                 if event.ident == "terminate" then
                     error("terminate")
                 end
@@ -316,14 +311,12 @@ function SeeVM:start(mainClass, ...)
                         error(threadData[2], 2)
                         table.insert(threadDeaths, i)
                     end
-                else
-                    threadFilters[i] = threadData or threadFilters[i]
+
+                    threadFilters[i] = threadData
                 end
 
                 if coroutine.status(threads[i]) == "dead" then
                     table.insert(threadDeaths, i)
-                    i = i - 1
-                    dead = true
                 end
             end
         end
@@ -347,9 +340,9 @@ function SeeVM:start(mainClass, ...)
         else
             local EventClass = Events.getEventClass(eventData[1])
             if EventClass == UnknownEvent then
-                event = xpcall(function() EventClass.new(unpack(eventData)) end, errorHandler)
+                xpcall(function() event = EventClass.new(unpack(eventData)) end, errorHandler)
             else
-                event = xpcall(function () EventClass.new(unpack(eventParams)) end, errorHandler)
+                xpcall(function() event = EventClass.new(unpack(eventParams)) end, errorHandler)
             end
         end
     end

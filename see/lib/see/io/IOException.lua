@@ -2,6 +2,6 @@
 
 --@extends see.base.Exception
 
-function IOException(message)
+function IOException:init(message)
     Exception.init(self, message)
 end
