@@ -1,5 +1,8 @@
 --@native coroutine
---@native sleep
+--@native __rt
+--@native os.startTimer
+
+--@import see.event.Events
 
 Thread.SUSPENDED = "suspended"
 Thread.RUNNING = "running"
@@ -19,7 +22,8 @@ end
     @param number:s Seconds.
 ]]
 function Thread.sleep(s)
-    sleep(s)
+    local id = os.startTimer(s)
+    while id ~= Events.pull("timer").id do end
 end
 
 --[[
@@ -27,14 +31,14 @@ end
     @param function:func The function to run in a new thread.
 ]]
 function Thread:init(func)
-    self.co = coroutine.create(func)
+    self.func = func
 end
 
 --[[
-    Resumes a suspended coroutine.
+    Add thread to the event dispatcher.
 ]]
-function Thread:resume()
-    coroutine.resume(self.co)
+function Thread:start()
+    self.co = __rt:spawnThread(self.func)
 end
 
 --[[
@@ -51,4 +55,8 @@ end
 ]]
 function Thread:isRunning()
     return coroutine.running(self.co)
+end
+
+function Thread:isAlive()
+    return self:status() ~= Thread.DEAD
 end

@@ -50,7 +50,7 @@ function errorHandler(err)
     if term.isColor() then
         term.setTextColor(colors.red)
     end
-    print(see.formatTraceback(err, see.traceback(err, 3, true), 10))
+    print(formatTraceback(err, traceback(err, 2, true), 10))
     if term.isColor() then
         term.setTextColor(colors.white)
     end
@@ -178,6 +178,9 @@ function SeeVM.new(natives, seePath)
     setmetatable(self, SeeVM)
     self.seePath = seePath
 
+    self.threads = { }
+    self.threadFilters = { }
+
     self.standardGlobals = { }
     for k, v in pairs(StandardGlobals) do
         self.standardGlobals[k] = function(...) return StandardGlobals[k](self, ...) end
@@ -185,18 +188,21 @@ function SeeVM.new(natives, seePath)
 
     self.base = { }
     self.rt = { }
+    self.event = { }
     self.classes = { }
     self.natives = natives
     self.natives.error = error
     self.archives = { }
     self.classPaths = { }
     self.base.Object = self:loadClassFromAny("see.base.Object")
-    self.rt = self:loadClassFromAny("see.rt.Class")
+    self.rt.Class = self:loadClassFromAny("see.rt.Class")
     self.base.Exception = self:loadClassFromAny("see.base.Exception")
     self.base.System = self:loadClassFromAny("see.base.System")
     self.base.Iterators = self:loadClassFromAny("see.base.Iterators")
     self.base.Array  = self:loadClassFromAny("see.base.Array")
     self.base.String = self:loadClassFromAny("see.base.String")
+    self.event.Events = self:loadClassFromAny("see.event.Events")
+    self.event.UnknownEvent = self:loadClassFromAny("see.event.impl.UnknownEvent")
     return self
 end
 
@@ -257,6 +263,91 @@ function getAnnotations(code)
     return annotations
 end
 
+function SeeVM:spawnThread(func)
+    local thread = coroutine.create(function() xpcall(func, errorHandler) end)
+    table.insert(self.threads, thread)
+    self.threadFilters[#self.threads] = { coroutine.resume(thread) }
+    return thread
+end
+
+function SeeVM:start(mainClass, ...)
+    local Events = self.event.Events
+    local UnknownEvent = self.event.UnknownEvent
+    local args = self.base.Array.new(...)
+    local threads = self.threads
+    threads[1] = coroutine.create(function() xpcall(function() mainClass.main(args) end, errorHandler) end)
+    local threadFilters = self.threadFilters
+    local event
+
+    threadFilters[1] = { coroutine.resume(threads[1], args) }
+    local cycle = 1
+    while true do
+        local threadDeaths = { }
+        for i = 1, #threads do
+            if coroutine.status(threads[i]) == "dead" then
+                table.insert(threadDeaths, i)
+            elseif event then
+                if event.ident == "terminate" then
+                    error("terminate")
+                end
+
+                local passEvent = false
+
+                if #threadFilters[i] == 1 then
+                    passEvent = true
+                else
+                    for j = 2, #threadFilters[i] do
+                        if threadFilters[i][j] == event.ident then
+                            passEvent = true
+                            break
+                        end
+                    end
+                end
+
+                if passEvent then
+                    local threadData = { coroutine.resume(threads[i], event) }
+
+                    if not threadData[1] then
+                        error(threadData[2], 2)
+                        table.insert(threadDeaths, i)
+                    end
+
+                    threadFilters[i] = threadData
+                end
+
+                if coroutine.status(threads[i]) == "dead" then
+                    table.insert(threadDeaths, i)
+                end
+            end
+        end
+
+        for i = #threadDeaths, 1, -1 do
+            table.remove(threads, threadDeaths[i])
+            table.remove(threadFilters, threadDeaths[i])
+        end
+
+        if #threads == 0 then break end
+
+        local eventData = { coroutine.yield() }
+        local eventParams = { }
+
+        for i = 2, #eventData do
+            eventParams[i - 1] = eventData[i]
+        end
+
+        if type(eventData[2]) == "table" and eventData[2].__type then
+            event = eventData[2]
+        else
+            local EventClass = Events.getEventClass(eventData[1])
+            if EventClass == UnknownEvent then
+                xpcall(function() event = EventClass.new(unpack(eventData)) end, errorHandler)
+            else
+                xpcall(function() event = EventClass.new(unpack(eventParams)) end, errorHandler)
+            end
+        end
+    end
+end
+
 --[[
     Loads a class by trying the standard library first, then from class paths.
     @param string:name
@@ -301,6 +392,11 @@ end
 ]]
 function SeeVM:executeAnnotation(env, class, annotation)
     local pindex = annotation:find("%s")
+
+    if not pindex then
+        error("Failed to execute annotation for class " .. class.__name .. ".")
+    end
+
     local aname = annotation:sub(1, pindex - 1)
 
     if aname == "import" then
@@ -310,6 +406,12 @@ function SeeVM:executeAnnotation(env, class, annotation)
         env[getPackageName(name)] = class
     elseif aname == "native" then
         local name = annotation:sub(pindex + 1):gsub("%s", "")
+
+        if name == "__rt" then
+            env.__rt = self
+            return
+        end
+
         local keys = getPackageComponents(name)
         local lk
         local v = self.natives
@@ -416,6 +518,9 @@ function SeeVM:loadClass(def, annotations, name)
     for k, class in pairs(self.base) do
         env[k] = class
     end
+
+    -- Import Events class for convenience.
+    env["Events"] = self.event.Events
 
     -- Setup class environment.
     env[className] = class
