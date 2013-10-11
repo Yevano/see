@@ -115,10 +115,16 @@ function StandardGlobals.cast(vm, value, castType)
         else
             -- TODO
         end
-    else
-        return castType.__cast(value)
+    elseif type(castType) == "table" then
+        if castType.__cast then
+            return castType.__cast(value)
+        else
+            StandardGlobals.throw(vm, vm:loadClassFromAny("see.rt.CastException").new(StandardGlobals.typeof(vm, value), castType))
+        end
         -- Casting to Object.
         -- TODO
+    else
+        --StandardGlobals.throw(vm, vm:loadClassFromAny("see.rt.CastException").new())
     end
 end
 

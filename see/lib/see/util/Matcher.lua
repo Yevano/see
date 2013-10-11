@@ -14,10 +14,13 @@ function Matcher:init(pattern, str)
 end
 
 function Matcher:find()
-	self.left, self.right = self.string:find(pattern, (self.right or 0) + 1)
+	if self.right and self.right + 1 > #self.string then
+		return false
+	end
+	self.left, self.right = self.string:find(self.pattern, (self.right or 0) + 1)
 	return self.left and true or false
 end
 
 function Matcher:matched()
-	return String.new(str:sub(self.left, self.right))
+	return String.new(self.string:sub(self.left, self.right))
 end
