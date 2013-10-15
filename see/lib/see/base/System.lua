@@ -75,3 +75,11 @@ end
 function System.getID()
     return os.getComputerID()
 end
+
+function System.clock()
+    return os.clock()
+end
+
+function System.time()
+    return os.time()
+end

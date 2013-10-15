@@ -185,6 +185,7 @@ function SeeVM.new(natives, seePath)
     self.seePath = seePath
 
     self.threads = { }
+    self.objThreads = { }
     self.threadFilters = { }
 
     self.standardGlobals = { }
@@ -209,6 +210,7 @@ function SeeVM.new(natives, seePath)
     self.base.String = self:loadClassFromAny("see.base.String")
     self.event.Events = self:loadClassFromAny("see.event.Events")
     self.event.UnknownEvent = self:loadClassFromAny("see.event.impl.UnknownEvent")
+    self.rt.RuntimeException = self:loadClassFromAny("see.rt.RuntimeException")
     return self
 end
 
@@ -269,8 +271,9 @@ function getAnnotations(code)
     return annotations
 end
 
-function SeeVM:spawnThread(func)
+function SeeVM:spawnThread(func, obj)
     local thread = coroutine.create(function() xpcall(func, errorHandler) end)
+    self.objThreads[thread] = obj
     table.insert(self.threads, thread)
     self.threadFilters[#self.threads] = { coroutine.resume(thread) }
     return thread
@@ -281,7 +284,11 @@ function SeeVM:start(mainClass, ...)
     local UnknownEvent = self.event.UnknownEvent
     local args = self.base.Array.new(...)
     local threads = self.threads
-    threads[1] = coroutine.create(function() xpcall(function() mainClass.main(args) end, errorHandler) end)
+    local f = function() mainClass.main(args) end
+    threads[1] = coroutine.create(function() xpcall(f, errorHandler) end)
+    local t = self:loadClassFromAny("see.concurrent.Thread").new(f)
+    t.co = threads[1]
+    self.objThreads[threads[1]] = t
     local threadFilters = self.threadFilters
     local event
 
@@ -292,6 +299,7 @@ function SeeVM:start(mainClass, ...)
         for i = 1, #threads do
             if coroutine.status(threads[i]) == "dead" then
                 table.insert(threadDeaths, i)
+                self.objThreads[threads[i]] = nil
             elseif event then
                 if event.ident == "terminate" then
                     error("terminate")
@@ -316,6 +324,7 @@ function SeeVM:start(mainClass, ...)
                     if not threadData[1] then
                         error(threadData[2], 2)
                         table.insert(threadDeaths, i)
+                        self.objThreads[threads[i]] = nil
                     end
 
                     threadFilters[i] = threadData
@@ -323,6 +332,7 @@ function SeeVM:start(mainClass, ...)
 
                 if coroutine.status(threads[i]) == "dead" then
                     table.insert(threadDeaths, i)
+                    self.objThreads[threads[i]] = nil
                 end
             end
         end

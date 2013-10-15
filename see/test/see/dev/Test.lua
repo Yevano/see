@@ -1,28 +1,23 @@
 --@import see.concurrent.Thread
---@import see.dev.TestEvent
---@import see.util.Math
+--@import see.concurrent.Task
 
 function Test.main()
-    Events.register("test", TestEvent)
-    System.print("Hello World!")
+    local piTask = Task.new(calculatePi, 1000000):setCallback(function(result)
+        System.print(result)
+    end)
 
-    for i = 1, 4 do
-        Thread.new(function()
-            System.print("Hello from thread " .. i .. "!")
+    repeat
+        System.print("Waiting...")
+        Thread.sleep(1)
+    until piTask:isFinished()
+end
 
-            local event = Events.pull("test")
-            local message = event.message
-            repeat
-                System.print("T[" .. i .. "] " .. message)
-                event = Events.pull("test")
-                message = event.message
-            until message == "stop"
-        end):start()
+function calculatePi(iter)
+    local pi = 4
+    for i = 1, iter * 2, 2 do
+        Thread.work()
+        pi = pi - (4/(1 + i * 2))
+        pi = pi + (4/(3 + i * 2))
     end
-
-    for i = 1, 3 do
-        Events.queue(TestEvent.new(Math.random()))
-    end
-
-    Events.queue(TestEvent.new("stop"))
+    return pi
 end
