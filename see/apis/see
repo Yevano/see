@@ -68,39 +68,39 @@ StandardGlobals = { }
 
 --[[
     Creates a new anonymous class.
-    @param SeeVM:vm The VM to run this function for.
+    @param SeeRT:rt The VM to run this function for.
     @param function:def The function used to define this class.
     @param table:super The super class for this class. If nil, this class extends see.lang.Object.
 ]]
-function StandardGlobals.class(vm, def)
+function StandardGlobals.class(rt, def)
     -- TODO
 end
 
 --[[
     Gets the type of a given value.
-    @param SeeVM:vm The VM to run this function for.
+    @param SeeRT:rt The VM to run this function for.
     @param value:any The value to get the type of.
     @return string|table The type identifier if value if primitive, or the class of value if value is an object.
 ]]
-function StandardGlobals.typeof(vm, value)
+function StandardGlobals.typeof(rt, value)
     if type(value) == "table" then
         return value.__type or "table"
     end
     return type(value)
 end
 
-function StandardGlobals.isprimitive(vm, t)
+function StandardGlobals.isprimitive(rt, t)
     return type(t) == "string"
 end
 
 --[[
     Casts a value to a particular class.
-    @param SeeVM:vm The VM to run this function for.
+    @param SeeRT:rt The VM to run this function for.
     @param any:value The value to cast.
     @param string|table:castType The type to cast to.
 ]]
-function StandardGlobals.cast(vm, value, castType)
-    if StandardGlobals.typeof(vm, value) == castType then
+function StandardGlobals.cast(rt, value, castType)
+    if StandardGlobals.typeof(rt, value) == castType then
         return value
     end
 
@@ -119,69 +119,69 @@ function StandardGlobals.cast(vm, value, castType)
         if castType.__cast then
             return castType.__cast(value)
         else
-            StandardGlobals.throw(vm, vm:loadClassFromAny("see.rt.CastException").new(StandardGlobals.typeof(vm, value), castType))
+            StandardGlobals.throw(rt, rt:loadClassFromAny("see.rt.CastException").new(StandardGlobals.typeof(rt, value), castType))
         end
         -- Casting to Object.
         -- TODO
     else
-        --StandardGlobals.throw(vm, vm:loadClassFromAny("see.rt.CastException").new())
+        --StandardGlobals.throw(rt, rt:loadClassFromAny("see.rt.CastException").new())
     end
 end
 
 --[[
     Casts an object to a different class by setting its metatable.
-    @param SeeVM:vm The VM to run this function for.
+    @param SeeRT:rt The VM to run this function for.
     @param see.base.Object value
 ]]
-function StandardGlobals.reinterpret_cast(vm, value, castType)
+function StandardGlobals.reinterpret_cast(rt, value, castType)
     if type(value) ~= "table" or not value.__type then error("Cannot use reinterpret_cast to cast a primitive type.") end
     setmetatable(value, castType.__meta)
 end
 
 --[[
     Throws an exception.
-    @param SeeVM:vm The VM to run this function for.
+    @param SeeRT:rt The VM to run this function for.
     @param see.base.Exception The exception to throw.
 ]]
-function StandardGlobals.throw(vm, exception)
+function StandardGlobals.throw(rt, exception)
     if exception then
-        vm.lastException = exception
+        rt.lastException = exception
     else
-        vm.lastException = vm:loadClassFromAny("see.rt.RuntimeException").new("Invalid argument to throw.")
+        rt.lastException = rt:loadClassFromAny("see.rt.RuntimeException").new("Invalid argument to throw.")
     end
     error("Uncaught exception " .. exception.__type.__name .. ': "' .. exception.message:lstr() .. '"', 4, true)
 end
 
 --[[
     Tries to execute code until an error occurs. Calls catch code if an error occurs.
-    @param SeeVM:vm The VM to run this function for.
+    @param SeeRT:rt The VM to run this function for.
     @param function:tryFunc Function to run and catch errors from.
     @param function:catchFunc(see.base.Exception) Function to run on error.
 ]]
-function StandardGlobals.try(vm, tryFunc, catchFunc)
+function StandardGlobals.try(rt, tryFunc, catchFunc)
     local suc, err = pcall(tryFunc)
     if suc then return end
-    if err then vm.lastException = vm:loadClassFromAny("see.rt.RuntimeException").new(err) end
-    catchFunc(vm.lastException)
+    if err then rt.lastException = rt:loadClassFromAny("see.rt.RuntimeException").new(err) end
+    catchFunc(rt.lastException)
 end
 
 --[[
     Converts a Lua string to a see.base.String.
     @param see.base.String... Strings to concatenate.
 ]]
-function StandardGlobals.STR(vm, ...)
-    return vm.base.String.new(...)
+function StandardGlobals.STR(rt, ...)
+    return rt.base.String.new(...)
 end
 
-SeeVM = { }
-SeeVM.__index = SeeVM
+SeeRT = { }
+SeeRT.__index = SeeRT
 
 --[[
-    Creates a new SeeVM.
+    Creates a new SeeRT.
 ]]
-function SeeVM.new(natives, seePath)
+function SeeRT.new(natives, seePath)
     local self = { }
-    setmetatable(self, SeeVM)
+    setmetatable(self, SeeRT)
     self.seePath = seePath
 
     self.threads = { }
@@ -271,7 +271,7 @@ function getAnnotations(code)
     return annotations
 end
 
-function SeeVM:spawnThread(func, obj)
+function SeeRT:spawnThread(func, obj)
     local thread = coroutine.create(function() xpcall(func, errorHandler) end)
     self.objThreads[thread] = obj
     table.insert(self.threads, thread)
@@ -279,7 +279,7 @@ function SeeVM:spawnThread(func, obj)
     return thread
 end
 
-function SeeVM:start(mainClass, ...)
+function SeeRT:start(mainClass, ...)
     local Events = self.event.Events
     local UnknownEvent = self.event.UnknownEvent
     local args = self.base.Array.new(...)
@@ -369,7 +369,7 @@ end
     @param string:name
     @return table The class loaded.
 ]]
-function SeeVM:loadClassFromAny(name)
+function SeeRT:loadClassFromAny(name)
     local class = self.classes[name]
     local err
 
@@ -406,7 +406,7 @@ end
     @param table:env The function environment.
     @param table:annotation Annotation to execute.
 ]]
-function SeeVM:executeAnnotation(env, class, annotation)
+function SeeRT:executeAnnotation(env, class, annotation)
     local pindex = annotation:find("%s")
 
     if not pindex then
@@ -458,7 +458,7 @@ end
     @return table The loaded class.
     @return string Error message, or nil if successful.
 ]]
-function SeeVM:loadClassFromFile(path, name)
+function SeeRT:loadClassFromFile(path, name)
     local fileHandle = fs.open(path, "r")
     if not fileHandle then
         return nil, "Could not read file."
@@ -483,7 +483,7 @@ end
     @return table The loaded class.
     @return string Error message, or nil if successful.
 ]]
-function SeeVM:loadClassFromArchive(archiveBytes, path, name)
+function SeeRT:loadClassFromArchive(archiveBytes, path, name)
     local loc = archiveBytes:find("F" .. path .. "\0", 1, true) + #path + 2
     local fin = archiveBytes:find("\0", loc) - 1
     local code = archiveBytes:sub(loc, fin)
@@ -502,7 +502,7 @@ end
     @param table[string]:annotations Table of annotation strings.
     @param string:name The name of this class, including the full package.
 ]]
-function SeeVM:loadClass(def, annotations, name)
+function SeeRT:loadClass(def, annotations, name)
     local className = getPackageName(name)
 
     if self.classes[name] then

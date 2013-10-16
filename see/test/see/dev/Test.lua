@@ -2,14 +2,15 @@
 --@import see.concurrent.Task
 
 function Test.main()
-    local piTask = Task.new(calculatePi, 1000000):setCallback(function(result)
-        System.print(result)
+    local piTask = Task.new(calculatePi, 200000):setCallback(function(result)
+        System.print("\n" .. result)
     end)
 
+    System.write("Waiting")
+
     repeat
-        System.print("Waiting...")
         Thread.sleep(1)
-    until piTask:isFinished()
+    until piTask:isFinished() or System.write(".")
 end
 
 function calculatePi(iter)

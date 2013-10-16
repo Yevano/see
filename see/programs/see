@@ -12,25 +12,23 @@ local _, err = pcall(function(...)
 
     local natives = copy(_G)
     natives.shell = shell
-    local vm
+    local rt
     local classPath
 
     local function runFromPath(classPath, mainClassName, args)
-        local MainClass = vm:loadClassFromAny(mainClassName)
+        local MainClass = rt:loadClassFromAny(mainClassName)
         if not MainClass then error("Main class not found! ") end
-        --[[if not MainClass.main then error("Main method not found!") end
-        xpcall(function() MainClass.main(vm.base.Array.new(unpack(args))) end, see.errorHandler)]]
-        vm:start(MainClass, unpack(args))
+        rt:start(MainClass, unpack(args))
     end
 
     local function runFromArchive(classPath, mainClassName, args)
         local fileHandle = fs.open(classPath, "r")
-        vm.archives[classPath] = fileHandle.readAll()
+        rt.archives[classPath] = fileHandle.readAll()
         fileHandle.close()
-        local MainClass = vm:loadClassFromAny(mainClassName)
+        local MainClass = rt:loadClassFromAny(mainClassName)
         if not MainClass then error("Main class not found! ") end
         if not MainClass.main then error("Main method not found!") end
-        xpcall(function() MainClass.main(vm.base.Array.new(unpack(args))) end, see.errorHandler)
+        xpcall(function() MainClass.main(rt.base.Array.new(unpack(args))) end, see.errorHandler)
     end
 
     local function getSubDirectories(path)
@@ -126,9 +124,9 @@ local _, err = pcall(function(...)
 
         apiPath = fs.combine(config.install_dir, "apis/see")
         os.loadAPI(apiPath)
-        vm = see.SeeVM.new(natives, config.install_dir)
+        rt = see.SeeRT.new(natives, config.install_dir)
         classPath = shell.resolve(args[2])
-        table.insert(vm.classPaths, classPath)
+        table.insert(rt.classPaths, classPath)
         
         local mainClassName = args[3]
         local programArgs = { }

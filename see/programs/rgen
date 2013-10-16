@@ -45,14 +45,14 @@ local _, err = pcall(function(...)
 
     os.loadAPI(fs.combine(config.install_dir, "apis/see"))
 
-    local vm = see.SeeVM.new(natives, config.install_dir)
-    table.insert(vm.classPaths, classPath)
-    vm.archives[classPath] = archiveBytes
+    local rt = see.SeeRT.new(natives, config.install_dir)
+    table.insert(rt.classPaths, classPath)
+    rt.archives[classPath] = archiveBytes
 
-    local MainClass = vm:loadClassFromAny(mainClass)
+    local MainClass = rt:loadClassFromAny(mainClass)
     if not MainClass then error("Main class not found!") end
     if not MainClass.main then error("Main method not found!") end
-    xpcall(function() MainClass.main(vm.base.Array.new(unpack(args))) end, see.errorHandler)
+    xpcall(function() MainClass.main(rt.base.Array.new(unpack(args))) end, see.errorHandler)
 end, ...)
 
 os.unloadAPI(fs.combine(config.install_dir, "apis/see"))
