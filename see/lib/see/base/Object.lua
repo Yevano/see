@@ -30,10 +30,9 @@ function Object:getClass()
 end
 
 function Object:toString()
-    return String.new(tostring(self) .. ":" .. self:getClass().__name)
+    return String.new(self:getClass().__name, " (", tostring(self):sub(8, -1), ")")
 end
 
--- TODO: Fix me.
 function Object.__concat(l, r)
     return cast(l, String):concat(cast(r, String))
 end

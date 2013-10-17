@@ -447,7 +447,9 @@ function SeeRT:executeAnnotation(env, class, annotation)
         lw[lk] = v
     elseif aname == "extends" then
         local name = annotation:sub(pindex + 1):gsub("%s", "")
-        setmetatable(class, env[getPackageName(name)])
+        local super = env[getPackageName(name)]
+        class.__super = super
+        setmetatable(class, super.__meta)
     end
 end
 
@@ -562,7 +564,8 @@ function SeeRT:loadClass(def, annotations, name)
 
     -- Extend Object by default.
     if abool then
-        setmetatable(class, self.base.Object)
+        class.__super = self.base.Object
+        setmetatable(class, self.base.Object.__meta)
     end
 
     if class.__static then
