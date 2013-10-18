@@ -6,7 +6,7 @@ function traceback(err, level, b)
         j = j + 1
         ok, err = pcall(_G.error, '', j)
         local name = err:match("^[^:]+")
-        if not b and name == "bios" or name == "see" then break end
+        if not b and name == "bios" or name == "see" or name == "xpcall" then break end
         table.insert(errors, err)
     end
 
@@ -35,7 +35,7 @@ function formatTraceback(err, errors, level)
     return f
 end
 
-local function error(err, level)
+local function error(err, level, b)
     if term.isColor() then
         term.setTextColor(colors.red)
     end
@@ -50,7 +50,7 @@ function errorHandler(err)
     if term.isColor() then
         term.setTextColor(colors.red)
     end
-    print(formatTraceback(err, traceback(err, 2, true), 10))
+    print(formatTraceback(err, traceback(err, 3, true), 100))
     if term.isColor() then
         term.setTextColor(colors.white)
     end
@@ -322,7 +322,7 @@ function SeeRT:start(mainClass, ...)
                     local threadData = { coroutine.resume(threads[i], event) }
 
                     if not threadData[1] then
-                        error(threadData[2], 2)
+                        error(threadData[2], 1)
                         table.insert(threadDeaths, i)
                         self.objThreads[threads[i]] = nil
                     end
