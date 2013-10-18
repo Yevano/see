@@ -27,7 +27,7 @@ end
 function System.print(...)
     local args = {...}
     for i = 1, #args do
-        args[i] = cast(args[i], "string")
+        args[i] = cast(cast(args[i], String), "string")
     end
     print(unpack(args))
 end

@@ -145,11 +145,10 @@ end
 ]]
 function StandardGlobals.throw(rt, exception)
     if exception then
-        rt.lastException = exception
+        rt:throw(exception, 5)
     else
-        rt.lastException = rt:loadClassFromAny("see.rt.RuntimeException").new("Invalid argument to throw.")
+        rt:throw(rt:loadClassFromAny("see.rt.RuntimeException").new("Invalid argument to throw."), 6)
     end
-    error("Uncaught exception " .. exception.__type.__name .. ': "' .. exception.message:lstr() .. '"', 4, true)
 end
 
 --[[
@@ -212,6 +211,11 @@ function SeeRT.new(natives, seePath)
     self.event.UnknownEvent = self:loadClassFromAny("see.event.impl.UnknownEvent")
     self.rt.RuntimeException = self:loadClassFromAny("see.rt.RuntimeException")
     return self
+end
+
+function SeeRT:throw(exception, level)
+    self.lastException = exception
+    error("Uncaught exception " .. exception.__type.__name .. ': "' .. exception.message:lstr() .. '"', level, true)
 end
 
 --[[
