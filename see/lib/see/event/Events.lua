@@ -23,6 +23,7 @@
 --@import see.event.impl.MonitorResizeEvent
 --@import see.event.impl.TurtleInventoryEvent
 --@import see.event.impl.UnknownEvent
+--@import see.event.impl.SignalEvent
 
 local registeredEvents
 
@@ -49,6 +50,7 @@ function Events.__static()
 	Events.register("monitor_touch",     MonitorTouchEvent)
 	Events.register("monitor_resize",    MonitorResizeEvent)
 	Events.register("turtle_inventory",  TurtleInventoryEvent)
+	Events.register("signal",            SignalEvent)
 end
 
 function Events.register(ident, eventClass)

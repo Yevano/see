@@ -9,7 +9,7 @@ function Terminal.setBG(color)
 end
 
 function Terminal.write(string)
-    term.write(string)
+    term.write(cast(string, "string"))
 end
 
 function Terminal.clear()

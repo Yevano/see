@@ -279,7 +279,7 @@ function SeeRT:spawnThread(func, obj)
     local thread = coroutine.create(function() xpcall(func, errorHandler) end)
     self.objThreads[thread] = obj
     table.insert(self.threads, thread)
-    self.threadFilters[#self.threads] = { coroutine.resume(thread) }
+    self.threadFilters[#self.threads] = -1
     return thread
 end
 
@@ -301,7 +301,9 @@ function SeeRT:start(mainClass, ...)
     while true do
         local threadDeaths = { }
         for i = 1, #threads do
-            if coroutine.status(threads[i]) == "dead" then
+            if threadFilters[i] == -1 then
+                threadFilters[i] = { coroutine.resume(threads[i], event) }
+            elseif coroutine.status(threads[i]) == "dead" then
                 table.insert(threadDeaths, i)
                 self.objThreads[threads[i]] = nil
             elseif event then
