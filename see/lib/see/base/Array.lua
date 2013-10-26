@@ -129,6 +129,18 @@ function Array:insert(index, value)
     throw(IndexOutOfBoundsException.new(index))
 end
 
+function Array:indexOf(value)
+    for i = 1, self:length() do
+        if self[i] == value then
+            return i
+        end
+    end
+end
+
+function Array:reset()
+    self.luaArray = { }
+end
+
 function Array:unpack()
     return unpack(self.luaArray)
 end
@@ -155,10 +167,23 @@ end
 function Array:iRange(a, b)
     ArgumentUtils.check(1, a, "number")
     ArgumentUtils.check(2, b, "number")
-    if a > b then a, b = b, a end
-    local i = a - 1
+
+    if self:length() == 0 then return function() end end
+
+    if a < 0 then a = self:length() + a + 1 end
+    if b < 0 then b = self:length() + b + 1 end
+
+    if a < b then
+        local i = a - 1
+        return function()
+            i = i + 1
+            return i <= b and self[i] or nil
+        end
+    end
+
+    local i = a + 1
     return function()
-        i = i + 1
-        return i <= b and self[i] or nil
+        i = i - 1
+        return i >= b and self[i] or nil
     end
 end
