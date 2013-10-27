@@ -137,6 +137,14 @@ function Array:indexOf(value)
     end
 end
 
+function Array:contains(value)
+    for i = 1, self:length() do
+        if self[i] == value then
+            return true
+        end
+    end
+end
+
 function Array:reset()
     self.luaArray = { }
 end

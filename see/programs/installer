@@ -48,6 +48,7 @@ local DL_PATHS = {
     "lib/see/event/impl/MonitorTouchEvent.lua",
     "lib/see/event/impl/MonitorResizeEvent.lua",
     "lib/see/event/impl/TurtleInventoryEvent.lua",
+    "lib/see/event/impl/SignalEvent.lua",
     "lib/see/event/impl/UnknownEvent.lua",
     "lib/see/io/ArrayInputStream.lua",
     "lib/see/io/ArrayOutputStream.lua",
