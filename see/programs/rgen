@@ -68,7 +68,7 @@ end
         if b < 32 or b > 126 or b == 34 or b == 39 then
             archiveTable[i] = "\\" .. b
         else
-            archiveTable[i] = b:char()
+            archiveTable[i] = string.char(b)
         end
     end
 
