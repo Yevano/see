@@ -1,6 +1,8 @@
 local REPO_URL = "https://raw.github.com/Yevano/see/master/see/"
 local SUPPORTS_COLOR = term.isColor()
 
+local args = { ... }
+
 local MAKE_PATHS = {
     "apis/",
     "lib/",
@@ -114,8 +116,13 @@ while true do
     while true do
         local downloaded = 0
 
-        write("Choose an install path: ")
-        local installPath = "/" .. shell.resolve(read())
+        local installPath
+        if #args == 1 then
+            installPath = args[1]
+        else
+            write("Choose an install path: ")
+            installPath = "/" .. shell.resolve(read())
+        end
 
         local configHandle = fs.open("/.see", "w")
         configHandle.write('install_dir = "' .. installPath .. '"')
