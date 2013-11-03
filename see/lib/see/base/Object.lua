@@ -29,6 +29,16 @@ function Object:getClass()
     return self.__type
 end
 
+function Object:instanceof(type)
+    local objectType = self.__type
+    while objectType do
+        if type == objectType then
+            return true
+        end
+        objectType = objectType.__super
+    end
+end
+
 function Object:toString()
     return String.new(self:getClass().__name, " (", tostring(self):sub(8, -1), ")")
 end

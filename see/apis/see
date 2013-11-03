@@ -90,7 +90,7 @@ function StandardGlobals.typeof(rt, value)
 end
 
 function StandardGlobals.isprimitive(rt, t)
-    return type(t) == "string"
+    return type(t) ~= "table" or not t.__type
 end
 
 --[[
@@ -147,7 +147,7 @@ function StandardGlobals.throw(rt, exception)
     if exception then
         rt:throw(exception, 5)
     else
-        rt:throw(rt:loadClassFromAny("see.rt.RuntimeException").new("Invalid argument to throw."), 6)
+        rt:throw(rt:loadClassFromAny("see.rt.RuntimeException").new("Invalid argument to throw."), 5)
     end
 end
 
