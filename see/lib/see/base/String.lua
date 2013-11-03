@@ -18,7 +18,10 @@
 ]]
 function String.__cast(value)
     local type = typeof(value)
-    if typeof(type) == "table" and value.__type then
+    if not isprimitive(value) then
+        if value.__type == String then
+            return value
+        end
         return value:toString()
     end
 
