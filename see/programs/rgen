@@ -64,7 +64,12 @@ end
 
     local archiveTable = { }
     for i = 1, #archiveBytes do
-        archiveTable[i] = "\\" .. archiveBytes:sub(i, i):byte()
+        local b = archiveBytes:sub(i, i):byte()
+        if b < 32 or b > 126 or b == 34 or b == 39 or b == 45 or b == 91 or b == 93 then
+            archiveTable[i] = "\\" .. b
+        else
+            archiveTable[i] = string.char(b)
+        end
     end
 
     local archiveConverted = table.concat(archiveTable)
