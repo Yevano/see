@@ -6,7 +6,7 @@ function traceback(err, level, b)
         j = j + 1
         ok, err = pcall(_G.error, '', j)
         local name = err:match("^[^:]+")
-        if not b and name == "bios" or name == "see" or name == "xpcall" then break end
+        if (not b and name == "bios" or name == "see" or name == "xpcall") or not err then break end
         table.insert(errors, err)
     end
 
@@ -14,15 +14,11 @@ function traceback(err, level, b)
 end
 
 function formatTraceback(err, errors, level)
+    level = level < #errors and levels or #errors
     if not err then err = "" end
     local f = "Error: " .. err
-    local j = 1
-    for _, err in pairs(errors) do
-        if j == level then
-            f = f .. "\n... and " .. (#errors - level) .. " more."
-            break
-        end
-
+    for i = 1, level do
+        err = errors[i]
         local ls = err:find(":")
         if ls then ls = ls + 1 end
         local le = err:find(":", ls)
@@ -30,9 +26,8 @@ function formatTraceback(err, errors, level)
         local line = ls and le and err:sub(ls, le)
         local location = ls and err:sub(1, ls - 2) or err
         f = f .. "\n@ line " .. (le and line or "?") .. " in " .. location
-        j = j + 1
     end
-    return f
+    return f .. (#errors - level > 0 and "\n... and " .. (#errors - level) .. " more." or "")
 end
 
 local function error(err, level, b)
@@ -50,7 +45,7 @@ function errorHandler(err)
     if term.isColor() then
         term.setTextColor(colors.red)
     end
-    print(formatTraceback(err, traceback(err, 3, true), 100))
+    print(formatTraceback(err, traceback(err, 5, true), 10))
     if term.isColor() then
         term.setTextColor(colors.white)
     end
@@ -145,9 +140,9 @@ end
 ]]
 function StandardGlobals.throw(rt, exception)
     if exception then
-        rt:throw(exception, 5)
+        rt:throw(exception)
     else
-        rt:throw(rt:loadClassFromAny("see.rt.RuntimeException").new("Invalid argument to throw."), 5)
+        rt:throw(rt:loadClassFromAny("see.rt.RuntimeException").new("Invalid argument to throw."))
     end
 end
 
@@ -160,7 +155,7 @@ end
 function StandardGlobals.try(rt, tryFunc, catchFunc)
     local suc, err = pcall(tryFunc)
     if suc then return end
-    if err then rt.lastException = rt:loadClassFromAny("see.rt.RuntimeException").new(err) end
+    --if err then rt.lastException = rt:loadClassFromAny("see.rt.RuntimeException").new(err) end
     catchFunc(rt.lastException)
 end
 
@@ -215,7 +210,7 @@ end
 
 function SeeRT:throw(exception, level)
     self.lastException = exception
-    error("Uncaught exception " .. exception.__type.__name .. ': "' .. exception.message:lstr() .. '"', level, true)
+    _G.error("Uncaught exception " .. exception.__type.__name .. ': "' .. exception.message:lstr() .. '"', level)
 end
 
 --[[
@@ -303,6 +298,10 @@ function SeeRT:start(mainClass, ...)
         for i = 1, #threads do
             if threadFilters[i] == -1 then
                 threadFilters[i] = { coroutine.resume(threads[i], event) }
+                if coroutine.status(threads[i]) == "dead" then
+                    table.insert(threadDeaths, i)
+                    self.objThreads[threads[i]] = nil
+                end
             elseif coroutine.status(threads[i]) == "dead" then
                 table.insert(threadDeaths, i)
                 self.objThreads[threads[i]] = nil
