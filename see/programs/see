@@ -23,7 +23,10 @@ local _, err = pcall(function(...)
 
     local function runFromArchive(classPath, mainClassName, args)
         local fileHandle = fs.open(classPath, "r")
-        rt.archives[classPath] = fileHandle.readAll()
+        rt.archives
+        [classPath] = 
+        fileHandle.
+        readAll()
         fileHandle.close()
         local MainClass = rt:loadClassFromAny(mainClassName)
         if not MainClass then error("Main class not found! ") end

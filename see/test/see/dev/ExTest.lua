@@ -1,16 +1,26 @@
 --@import see.concurrent.Thread
 
+function ExTest:init(x)
+    self.x = x
+end
+
 function ExTest.main()
-    local thread = Thread.new(function()
-        local function f(x)
-            if x == 0 then
-                throw(Exception.new("TEST"))
-            end
-            f(x - 1)
+    local c = class("Anon", {
+        import = {
+            "see.util.Math";
+        };
+        native = {
+            "print";
+        };
+        extends = ExTest;
+    }, function()
+        function Anon:init(x)
+            ExTest.init(self, x)
         end
-        f(8)
+
+        function Anon:y(z)
+            print(Math.pow(self.x, z))
+        end
     end)
-    thread:start()
-    thread:join()
-    System.print("hi")
+    c.new(22):y(4)
 end

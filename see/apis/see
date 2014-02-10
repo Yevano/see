@@ -62,13 +62,17 @@ end
 StandardGlobals = { }
 
 --[[
-    Creates a new anonymous class.
+    Creates a new anonymous class. This class' global table will attempt to index from the parent environment.
     @param SeeRT:rt The VM to run this function for.
     @param function:def The function used to define this class.
     @param table:super The super class for this class. If nil, this class extends see.lang.Object.
 ]]
-function StandardGlobals.class(rt, def)
-    -- TODO
+function StandardGlobals.class(rt, name, annotations, def)
+    local g = getfenv(def)
+    local useG = setmetatable({ }, { __index = g })
+    local anonName = "__anon[" .. tostring(rt.nAnonClasses) .. "]"
+    rt.nAnonClasses = rt.nAnonClasses + 1
+    return rt:loadClass(def, annotations, anonName, name, useG)
 end
 
 --[[
@@ -181,6 +185,8 @@ function SeeRT.new(natives, seePath)
     self.threads = { }
     self.objThreads = { }
     self.threadFilters = { }
+
+    self.nAnonClasses = 0
 
     self.standardGlobals = { }
     for k, v in pairs(StandardGlobals) do
@@ -455,7 +461,40 @@ function SeeRT:executeAnnotation(env, class, annotation)
         local super = env[getPackageName(name)]
         class.__super = super
         setmetatable(class, super.__meta)
+        return true
     end
+    return false
+end
+
+--[[
+    Executes table-style annotations for anonymous classes.
+    @param table:env The function environment.
+    @param table:annotation Annotation to execute.
+    @param string:key The annotation type.
+    @param any:value The value of the annotation.
+]]
+function SeeRT:executeTableStyleAnnotation(env, class, key, value)
+    if key == "import" then
+        for i = 1, #value do
+            self:executeAnnotation(env, class, "import " .. value[i])
+        end
+    elseif key == "native" then
+        for i = 1, #value do
+            self:executeAnnotation(env, class, "native " .. value[i])
+        end
+    elseif key == "extends" then
+        if type(value) == "string" then
+            self:executeAnnotation(env, class, "extends " .. value)
+        elseif type(value) == "table" then
+            class.__super = value
+            setmetatable(class, value.__meta)
+            return true
+        else
+            -- TODO: throw error
+        end
+    end
+
+    return false
 end
 
 --[[
@@ -508,14 +547,23 @@ end
     @param function:def Class definition for loading.
     @param table[string]:annotations Table of annotation strings.
     @param string:name The name of this class, including the full package.
+    @param string:refName The name to use in the class' global table for the class. If given, annotations will be
+    processed as an anonymous class annotation.
+    @param table:env Environment to use for the class definition.
 ]]
-function SeeRT:loadClass(def, annotations, name)
+function SeeRT:loadClass(def, annotations, name, refName, env)
     local className = getPackageName(name)
 
     if self.classes[name] then
         return self.classes[name]
     end
-    local env = copy(self.standardGlobals)
+
+    if not refName then
+        env = copy(self.standardGlobals)
+    end
+
+    local anon = refName ~= nil
+    refName = refName or className
 
     -- Setup class inheritance model.
     local class = { }
@@ -529,7 +577,7 @@ function SeeRT:loadClass(def, annotations, name)
     end
 
     function class.new(...)
-        if not class.init then error("Could not instantiate class " .. name .. ". No init method.") end
+        if not class.init then error("Could not instantiate class " .. refName .. ". No init method.") end
         local self = { }
         setmetatable(self, class.__meta)
         self.__type = class
@@ -546,29 +594,26 @@ function SeeRT:loadClass(def, annotations, name)
     env["Events"] = self.event.Events
 
     -- Setup class environment.
-    env[className] = class
+    env[refName] = class
     setfenv(def, env)
     xpcall(def, errorHandler)
     self.classes[name] = class
 
-    for _, annotation in pairs(annotations) do
-        self:executeAnnotation(env, class, annotation)
-    end
-
     local abool = true
-    if self.base.Object then
-        for _, annotation in pairs(annotations) do
-            if annotation:sub(1, 7) == "extends" then
-                abool = false
-                break
-            end
+    for k, v in pairs(annotations) do
+        local ret
+        if anon then
+            ret = self:executeTableStyleAnnotation(env, class, k, v)
+        else
+            ret = self:executeAnnotation(env, class, v)
         end
-    else
-        abool = false
+        if ret then
+            abool = false
+        end
     end
 
     -- Extend Object by default.
-    if abool then
+    if abool and self.base.Object then
         class.__super = self.base.Object
         setmetatable(class, self.base.Object.__meta)
     end
