@@ -110,17 +110,34 @@ local _, err = pcall(function(...)
     end
 
     local USAGE = "Usage: see <-r <classPath> <mainClass> <args>>|<-p <src> <dest>>|<-u <src> <dest>>|<-help>"
+    local CONFIG_FAIL = "Failed load /.see config file. Reinstall SEE or replace the file with correct info."
     local args = {...}
     local op = args[1]
 
     if not op then
         print(USAGE)
+        return
     end
 
     if op == "-r" then
+        if #args < 3 then
+            print(USAGE)
+            return
+        end
+
         --Run option.
         local fileHandle = fs.open("/.see", "r")
-        local configFunc = loadstring(fileHandle.readAll())
+        if not fileHandle then
+            print(CONFIG_FAIL)
+            return
+        end
+        local configFunc, err = loadstring(fileHandle.readAll())
+
+        if err then
+            print(CONFIG_FAIL)
+            return
+        end
+
         setfenv(configFunc, config)
         configFunc()
         fileHandle.close()
@@ -129,6 +146,10 @@ local _, err = pcall(function(...)
         os.loadAPI(apiPath)
         rt = see.SeeRT.new(natives, config.install_dir)
         classPath = shell.resolve(args[2])
+        if not fs.exists(classPath) then
+            print("No such archive or folder \"" .. classPath .. "\".")
+            return
+        end
         table.insert(rt.classPaths, classPath)
         
         local mainClassName = args[3]
@@ -144,12 +165,22 @@ local _, err = pcall(function(...)
         end
     elseif op == "-p" then
         -- Pack option.
+        if #args < 3 then
+            print(USAGE)
+            return
+        end
         packArchive(shell.resolve(args[2]), shell.resolve(args[3]))
     elseif op == "-u" then
         -- Unpack option.
+        if #args < 3 then
+            print(USAGE)
+            return
+        end
         unpackArchive(shell.resolve(args[2]), shell.resolve(args[3]))
     elseif op == "-help" then
         -- Help option.
+        print(USAGE)
+    else
         print(USAGE)
     end
 end, ...)
