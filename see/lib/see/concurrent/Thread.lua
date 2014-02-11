@@ -62,6 +62,13 @@ function Thread:start()
 end
 
 --[[
+    Interrupt thread.
+]]
+function Thread:interrupt()
+    __rt:interruptThread(self)
+end
+
+--[[
     Wait until the thread has terminated.
 ]]
 function Thread:join()

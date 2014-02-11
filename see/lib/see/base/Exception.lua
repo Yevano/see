@@ -1,5 +1,8 @@
+--@import see.base.Object
 --@import see.base.String
 --@import see.base.System
+
+--@extends see.base.Object
 
 --[[
     Describes any error that occurs.
@@ -12,8 +15,4 @@
 function Exception:init(message)
     message = cast(message, String)
     self.message = message
-end
-
-function Exception:toString()
-    return "[" .. self:getClass():getName() .. "]" .. self.message
 end

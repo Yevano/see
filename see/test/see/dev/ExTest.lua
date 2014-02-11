@@ -1,11 +1,11 @@
---@import see.concurrent.Thread
-
-function ExTest:init(x)
-    self.x = x
-end
-
 function ExTest.main()
-    local c = class("Anon", {
+    local A = class("A", { },
+    function()
+        function A:init(x)
+            self.x = x * 2
+        end
+    end)
+    local B = class("B", {
         import = {
             "see.util.Math";
         };
@@ -14,13 +14,13 @@ function ExTest.main()
         };
         extends = ExTest;
     }, function()
-        function Anon:init(x)
-            ExTest.init(self, x)
+        function B:init(x)
+            A.init(self, x)
         end
 
-        function Anon:y(z)
+        function B:y(z)
             print(Math.pow(self.x, z))
         end
     end)
-    c.new(22):y(4)
+    B.new(3):y(4)
 end

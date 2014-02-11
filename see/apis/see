@@ -64,8 +64,10 @@ StandardGlobals = { }
 --[[
     Creates a new anonymous class. This class' global table will attempt to index from the parent environment.
     @param SeeRT:rt The VM to run this function for.
+    @param string:name The name to use inside the definition.
+    @param table:annotations The table of annotations to be executed for the class.
     @param function:def The function used to define this class.
-    @param table:super The super class for this class. If nil, this class extends see.lang.Object.
+    @return Class The newly created anonymous class.
 ]]
 function StandardGlobals.class(rt, name, annotations, def)
     local g = getfenv(def)
@@ -182,9 +184,12 @@ function SeeRT.new(natives, seePath)
     setmetatable(self, SeeRT)
     self.seePath = seePath
 
+    self.maxThreadID = 0
     self.threads = { }
     self.objThreads = { }
     self.threadFilters = { }
+    self.threadsToIDs = { }
+    self.idsToThreads = { }
 
     self.nAnonClasses = 0
 
@@ -280,8 +285,16 @@ function SeeRT:spawnThread(func, obj)
     local thread = coroutine.create(function() xpcall(func, errorHandler) end)
     self.objThreads[thread] = obj
     table.insert(self.threads, thread)
+    self.maxThreadID = self.maxThreadID + 1
+    obj.id = self.maxThreadID
+    self.threadsToIDs[thread] = self.maxThreadID
+    self.idsToThreads[self.maxThreadID] = thread
     self.threadFilters[#self.threads] = -1
     return thread
+end
+
+function SeeRT:interruptThread(thread)
+    os.queueEvent("__thread_interrupt", thread.id)
 end
 
 function SeeRT:start(mainClass, ...)
@@ -290,10 +303,16 @@ function SeeRT:start(mainClass, ...)
     local args = self.base.Array.new(...)
     local threads = self.threads
     local f = function() mainClass.main(args) end
+    
     threads[1] = coroutine.create(function() xpcall(f, errorHandler) end)
     local t = self:loadClassFromAny("see.concurrent.Thread").new(f)
     t.co = threads[1]
+    t.id = 1
     self.objThreads[threads[1]] = t
+    self.maxThreadID = 1
+    self.threadsToIDs[threads[1]] = 1
+    self.idsToThreads[1] = threads[1]
+
     local threadFilters = self.threadFilters
     local event
 
@@ -312,20 +331,26 @@ function SeeRT:start(mainClass, ...)
                 table.insert(threadDeaths, i)
                 self.objThreads[threads[i]] = nil
             elseif event then
-                if event.ident == "terminate" then
-                    error("terminate")
-                end
-
                 local passEvent = false
+                if event[1] ~= "__thread_interrupt" then
+                    if event.ident == "terminate" then
+                        error("terminate")
+                    end
 
-                if #threadFilters[i] == 1 then
-                    passEvent = true
-                else
-                    for j = 2, #threadFilters[i] do
-                        if threadFilters[i][j] == event.ident then
-                            passEvent = true
-                            break
+                    if #threadFilters[i] == 1 then
+                        passEvent = true
+                    else
+                        for j = 2, #threadFilters[i] do
+                            if threadFilters[i][j] == event.ident then
+                                passEvent = true
+                                break
+                            end
                         end
+                    end
+                else
+                    if self.idsToThreads[event[2]] == threads[i] then
+                        passEvent = true
+                        event = event[1]
                     end
                 end
 
@@ -365,11 +390,15 @@ function SeeRT:start(mainClass, ...)
         if type(eventData[2]) == "table" and eventData[2].__type then
             event = eventData[2]
         else
-            local EventClass = Events.getEventClass(eventData[1])
-            if EventClass == UnknownEvent then
-                xpcall(function() event = EventClass.new(unpack(eventData)) end, errorHandler)
+            if eventData[1] == "__thread_interrupt" then
+                event = { "__thread_interrupt", eventData[2] }
             else
-                xpcall(function() event = EventClass.new(unpack(eventParams)) end, errorHandler)
+                local EventClass = Events.getEventClass(eventData[1])
+                if EventClass == UnknownEvent then
+                    xpcall(function() event = EventClass.new(unpack(eventData)) end, errorHandler)
+                else
+                    xpcall(function() event = EventClass.new(unpack(eventParams)) end, errorHandler)
+                end
             end
         end
     end

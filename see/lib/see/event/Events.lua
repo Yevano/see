@@ -1,6 +1,9 @@
 --@native os.queueEvent
 
 --@import see.concurrent.Thread
+--@import see.concurrent.InterruptedException
+
+--@import see.util.VarArgs
 
 --@import see.event.impl.CharEvent
 --@import see.event.impl.KeyPressEvent
@@ -28,48 +31,57 @@
 local registeredEvents
 
 function Events.__static()
-	registeredEvents = { }
+    registeredEvents = { }
 
-	Events.register("char",              CharEvent)
-	Events.register("key",               KeyPressEvent)
-	Events.register("timer",             TimerEvent)
-	Events.register("alarm",             AlarmEvent)
-	Events.register("redstone",          RedstoneEvent)
-	Events.register("terminate",         TerminateEvent)
-	Events.register("disk",              DiskInsertEvent)
-	Events.register("disk_eject",        DiskEjectEvent)
-	Events.register("peripheral",        PeripheralAttachEvent)
-	Events.register("peripheral_detach", PeripheralDetachEvent)
-	Events.register("rednet_message",    RednetMessageEvent)
-	Events.register("modem_message",     ModemMessageEvent)
-	Events.register("http_success",      HttpSuccessEvent)
-	Events.register("http_failure",      HttpFailureEvent)
-	Events.register("mouse_click",       MousePressEvent)
-	Events.register("mouse_scroll",      MouseScrollEvent)
-	Events.register("mouse_drag",        MouseDragEvent)
-	Events.register("monitor_touch",     MonitorTouchEvent)
-	Events.register("monitor_resize",    MonitorResizeEvent)
-	Events.register("turtle_inventory",  TurtleInventoryEvent)
-	Events.register("signal",            SignalEvent)
+    Events.register("char",              CharEvent)
+    Events.register("key",               KeyPressEvent)
+    Events.register("timer",             TimerEvent)
+    Events.register("alarm",             AlarmEvent)
+    Events.register("redstone",          RedstoneEvent)
+    Events.register("terminate",         TerminateEvent)
+    Events.register("disk",              DiskInsertEvent)
+    Events.register("disk_eject",        DiskEjectEvent)
+    Events.register("peripheral",        PeripheralAttachEvent)
+    Events.register("peripheral_detach", PeripheralDetachEvent)
+    Events.register("rednet_message",    RednetMessageEvent)
+    Events.register("modem_message",     ModemMessageEvent)
+    Events.register("http_success",      HttpSuccessEvent)
+    Events.register("http_failure",      HttpFailureEvent)
+    Events.register("mouse_click",       MousePressEvent)
+    Events.register("mouse_scroll",      MouseScrollEvent)
+    Events.register("mouse_drag",        MouseDragEvent)
+    Events.register("monitor_touch",     MonitorTouchEvent)
+    Events.register("monitor_resize",    MonitorResizeEvent)
+    Events.register("turtle_inventory",  TurtleInventoryEvent)
+    Events.register("signal",            SignalEvent)
 end
 
 function Events.register(ident, eventClass)
-	registeredEvents[cast(ident, "string")] = eventClass
+    registeredEvents[cast(ident, "string")] = eventClass
 end
 
 function Events.getEventClass(ident)
-	return registeredEvents[cast(ident, "string")] or UnknownEvent
+    return registeredEvents[cast(ident, "string")] or UnknownEvent
 end
 
 function Events.queue(event)
-	os.queueEvent(cast(event.ident, "string"), event)
+    os.queueEvent(cast(event.ident, "string"), event)
 end
 
 function Events.pull(...)
-	local args = Array.new(...)
-	local casted = Array.new()
-	for arg in args:iAll() do
-		casted:add(cast(arg, "string"))
-	end
-	return Thread.yield(casted:unpack())
+    local args = Array.new(...)
+    local casted = Array.new()
+    for arg in args:iAll() do
+        casted:add(cast(arg, "string"))
+    end
+
+    while true do
+        local ret = Thread.yield(casted:unpack())
+
+        if ret == "__thread_interrupt" then
+            throw(InterruptedException.new())
+        end
+
+        return ret
+    end
 end

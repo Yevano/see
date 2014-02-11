@@ -22,8 +22,8 @@ function Object:copy()
 end
 
 --[[
-    Return the full class name of this Object.
-    @return string The class name.
+    Return the type of this Object.
+    @return table The runtime class.
 ]]
 function Object:getClass()
     return self.__type
