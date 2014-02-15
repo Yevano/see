@@ -24,7 +24,7 @@ function Thread.current()
 end
 
 function Thread.work(t)
-    t = t or 1/20
+    t = t or 1/80
     local thread = Thread.current()
 
     if thread.workStart then

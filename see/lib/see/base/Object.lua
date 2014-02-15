@@ -37,6 +37,7 @@ function Object:instanceof(type)
         end
         objectType = objectType.__super
     end
+    return false
 end
 
 function Object:toString()
@@ -45,4 +46,8 @@ end
 
 function Object.__concat(l, r)
     return cast(l, String):concat(cast(r, String))
+end
+
+function Object:equals(other)
+    return self == other
 end

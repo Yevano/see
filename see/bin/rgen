@@ -28,7 +28,7 @@ local config = { }
 local _, err = pcall(function(...)
     local args = {...}
     local archiveBytes = '$'
-    local mainClass = "$"
+    local mainClass = '$'
     local classPath = "FROM_MEMORY"
 
     local natives = { }
@@ -62,13 +62,24 @@ if err then
 end
 ]]
 
+    local escaped
     local archiveTable = { }
     for i = 1, #archiveBytes do
         local b = archiveBytes:sub(i, i):byte()
-        if b < 32 or b > 126 or b == 34 or b == 39 or b == 45 or b == 91 or b == 93 then
+        if b < 32 or b > 126 or b == 34 or b == 39 then
+            escaped = true
             archiveTable[i] = "\\" .. b
         else
-            archiveTable[i] = string.char(b)
+            if escaped then
+                escaped = false
+                if b > 47 and b < 57 then
+                    archiveTable[i] ="'..'" .. string.char(b);
+                else
+                    archiveTable[i] = string.char(b)
+                end
+            else
+                archiveTable[i] = string.char(b)
+            end
         end
     end
 

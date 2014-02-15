@@ -113,6 +113,10 @@ function Array:remove(index)
     throw(IndexOutOfBoundsException.new(index))
 end
 
+function Array:removeElement(element)
+    
+end
+
 --[[
     Inserts a value into this Array at the given index, sliding elements forward if needed.
     @param number:index The index to insert at.
@@ -143,6 +147,7 @@ function Array:contains(value)
             return true
         end
     end
+    return false
 end
 
 function Array:reset()

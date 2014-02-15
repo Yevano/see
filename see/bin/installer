@@ -5,6 +5,7 @@ local args = { ... }
 
 local MAKE_PATHS = {
     "apis/",
+    "bin/",
     "lib/",
     "lib/see/",
     "lib/see/base/",
@@ -15,11 +16,15 @@ local MAKE_PATHS = {
     "lib/see/net/",
     "lib/see/rt/",
     "lib/see/util/",
-    "programs/"
 }
 
 local DL_PATHS = {
     "apis/see",
+    "bin/see",
+    "bin/installer",
+    "bin/igen",
+    "bin/rgen",
+    "bin/wgen",
     "lib/see/base/Array.lua",
     "lib/see/base/Exception.lua",
     "lib/see/base/Iterators.lua",
@@ -83,11 +88,6 @@ local DL_PATHS = {
     "lib/see/util/Matcher.lua",
     "lib/see/util/Math.lua",
     "lib/see/util/VarArgs.lua",
-    "programs/see",
-    "programs/installer",
-    "programs/igen",
-    "programs/rgen",
-    "programs/wgen"
 }
 
 local function fail(err)
