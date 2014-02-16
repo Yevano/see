@@ -2,15 +2,6 @@ local config = { }
 local _, err = pcall(function(...)
     local USAGE = "Usage: rgen <classArchive> <mainClass> <target>"
 
-    local fileHandle = fs.open("/.see", "r")
-    local configFunc, err = loadstring(fileHandle.readAll())
-    if err then print("Config err " .. err) end
-    setfenv(configFunc, config)
-    configFunc()
-    fileHandle.close()
-
-    os.loadAPI(fs.combine(config.install_dir, "apis/see"))
-
     local args = { ... }
     if #args < 3 then print(USAGE) end
     local classArchive = "/" .. shell.resolve(args[1])
@@ -26,33 +17,45 @@ local _, err = pcall(function(...)
 [[
 local config = { }
 local _, err = pcall(function(...)
+    local CONFIG_FAIL = "Failed load /.see config file. Reinstall SEE or replace the file with correct info."
+    local apiPath, rt
     local args = {...}
     local archiveBytes = '$'
-    local mainClass = '$'
+    local mainClassName = '$'
     local classPath = "FROM_MEMORY"
 
     local natives = { }
-    natives.shell = shell
     for k, v in pairs(_G) do
         natives[k] = v
     end
+    natives.shell = shell
 
     local fileHandle = fs.open("/.see", "r")
-    local configFunc = loadstring(fileHandle.readAll())
+    if not fileHandle then
+        print(CONFIG_FAIL)
+        return
+    end
+    local configFunc, err = loadstring(fileHandle.readAll())
+
+    if err then
+        print(CONFIG_FAIL)
+        return
+    end
+
     setfenv(configFunc, config)
     configFunc()
     fileHandle.close()
 
-    os.loadAPI(fs.combine(config.install_dir, "apis/see"))
-
-    local rt = see.SeeRT.new(natives, config.install_dir)
+    apiPath = fs.combine(config.install_dir, "apis/see")
+    os.loadAPI(apiPath)
+    rt = see.SeeRT.new(natives, config.install_dir)
     table.insert(rt.classPaths, classPath)
-    rt.archives[classPath] = archiveBytes
 
-    local MainClass = rt:loadClassFromAny(mainClass)
-    if not MainClass then error("Main class not found!") end
+    rt.archives[classPath] = archiveBytes
+    local MainClass = rt:loadClassFromAny(mainClassName)
+    if not MainClass then error("Main class not found! ") end
     if not MainClass.main then error("Main method not found!") end
-    xpcall(function() MainClass.main(rt.base.Array.new(unpack(args))) end, see.errorHandler)
+    rt:start(MainClass, unpack(args))
 end, ...)
 
 os.unloadAPI(fs.combine(config.install_dir, "apis/see"))
@@ -94,8 +97,6 @@ end
     out.write(code)
     out.close()
 end, ...)
-
-os.unloadAPI(fs.combine(config.install_dir, "apis/see"))
 
 if err then
     error(err)

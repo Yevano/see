@@ -6,6 +6,7 @@
 
 --@import see.util.ArgumentUtils
 --@import see.rt.IndexOutOfBoundsException
+--@import see.rt.NoSuchElementException
 --@import see.base.System
 
 --[[
@@ -30,6 +31,7 @@ end
     @return see.base.Array Array that wraps around the given table.
 ]]
 function Array.wrap(t)
+    ArgumentUtils.check(1, t, "table")
     return Array.new(unpack(t))
 end
 
@@ -114,7 +116,10 @@ function Array:remove(index)
 end
 
 function Array:removeElement(element)
-    
+    local index = self:indexOf(element)
+    if not index then
+        throw(NoSuchElementException.new(STR("No such element ", cast(element, String), ".")))
+    end
 end
 
 --[[

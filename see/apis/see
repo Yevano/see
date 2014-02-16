@@ -559,7 +559,11 @@ end
     @return string Error message, or nil if successful.
 ]]
 function SeeRT:loadClassFromArchive(archiveBytes, path, name)
-    local loc = archiveBytes:find("F" .. path .. "\0", 1, true) + #path + 2
+    local loc = archiveBytes:find("F" .. path .. "\0", 1, true)
+    if not loc then
+        return nil, "Could not find class " .. name .. " in archive path " .. path .. "."
+    end
+    loc = loc + #path + 2
     local fin = archiveBytes:find("\0", loc) - 1
     local code = archiveBytes:sub(loc, fin)
 

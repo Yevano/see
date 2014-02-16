@@ -79,6 +79,7 @@ local DL_PATHS = {
     "lib/see/rt/Class.lua",
     "lib/see/rt/IndexOutOfBoundsException.lua",
     "lib/see/rt/InvalidArgumentException.lua",
+    "lib/see/rt/NoSuchElementException.lua",
     "lib/see/rt/RuntimeException.lua",
     "lib/see/rt/UnsupportedOperationException.lua",
     "lib/see/util/ArgumentUtils.lua",
