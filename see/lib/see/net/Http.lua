@@ -1,5 +1,6 @@
 --@native http
 
+--@import see.io.IOException
 --@import see.net.HttpResponse
 
 --[[

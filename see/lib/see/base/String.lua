@@ -2,6 +2,7 @@
 --@native tostring
 --@native rawget
 --@native rawset
+--@native tonumber
 
 --@import see.base.Array
 --@import see.base.System
@@ -297,6 +298,29 @@ function String:reverse()
         ret:add(String.char(self[i]))
     end
     return ret
+end
+
+--[[
+    Splits this String into strings separated by sep.
+    @param see.base.String sep The separator.
+    @return see.base.Array The split strings.
+]]
+function String:split(sep)
+    local ret = Array.new()
+    local matcher = Matcher.new(sep, self)
+    local l = 1
+    while matcher:find() do
+        ret:add(self:sub(l, matcher.left - 1))
+    end
+    return ret
+end
+
+--[[
+    Converts this String to a number.
+    @return number The converted number.
+]]
+function String:toNumber()
+    return tonumber(self:lstr())
 end
 
 function String:toString()
