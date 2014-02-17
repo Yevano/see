@@ -67,9 +67,10 @@ end
 
     local escaped
     local archiveTable = { }
+    local strSize = 0
     for i = 1, #archiveBytes do
         local b = archiveBytes:sub(i, i):byte()
-        if b < 32 or b > 126 or b == 34 or b == 39 then
+        if b < 32 or b > 126 or b == 34 or b == 39 or b == 92 then
             escaped = true
             archiveTable[i] = "\\" .. b
         else
@@ -83,6 +84,13 @@ end
             else
                 archiveTable[i] = string.char(b)
             end
+        end
+
+        if strSize >= 500 then
+            archiveTable[i] = archiveTable[i] .. "'..'"
+            strSize = 0
+        else
+            strSize = strSize + 1
         end
     end
 
