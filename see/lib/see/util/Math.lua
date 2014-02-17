@@ -1,4 +1,5 @@
 --@native math
+
 --@import see.util.ArgumentUtils
 
 --[[

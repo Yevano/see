@@ -2,10 +2,16 @@
 
 --@import see.io.InputStream
 --@import see.io.IOException
+--@import see.io.Path
+--@import see.util.ArgumentUtils
 
 --@extends see.io.InputStream
 
+--[[
+    @throw see.util.InvalidArgumentException if the args are incorrect.
+]]
 function FileInputStream:init(path)
+    ArgumentUtils.check(1, path, Path)
     self.handle = fs.open(path.pathString:lstr(), "rb")
 end
 

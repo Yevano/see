@@ -315,6 +315,7 @@ function SeeRT:start(mainClass, ...)
 
     local threadFilters = self.threadFilters
     local event
+    local isNative
 
     threadFilters[1] = { coroutine.resume(threads[1], args) }
     local cycle = 1
@@ -341,7 +342,12 @@ function SeeRT:start(mainClass, ...)
                         passEvent = true
                     else
                         for j = 2, #threadFilters[i] do
-                            if threadFilters[i][j] == event.ident then
+                            if isNative then
+                                if threadFilters[i][j] == event[1] then
+                                    passEvent = true
+                                    break
+                                end
+                            elseif threadFilters[i][j] == event.ident then
                                 passEvent = true
                                 break
                             end
@@ -355,7 +361,12 @@ function SeeRT:start(mainClass, ...)
                 end
 
                 if passEvent then
-                    local threadData = { coroutine.resume(threads[i], event) }
+                    local threadData
+                    if isNative then
+                        threadData = { coroutine.resume(threads[i], unpack(event)) }
+                    else
+                        threadData = { coroutine.resume(threads[i], event) }
+                    end
 
                     if not threadData[1] then
                         error(threadData[2], 1)
@@ -387,17 +398,23 @@ function SeeRT:start(mainClass, ...)
             eventParams[i - 1] = eventData[i]
         end
 
-        if type(eventData[2]) == "table" and eventData[2].__type then
-            event = eventData[2]
+        if Events.isNativeEvent(eventData[1]) then
+            isNative = true
+            event = eventData
         else
-            if eventData[1] == "__thread_interrupt" then
-                event = { "__thread_interrupt", eventData[2] }
+            isNative = false
+            if type(eventData[2]) == "table" and eventData[2].__type then
+                event = eventData[2]
             else
-                local EventClass = Events.getEventClass(eventData[1])
-                if EventClass == UnknownEvent then
-                    xpcall(function() event = EventClass.new(unpack(eventData)) end, errorHandler)
+                if eventData[1] == "__thread_interrupt" then
+                    event = { "__thread_interrupt", eventData[2] }
                 else
-                    xpcall(function() event = EventClass.new(unpack(eventParams)) end, errorHandler)
+                    local EventClass = Events.getEventClass(eventData[1])
+                    if EventClass == UnknownEvent then
+                        xpcall(function() event = EventClass.new(unpack(eventData)) end, errorHandler)
+                    else
+                        xpcall(function() event = EventClass.new(unpack(eventParams)) end, errorHandler)
+                    end
                 end
             end
         end

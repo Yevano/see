@@ -15,6 +15,10 @@ function DataOutputStream:init(wrap)
     self.wrap = wrap
 end
 
+--[[
+    Writes a byte to the stream
+    @param number:byte The byte to write.
+]]
 function DataOutputStream:write(b)
     self.wrap:write(b)
 end
