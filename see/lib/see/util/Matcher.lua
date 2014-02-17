@@ -7,8 +7,11 @@
 --[[
 	Constructs a matcher with the given pattern.
 	@param string:pattern Pattern to match.
+	@throw see.util.InvalidArgumentException if the args are incorrect.
 ]]
 function Matcher:init(pattern, str)
+	ArgumentUtils.check(1, pattern, "string")
+	ArgumentUtils.check(2, str, "string")
 	self.pattern = cast(pattern, "string")
 	self.string = cast(str, "string")
 end

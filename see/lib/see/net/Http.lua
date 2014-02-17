@@ -2,12 +2,14 @@
 
 --@import see.io.IOException
 --@import see.net.HttpResponse
+--@import see.util.ArgumentUtils
 
 --[[
     Makes a blocking HTTP request.
     @param see.net.Url:url The URL to request from.
     @param see.base.String:postData Post data to send if this is a POST request.
     @return see.base.String The body of the response.
+    @throw see.util.InvalidArgumentException if the args are incorrect.
     @throw see.io.IOException If the request fails.
 ]]
 function Http.sync(url, postData)
@@ -15,6 +17,8 @@ function Http.sync(url, postData)
     local f = postData and http.post or http.get
     local handle = f(url.string:lstr(), postData)
     return HttpResponse.new(String.new(handle.readAll()), handle.getResponseCode())]]
+    ArgumentUtils.check(1, url, "string")
+    ArgumentUtils.check(2, postData, "string")
     Http.async(url, postData)
     local event = Events.pull("http_success", "http_failure")
     if event.ident == "http_success" then
@@ -28,8 +32,11 @@ end
     Makes an asynchronous HTTP request.
     @param see.net.Url:url The URL to request from.
     @param see.base.String:postData Post data to send if this is a POST request.
+    @throw see.util.InvalidArgumentException if the args are incorrect.
 ]]
 function Http.async(url, postData)
+    ArgumentUtils.check(1, url, "string")
+    ArgumentUtils.check(2, postData, "string")
     if postData then postData = cast(postData, "string") end
     http.request(url.string:lstr(), postData)
 end
