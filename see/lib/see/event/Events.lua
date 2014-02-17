@@ -29,9 +29,11 @@
 --@import see.event.impl.SignalEvent
 
 local registeredEvents
+local nativeEvents
 
 function Events.__static()
     registeredEvents = { }
+    nativeEvents = { }
 
     Events.register("char",              CharEvent)
     Events.register("key",               KeyPressEvent)
@@ -54,6 +56,16 @@ function Events.__static()
     Events.register("monitor_resize",    MonitorResizeEvent)
     Events.register("turtle_inventory",  TurtleInventoryEvent)
     Events.register("signal",            SignalEvent)
+
+    Events.registerNative("op_tick_sync")
+end
+
+function Events.registerNative(ident)
+    nativeEvents[ident] = true
+end
+
+function Events.isNativeEvent(ident)
+    return nativeEvents[ident]
 end
 
 function Events.register(ident, eventClass)
