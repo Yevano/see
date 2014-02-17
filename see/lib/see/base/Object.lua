@@ -48,6 +48,10 @@ function Object.__concat(l, r)
     return cast(l, String):concat(cast(r, String))
 end
 
+function Object.__meta:__eq(other)
+    return self:equals(other)
+end
+
 function Object:equals(other)
     return self == other
 end

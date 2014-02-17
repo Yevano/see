@@ -323,6 +323,10 @@ function String:toNumber()
     return tonumber(self:lstr())
 end
 
+function String:equals(other)
+    return self:lstr() == cast(other, "string")
+end
+
 function String:toString()
     return self
 end
