@@ -1,13 +1,20 @@
-function traceback(err, level, b)
+function traceback()
     local errors = { }
-    local ok, err
-    local j = level or 2
-    while j < 256 do
-        j = j + 1
-        ok, err = pcall(_G.error, '', j)
+    local ok, err, name
+    local i = 2
+    while true do
+        ok, err = pcall(_G.error, '', i)
+        name = err:match("^[^:]+")
+        if name ~= "bios" and name ~= "see" and name ~= "xpcall" and name ~= "pcall" then break end
+        i = i + 1
+    end
+
+    while true do
+        ok, err = pcall(_G.error, '', i)
         local name = err:match("^[^:]+")
-        if (not b and name == "bios" or name == "see" or name == "xpcall") or not err then break end
+        if (name == "bios" or name == "see" or name == "xpcall" or name == "pcall" or name == "shell") or not err then break end
         table.insert(errors, err)
+        i = i + 1
     end
 
     return errors
@@ -15,8 +22,12 @@ end
 
 function formatTraceback(err, errors, level)
     level = level < #errors and levels or #errors
-    if not err then err = "" end
-    local f = "Error: " .. err
+    if not err then
+        err = ""
+    else
+        err = err:sub(err:find(":", err:find(":") + 1) + 2, -1)
+    end
+    local f = err
     for i = 1, level do
         err = errors[i]
         local ls = err:find(":")
@@ -34,7 +45,7 @@ local function error(err, level, b)
     if term.isColor() then
         term.setTextColor(colors.red)
     end
-    print(formatTraceback(err, traceback(err, level, b), 10))
+    print(formatTraceback(err, traceback(), 10))
     if term.isColor() then
         term.setTextColor(colors.white)
     end
@@ -45,7 +56,7 @@ function errorHandler(err)
     if term.isColor() then
         term.setTextColor(colors.red)
     end
-    print(formatTraceback(err, traceback(err, 5, true), 10))
+    print(formatTraceback(err, traceback(), 10))
     if term.isColor() then
         term.setTextColor(colors.white)
     end
@@ -298,127 +309,130 @@ function SeeRT:interruptThread(thread)
 end
 
 function SeeRT:start(mainClass, ...)
-    local Events = self.event.Events
-    local UnknownEvent = self.event.UnknownEvent
-    local args = self.base.Array.new(...)
-    local threads = self.threads
-    local f = function() mainClass.main(args) end
-    
-    threads[1] = coroutine.create(function() xpcall(f, errorHandler) end)
-    local t = self:loadClassFromAny("see.concurrent.Thread").new(f)
-    t.co = threads[1]
-    t.id = 1
-    self.objThreads[threads[1]] = t
-    self.maxThreadID = 1
-    self.threadsToIDs[threads[1]] = 1
-    self.idsToThreads[1] = threads[1]
+    local args = { ... }
+    xpcall(function() (function(mainClass, ...)
+        local Events = self.event.Events
+        local UnknownEvent = self.event.UnknownEvent
+        local args = self.base.Array.new(...)
+        local threads = self.threads
+        local f = function() mainClass.main(args) end
+        
+        threads[1] = coroutine.create(function() xpcall(f, errorHandler) end)
+        local t = self:loadClassFromAny("see.concurrent.Thread").new(f)
+        t.co = threads[1]
+        t.id = 1
+        self.objThreads[threads[1]] = t
+        self.maxThreadID = 1
+        self.threadsToIDs[threads[1]] = 1
+        self.idsToThreads[1] = threads[1]
 
-    local threadFilters = self.threadFilters
-    local event
-    local isNative
+        local threadFilters = self.threadFilters
+        local event
+        local isNative
 
-    threadFilters[1] = { coroutine.resume(threads[1], args) }
-    local cycle = 1
-    while true do
-        local threadDeaths = { }
-        for i = 1, #threads do
-            if threadFilters[i] == -1 then
-                threadFilters[i] = { coroutine.resume(threads[i], event) }
-                if coroutine.status(threads[i]) == "dead" then
-                    table.insert(threadDeaths, i)
-                    self.objThreads[threads[i]] = nil
-                end
-            elseif coroutine.status(threads[i]) == "dead" then
-                table.insert(threadDeaths, i)
-                self.objThreads[threads[i]] = nil
-            elseif event then
-                local passEvent = false
-                if event[1] ~= "__thread_interrupt" then
-                    if event.ident == "terminate" then
-                        error("terminate")
-                    end
-
-                    if #threadFilters[i] == 1 then
-                        passEvent = true
-                    else
-                        for j = 2, #threadFilters[i] do
-                            if isNative then
-                                if threadFilters[i][j] == event[1] then
-                                    passEvent = true
-                                    break
-                                end
-                            elseif threadFilters[i][j] == event.ident then
-                                passEvent = true
-                                break
-                            end
-                        end
-                    end
-                else
-                    if self.idsToThreads[event[2]] == threads[i] then
-                        passEvent = true
-                        event = event[1]
-                    end
-                end
-
-                if passEvent then
-                    local threadData
-                    if isNative then
-                        threadData = { coroutine.resume(threads[i], unpack(event)) }
-                    else
-                        threadData = { coroutine.resume(threads[i], event) }
-                    end
-
-                    if not threadData[1] then
-                        error(threadData[2], 1)
+        threadFilters[1] = { coroutine.resume(threads[1], args) }
+        local cycle = 1
+        while true do
+            local threadDeaths = { }
+            for i = 1, #threads do
+                if threadFilters[i] == -1 then
+                    threadFilters[i] = { coroutine.resume(threads[i], event) }
+                    if coroutine.status(threads[i]) == "dead" then
                         table.insert(threadDeaths, i)
                         self.objThreads[threads[i]] = nil
                     end
-
-                    threadFilters[i] = threadData
-                end
-
-                if coroutine.status(threads[i]) == "dead" then
+                elseif coroutine.status(threads[i]) == "dead" then
                     table.insert(threadDeaths, i)
                     self.objThreads[threads[i]] = nil
+                elseif event then
+                    local passEvent = false
+                    if event[1] ~= "__thread_interrupt" then
+                        if event.ident == "terminate" then
+                            self:throw(self.rt.RuntimeException.new("terminated"))
+                        end
+
+                        if #threadFilters[i] == 1 then
+                            passEvent = true
+                        else
+                            for j = 2, #threadFilters[i] do
+                                if isNative then
+                                    if threadFilters[i][j] == event[1] then
+                                        passEvent = true
+                                        break
+                                    end
+                                elseif threadFilters[i][j] == event.ident then
+                                    passEvent = true
+                                    break
+                                end
+                            end
+                        end
+                    else
+                        if self.idsToThreads[event[2]] == threads[i] then
+                            passEvent = true
+                            event = event[1]
+                        end
+                    end
+
+                    if passEvent then
+                        local threadData
+                        if isNative then
+                            threadData = { coroutine.resume(threads[i], unpack(event)) }
+                        else
+                            threadData = { coroutine.resume(threads[i], event) }
+                        end
+
+                        if not threadData[1] then
+                            error(threadData[2], 1)
+                            table.insert(threadDeaths, i)
+                            self.objThreads[threads[i]] = nil
+                        end
+
+                        threadFilters[i] = threadData
+                    end
+
+                    if coroutine.status(threads[i]) == "dead" then
+                        table.insert(threadDeaths, i)
+                        self.objThreads[threads[i]] = nil
+                    end
                 end
             end
-        end
 
-        for i = #threadDeaths, 1, -1 do
-            table.remove(threads, threadDeaths[i])
-            table.remove(threadFilters, threadDeaths[i])
-        end
+            for i = #threadDeaths, 1, -1 do
+                table.remove(threads, threadDeaths[i])
+                table.remove(threadFilters, threadDeaths[i])
+            end
 
-        if #threads == 0 then break end
+            if #threads == 0 then break end
 
-        local eventData = { coroutine.yield() }
-        local eventParams = { }
+            local eventData = { coroutine.yield() }
+            local eventParams = { }
 
-        for i = 2, #eventData do
-            eventParams[i - 1] = eventData[i]
-        end
+            for i = 2, #eventData do
+                eventParams[i - 1] = eventData[i]
+            end
 
-        if Events.isNativeEvent(eventData[1]) then
-            isNative = true
-            event = eventData
-        else
-            isNative = false
-            if type(eventData[2]) == "table" and eventData[2].__type then
-                event = eventData[2]
+            if Events.isNativeEvent(eventData[1]) then
+                isNative = true
+                event = eventData
             else
-                if eventData[1] == "__thread_interrupt" then
-                    event = { "__thread_interrupt", eventData[2] }
+                isNative = false
+                if type(eventData[2]) == "table" and eventData[2].__type then
+                    event = eventData[2]
                 else
-                    local EventClass = Events.getEventClass(eventData[1])
-                    if EventClass == UnknownEvent then
-                        xpcall(function() event = EventClass.new(unpack(eventData)) end, errorHandler)
+                    if eventData[1] == "__thread_interrupt" then
+                        event = { "__thread_interrupt", eventData[2] }
                     else
-                        xpcall(function() event = EventClass.new(unpack(eventParams)) end, errorHandler)
+                        local EventClass = Events.getEventClass(eventData[1])
+                        if EventClass == UnknownEvent then
+                            xpcall(function() event = EventClass.new(unpack(eventData)) end, errorHandler)
+                        else
+                            xpcall(function() event = EventClass.new(unpack(eventParams)) end, errorHandler)
+                        end
                     end
                 end
             end
         end
-    end
+    end)(mainClass, unpack(args)) end, errorHandler)
 end
 
 --[[
