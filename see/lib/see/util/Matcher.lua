@@ -1,4 +1,3 @@
---@import see.util.ArgumentUtils
 --@native string.find
 
 --[[
@@ -11,8 +10,6 @@
 	@throw see.util.InvalidArgumentException if the args are incorrect.
 ]]
 function Matcher:init(pattern, str)
-	ArgumentUtils.check(1, pattern, "string")
-	ArgumentUtils.check(2, str, "string")
 	self.pattern = cast(pattern, "string")
 	self.string = cast(str, "string")
 end
