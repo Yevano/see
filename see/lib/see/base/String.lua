@@ -7,6 +7,7 @@
 --@import see.base.Array
 --@import see.base.System
 --@import see.util.ArgumentUtils
+--@import see.util.Matcher
 
 --[[
     An Array-backed string. Faster and more memory efficient than native strings.
@@ -37,12 +38,12 @@ function String.__cast(value)
 end
 
 --[[
-    Converts a byte to a single-char String.
-    @param number:byte The byte to convert.
-    @return see.base.String A string representation of the given byte.
+    Converts bytes to a String.
+    @param ... The bytes to convert.
+    @return see.base.String A string representation of the given bytes.
 ]]
-function String.char(byte)
-    return String.new(string.char(byte))
+function String.char(...)
+    return String.new(string.char(...))
 end
 
 --[[
@@ -311,7 +312,9 @@ function String:split(sep)
     local l = 1
     while matcher:find() do
         ret:add(self:sub(l, matcher.left - 1))
+        l = matcher.right + 1
     end
+    ret:add(self:sub(l, -1))
     return ret
 end
 
