@@ -1,3 +1,4 @@
+--@import see.util.ArgumentUtils
 --@native string.find
 
 --[[
