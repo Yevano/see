@@ -321,7 +321,7 @@ end
 function String:trim()
     local ret = String.new()
     for i = 1, self:length() do
-        if self[i] ~= STR(' ')[1] then
+        if self[i] ~= STR(' ')[1] and self[i] ~= STR('\n')[1] and self[i] ~= STR('\t')[1] and self[i] ~= STR('\r')[1] then
             ret:add(String.char(self[i]))
         end
     end
