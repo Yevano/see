@@ -7,6 +7,7 @@
 --[[
 	Constructs a matcher with the given pattern.
 	@param string:pattern Pattern to match.
+	@throw see.util.InvalidArgumentException if the args are incorrect.
 ]]
 function Matcher:init(pattern, str)
 	self.pattern = cast(pattern, "string")

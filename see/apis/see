@@ -534,13 +534,9 @@ end
     @param any:value The value of the annotation.
 ]]
 function SeeRT:executeTableStyleAnnotation(env, class, key, value)
-    if key == "import" then
+    if key == "import" or key == "native" then
         for i = 1, #value do
-            self:executeAnnotation(env, class, "import " .. value[i])
-        end
-    elseif key == "native" then
-        for i = 1, #value do
-            self:executeAnnotation(env, class, "native " .. value[i])
+            self:executeAnnotation(env, class, key .. " " .. value[i])
         end
     elseif key == "extends" then
         if type(value) == "string" then
