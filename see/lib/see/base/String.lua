@@ -318,6 +318,16 @@ function String:split(sep)
     return ret
 end
 
+function String:trim()
+    local ret = String.new()
+    for i = 1, self:length() do
+        if self[i] ~= STR(' ')[1] then
+            ret:add(String.char(self[i]))
+        end
+    end
+    return ret
+end
+
 --[[
     Converts this String to a number.
     @return number The converted number.
