@@ -17,8 +17,8 @@
 --@import see.event.impl.PeripheralDetachEvent
 --@import see.event.impl.RednetMessageEvent
 --@import see.event.impl.ModemMessageEvent
---@import see.event.impl.HttpSuccessEvent
---@import see.event.impl.HttpFailureEvent
+--@import see.event.impl.HTTPSuccessEvent
+--@import see.event.impl.HTTPFailureEvent
 --@import see.event.impl.MousePressEvent
 --@import see.event.impl.MouseScrollEvent
 --@import see.event.impl.MouseDragEvent
@@ -47,8 +47,8 @@ function Events.__static()
     Events.register("peripheral_detach", PeripheralDetachEvent)
     Events.register("rednet_message",    RednetMessageEvent)
     Events.register("modem_message",     ModemMessageEvent)
-    Events.register("http_success",      HttpSuccessEvent)
-    Events.register("http_failure",      HttpFailureEvent)
+    Events.register("http_success",      HTTPSuccessEvent)
+    Events.register("http_failure",      HTTPFailureEvent)
     Events.register("mouse_click",       MousePressEvent)
     Events.register("mouse_scroll",      MouseScrollEvent)
     Events.register("mouse_drag",        MouseDragEvent)
