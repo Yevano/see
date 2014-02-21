@@ -163,6 +163,23 @@ function Array:unpack()
     return unpack(self.luaArray)
 end
 
+function Array:map(mapFunc)
+    for i = 1, self:length() do
+        self[i] = mapFunc(self[i])
+    end
+end
+
+function Array:filter(filterFunc)
+    local ret = Array.new()
+    for i = 1, self:length() do
+        local e = self[i]
+        if filterFunc(e) then
+            ret:add(e)
+        end
+    end
+    return ret
+end
+
 --[[
     Iterate over all the elements in this Array.
     @return function An iterator.
