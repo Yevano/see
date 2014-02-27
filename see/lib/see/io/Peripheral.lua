@@ -8,12 +8,12 @@ function Peripheral.isPresent(side)
 end
 
 function Peripheral.getType(side)
-    return String.new(peripheral.getType(cast(side, "string")))
+    return String:new(peripheral.getType(cast(side, "string")))
 end
 
 function Peripheral.getMethods(side)
-    if not Peripheral.isPresent(side) then throw(IOException.new("No connected peripheral on " .. side .. " side.")) end
-    methods = Array.new(VarArgs.unpack(peripheral.getMethods(cast(side, "string"))))
+    if not Peripheral.isPresent(side) then throw(IOException:new("No connected peripheral on " .. side .. " side.")) end
+    methods = Array:new(VarArgs.unpack(peripheral.getMethods(cast(side, "string"))))
     for i = 1, methods:length() do
         methods[i] = STR(methods[i])
     end
@@ -21,12 +21,12 @@ function Peripheral.getMethods(side)
 end
 
 function Peripheral.call(side, method, ...)
-    if not Peripheral.isPresent(side) then throw(IOException.new("No connected peripheral on " .. side .. " side.")) end
+    if not Peripheral.isPresent(side) then throw(IOException:new("No connected peripheral on " .. side .. " side.")) end
     return peripheral.call(cast(side, "string"), cast(method, "string"), ...)
 end
 
 function Peripheral.getNames()
-    local names = Array.new(VarArgs.unpack(peripheral.getNames()))
+    local names = Array:new(VarArgs.unpack(peripheral.getNames()))
     for i = 1, names:length() do
         names[i] = STR(names[i])
     end

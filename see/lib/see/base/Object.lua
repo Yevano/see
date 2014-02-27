@@ -45,13 +45,13 @@ function Object:instanceof(type)
         if type == objectType then
             return true
         end
-        objectType = objectType.__super
+        objectType = objectType:getSuper()
     end
     return false
 end
 
 function Object:toString()
-    return String.new(self:getClass().__name, " (", tostring(self):sub(8, -1), ")")
+    return STR(self:getClass():getName(), " (", tostring(self):sub(8, -1), ")")
 end
 
 --[[function Object:opEq(other)

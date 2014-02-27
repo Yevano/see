@@ -3,6 +3,6 @@
 --@extends see.event.Event
 
 function MonitorResizeEvent:init(side)
-	Event.init(self, "monitor_resize")
+	self:super(Event).init("monitor_resize")
 	self.side = side
 end

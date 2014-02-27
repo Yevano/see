@@ -3,5 +3,5 @@
 --@extends see.rt.RuntimeException
 
 function NoSuchElementException:init(message)
-    RuntimeException.init(self, message)
+    self:super(RuntimeException).init(message)
 end

@@ -65,7 +65,7 @@ end
     @return see.io.Path The absolute path.
 ]]
 function System.resolve(path)
-    return Path.new(shell.resolve(path.pathString:lstr()))
+    return Path:new(shell.resolve(path.pathString:lstr()))
 end
 
 function System.run(cmd)

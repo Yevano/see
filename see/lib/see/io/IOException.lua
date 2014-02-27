@@ -3,5 +3,5 @@
 --@extends see.base.Exception
 
 function IOException:init(message)
-    Exception.init(self, message)
+    self:super(Exception).init(message)
 end

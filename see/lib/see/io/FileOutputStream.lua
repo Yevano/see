@@ -22,7 +22,7 @@ function FileOutputStream:write(b)
     try (function()
         self.handle.write(b)
     end, function(e)
-        throw(IOException.new("Could not write to file."))
+        throw(IOException:new("Could not write to file."))
     end)
 end
 

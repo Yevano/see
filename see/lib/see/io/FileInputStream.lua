@@ -20,7 +20,7 @@ function FileInputStream:read()
     try (function()
         ret = self.handle.read()
     end, function(e)
-        throw(IOException.new("Could not read file."))
+        throw(IOException:new("Could not read file."))
     end)
     return ret
 end

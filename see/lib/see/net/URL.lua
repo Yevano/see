@@ -8,7 +8,7 @@
 function URL.encode(str)
 	ArgumentUtils.check(1, str, "string")
     str = cast(str, "string")
-    return String.new(textutils.urlEncode(str))
+    return String:new(textutils.urlEncode(str))
 end
 
 --[[

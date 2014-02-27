@@ -3,5 +3,5 @@
 --@extends see.event.Event
 
 function TerminateEvent:init()
-	Event.init(self, "terminate")
+	self:super(Event).init("terminate")
 end

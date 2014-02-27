@@ -12,19 +12,19 @@
     @throw see.util.InvalidArgumentException if the args are incorrect.
     @throw see.io.IOException If the request fails.
 ]]
-function Http.sync(url, postData)
+function HTTP.sync(url, postData)
     --[[if postData then postData = cast(postData, "string") end
     local f = postData and http.post or http.get
     local handle = f(url.string:lstr(), postData)
     return HttpResponse.new(String.new(handle.readAll()), handle.getResponseCode())]]
     ArgumentUtils.check(1, url, "string")
     ArgumentUtils.check(2, postData, "string")
-    Http.async(url, postData)
+    HTTP.async(url, postData)
     local event = Events.pull("http_success", "http_failure")
     if event.ident == "http_success" then
         return event.response
     else
-        throw(IOException.new(STR("Request to ", event.url, " failed.")))
+        throw(IOException:new(STR("Request to ", event.url, " failed.")))
     end
 end
 
@@ -34,7 +34,7 @@ end
     @param see.base.String:postData Post data to send if this is a POST request.
     @throw see.util.InvalidArgumentException if the args are incorrect.
 ]]
-function Http.async(url, postData)
+function HTTP.async(url, postData)
     ArgumentUtils.check(1, url, "string")
     ArgumentUtils.check(2, postData, "string")
     if postData then postData = cast(postData, "string") end

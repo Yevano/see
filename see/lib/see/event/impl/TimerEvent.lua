@@ -3,6 +3,6 @@
 --@extends see.event.Event
 
 function TimerEvent:init(id)
-	Event.init(self, "timer")
+	self:super(Event).init("timer")
 	self.id = id
 end

@@ -3,6 +3,6 @@
 --@extends see.event.Event
 
 function AlarmEvent:init(id)
-	Event.init(self, "alarm")
+	self:super(Event).init("alarm")
 	self.id = id
 end
