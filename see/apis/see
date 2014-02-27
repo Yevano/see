@@ -258,7 +258,9 @@ function SeeRT.new(natives, seePath)
         end
         local oi
         local class = rawget(t, "__class")
+        --print("[" .. k .. "]")
         repeat
+            --print(rt.classTables[class].__name .. ", super: " .. (self.classTables[class].__super and self.classTables[self.classTables[class].__super].__name or ""))
             local v = rt.classTables[class][k]
             if v then
                 return v
@@ -266,7 +268,7 @@ function SeeRT.new(natives, seePath)
             if not oi then
                 oi = rt.classTables[class].opIndex
             end
-            class = rawget(class, "super")
+            class = self.classTables[class].__super
         until not class
 
         if oi then
@@ -327,7 +329,7 @@ end
 
 function SeeRT:throw(exception, level)
     self.lastException = exception
-    _G.error("Uncaught exception " .. exception:getClass().name .. ': "' .. exception.message:lstr() .. '"', level)
+    _G.error("Uncaught exception " .. exception:getClass():getName():lstr() .. ': "' .. exception.message:lstr() .. '"', level)
 end
 
 --[[
@@ -615,7 +617,7 @@ function SeeRT:executeAnnotation(env, class, annotation)
     elseif aname == "extends" then
         local name = annotation:sub(pindex + 1):gsub("%s", "")
         local super = env[getPackageName(name)]
-        rawset(class, "super", super)
+        self.classTables[class].__super = super
         return true
     end
     return false
@@ -637,7 +639,8 @@ function SeeRT:executeTableStyleAnnotation(env, class, key, value)
         if type(value) == "string" then
             self:executeAnnotation(env, class, "extends " .. value)
         elseif type(value) == "table" then
-            rawset(class, "super", value)
+            --rawset(self.classTables[class], "__super", value)
+            self.classTables[class].__super = value
             return true
         else
             -- TODO: throw error
@@ -734,7 +737,7 @@ function SeeRT:loadClass(def, annotations, name, refName, env)
 
     self.classes[name] = class
     self.classLookup[class] = true
-    self.classTables[class] = { name = name }
+    self.classTables[class] = { __name = name }
 
     setmetatable(class, self.classMT)
 
@@ -768,7 +771,8 @@ function SeeRT:loadClass(def, annotations, name, refName, env)
 
     -- Extend Object by default.
     if abool and self.base.Object and name ~= "see.base.Object" then
-        rawset(class, "super", self.base.Object)
+        --rawset(class, "super", self.base.Object)
+        self.classTables[class].__super = self.base.Object
     end
 
     local static = rawget(class, "__static")

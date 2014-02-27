@@ -1,3 +1,9 @@
+--@import see.rt.RuntimeException
+
 function Test.main()
-    System.print(STR("hi"))
+    try(function()
+        throw(RuntimeException:new("hello"))
+    end, function(e)
+        System.print(e:getClass())
+    end)
 end

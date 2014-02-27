@@ -1,6 +1,8 @@
 --@native __rt
---@native print
+--@native rawget
 --@native setmetatable
+
+--@import see.base.String
 
 --[[
     The runtime class.
@@ -12,6 +14,14 @@ function Class:new(...)
     return instance
 end
 
+function Class:getSuper()
+    return __rt.classTables[self].__super
+end
+
+function Class:getName()
+    return String:new(__rt.classTables[self].__name)
+end
+
 function Class:toString()
-    return String:new(self.name)
+    return self:getName()
 end
