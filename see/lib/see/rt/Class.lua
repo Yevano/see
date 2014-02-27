@@ -1,11 +1,17 @@
+--@native __rt
+--@native print
+--@native setmetatable
+
 --[[
-    A wrapper for the runtime class object.
+    The runtime class.
 ]]
 
-function Class:getName()
-    return String.new(self.__name)
+function Class:new(...)
+    local instance = setmetatable({ __class = self }, __rt.classMT)
+    instance:init(...)
+    return instance
 end
 
 function Class:toString()
-    return self:getName()
+    return String:new(self.name)
 end
