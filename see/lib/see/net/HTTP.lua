@@ -19,6 +19,7 @@ function HTTP.sync(url, postData)
     local handle = f(url.string:lstr(), postData)
     return HttpResponse.new(String.new(handle.readAll()), handle.getResponseCode())]]
     ArgumentUtils.check(1, url, URL)
+    ArgumentUtils.check(1, url, "string")
     HTTP.async(url, postData)
     local event = Events.pull("http_success", "http_failure")
     if event.ident == "http_success" then
@@ -36,6 +37,6 @@ end
 ]]
 function HTTP.async(url, postData)
     ArgumentUtils.check(1, url, URL)
-    if postData then postData = cast(postData, "string") end
+    ArgumentUtils.check(1, url, "string")
     http.request(url.string:lstr(), postData)
 end
