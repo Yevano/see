@@ -120,11 +120,11 @@ function String:sub(a, b)
 
     if a > b then a, b = b, a end
 
-    local substring = String:new()
+    local substring = ""
     for i = a, b do
-        substring[i - a + 1] = self[i]
+        substring = substring .. string.char(self[i])
     end
-    return substring
+    return String:new(substring)
 end
 
 --[[
