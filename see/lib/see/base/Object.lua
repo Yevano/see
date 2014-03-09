@@ -3,6 +3,7 @@
 --@native setmetatable
 --@native getmetatable
 --@native rawget
+--@native rawequal
 --@native __rt
  
 --[[
@@ -54,10 +55,10 @@ function Object:toString()
     return STR(self:getClass():getName(), " (", tostring(self):sub(8, -1), ")")
 end
 
---[[function Object:opEq(other)
+function Object:opEq(other)
     return self:equals(other)
-end]]
+end
 
 function Object:equals(other)
-    return self == other
+    return rawequal(self, other)
 end

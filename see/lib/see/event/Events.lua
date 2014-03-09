@@ -34,7 +34,7 @@ local nativeEvents
 function Events.__static()
     registeredEvents = { }
     nativeEvents = { }
-
+    
     Events.register("char",              CharEvent)
     Events.register("key",               KeyPressEvent)
     Events.register("timer",             TimerEvent)

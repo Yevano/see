@@ -775,7 +775,7 @@ function SeeRT:loadClass(def, annotations, name, refName, env)
         self.classTables[class].__super = self.base.Object
     end
 
-    local static = rawget(class, "__static")
+    local static = rawget(self.classTables[class], "__static")
     if static then
         static()
     end
