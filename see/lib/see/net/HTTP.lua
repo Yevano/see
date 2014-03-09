@@ -2,6 +2,7 @@
 
 --@import see.io.IOException
 --@import see.net.HTTPResponse
+--@import see.net.URL
 --@import see.util.ArgumentUtils
 
 --[[
@@ -17,8 +18,7 @@ function HTTP.sync(url, postData)
     local f = postData and http.post or http.get
     local handle = f(url.string:lstr(), postData)
     return HttpResponse.new(String.new(handle.readAll()), handle.getResponseCode())]]
-    ArgumentUtils.check(1, url, "string")
-    ArgumentUtils.check(2, postData, "string")
+    ArgumentUtils.check(1, url, URL)
     HTTP.async(url, postData)
     local event = Events.pull("http_success", "http_failure")
     if event.ident == "http_success" then
@@ -35,8 +35,7 @@ end
     @throw see.util.InvalidArgumentException if the args are incorrect.
 ]]
 function HTTP.async(url, postData)
-    ArgumentUtils.check(1, url, "string")
-    ArgumentUtils.check(2, postData, "string")
+    ArgumentUtils.check(1, url, URL)
     if postData then postData = cast(postData, "string") end
     http.request(url.string:lstr(), postData)
 end

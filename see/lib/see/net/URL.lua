@@ -15,7 +15,6 @@ end
 	@throw see.util.InvalidArgumentException if the args are incorrect.
 ]]
 function URL:init(string)
-	ArgumentUtils.check(1, string, "string")
     self.string = cast(string, String)
 end
 
