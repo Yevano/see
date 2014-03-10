@@ -15,12 +15,12 @@ function ExTest.main()
         extends = ExTest;
     }, function()
         function B:init(x)
-            A.init(self, x)
+            self:super(A).init(x)
         end
 
         function B:y(z)
             print(Math.pow(self.x, z))
         end
     end)
-    B.new(3):y(4)
+    B:new(3):y(4)
 end
