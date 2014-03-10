@@ -188,7 +188,7 @@ end
 function StandardGlobals.try(rt, tryFunc, catchFunc)
     local suc, err = pcall(tryFunc)
     if suc then return end
-    --if err then rt.lastException = rt:loadClassFromAny("see.rt.RuntimeException"):new(err) end
+    if err then rt.lastException = rt:loadClassFromAny("see.rt.RuntimeException"):new(err) end
     catchFunc(rt.lastException)
 end
 
