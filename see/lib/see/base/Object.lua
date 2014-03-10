@@ -14,7 +14,13 @@ function Object:super(class)
     local obj = self
     return setmetatable({ }, { __index = function(t, k)
         return function(...)
-            return __rt.classTables[class][k](obj, ...)
+            while class do
+                local method = __rt.classTables[class][k]
+                if method then
+                    return method(obj, ...)
+                end
+                class = __rt.classTables[class].__super
+            end
         end
     end })
 end
