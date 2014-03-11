@@ -70,10 +70,11 @@ function String:opIndex(index)
 end
 
 function String:opNewIndex(index, value)
+    if typeof(value) == "string" then
+        value = string.byte(value)
+    end
+
     if typeof(index) == "number" then
-        if typeof(value) == "string" then
-            value = string.byte(value)
-        end
         self.charArray[index] = value
         return true
     end
@@ -120,11 +121,11 @@ function String:sub(a, b)
 
     if a > b then a, b = b, a end
 
-    local substring = ""
+    local substring = String:new()
     for i = a, b do
-        substring = substring .. string.char(self[i])
+        substring:add(string.char(self[i]))
     end
-    return String:new(substring)
+    return substring
 end
 
 --[[
@@ -194,7 +195,6 @@ function String:find(str, init)
     end
 end
 
--- TODO: Reimplement as non-native solution.
 --[[
     Formats this String using the native string.format.
     @param native:values... The values to pass to string.format.
