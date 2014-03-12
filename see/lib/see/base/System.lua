@@ -27,7 +27,7 @@ end
 function System.print(...)
     local args = {...}
     for i = 1, #args do
-        args[i] = cast(cast(args[i], String), "string")
+        args[i] = cast(args[i], "string")
     end
     print(unpack(args))
 end
@@ -65,7 +65,7 @@ end
     @return see.io.Path The absolute path.
 ]]
 function System.resolve(path)
-    return Path.new(shell.resolve(path.pathString:lstr()))
+    return Path:new(shell.resolve(path.pathString:lstr()))
 end
 
 function System.run(cmd)

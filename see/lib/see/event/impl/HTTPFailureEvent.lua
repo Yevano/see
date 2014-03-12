@@ -3,6 +3,6 @@
 --@extends see.event.Event
 
 function HTTPFailureEvent:init(url)
-	Event.init(self, "http_failure")
+	self:super(Event).init("http_failure")
 	self.url = url
 end

@@ -32,24 +32,21 @@ end
 ]]
 function Array.wrap(t)
     ArgumentUtils.check(1, t, "table")
-    return Array.new(unpack(t))
+    return Array:new(unpack(t))
 end
 
-local oldindex = Array.__meta.__index
-
-function Array.__meta:__index(index)
+function Array:opIndex(index)
     if typeof(index) == "number" then
         return self:get(index)
     end
-    return oldindex[index]
 end
 
-function Array.__meta:__newindex(index, value)
+function Array:opNewIndex(index, value)
     if typeof(index) == "number" then
         self:set(index, value)
-        return
+        return true
     end
-    rawset(self, index, value)
+    return false
 end
 
 function Array:length()
@@ -70,7 +67,7 @@ function Array:get(index)
     if index <= self:length() and index > 0 then
         return self.luaArray[index]
     end
-    throw(IndexOutOfBoundsException.new(index))
+    throw(IndexOutOfBoundsException:new(index))
 end
 
 --[[
@@ -88,7 +85,7 @@ function Array:set(index, value)
         self.luaArray[index] = value
         return
     end
-    throw(IndexOutOfBoundsException.new(index))
+    throw(IndexOutOfBoundsException:new(index))
 end
 
 --[[
@@ -112,13 +109,13 @@ function Array:remove(index)
     if index <= self:length() and index > 0 then
         return table.remove(self.luaArray, index)
     end
-    throw(IndexOutOfBoundsException.new(index))
+    throw(IndexOutOfBoundsException:new(index))
 end
 
 function Array:removeElement(element)
     local index = self:indexOf(element)
     if not index then
-        throw(NoSuchElementException.new(STR("No such element ", cast(element, String), ".")))
+        throw(NoSuchElementException:new(STR("No such element ", cast(element, String), ".")))
     end
 end
 
@@ -135,7 +132,7 @@ function Array:insert(index, value)
     if index <= self:length() + 1 and index > 0 then
         return table.insert(self.luaArray, index, value)
     end
-    throw(IndexOutOfBoundsException.new(index))
+    throw(IndexOutOfBoundsException:new(index))
 end
 
 function Array:indexOf(value)
@@ -161,6 +158,23 @@ end
 
 function Array:unpack()
     return unpack(self.luaArray)
+end
+
+function Array:map(mapFunc)
+    for i = 1, self:length() do
+        self[i] = mapFunc(self[i])
+    end
+end
+
+function Array:filter(filterFunc)
+    local ret = Array:new()
+    for i = 1, self:length() do
+        local e = self[i]
+        if filterFunc(e) then
+            ret:add(e)
+        end
+    end
+    return ret
 end
 
 --[[

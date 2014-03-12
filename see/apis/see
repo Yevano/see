@@ -25,7 +25,13 @@ function formatTraceback(err, errors, level)
     if not err then
         err = ""
     else
-        err = err:sub(err:find(":", err:find(":") + 1) + 2, -1)
+        --[[local i = err:find(":")
+        if i then
+            local j = err:find(":", i + 1)
+            if j then
+                err = err:sub(j + 2, -1)
+            end
+        end]]
     end
     local f = err
     for i = 1, level do
@@ -42,17 +48,20 @@ function formatTraceback(err, errors, level)
 end
 
 local function error(err, level, b)
-    if term.isColor() then
+    --print(err)
+    --while true do end
+    --[[if term.isColor() then
         term.setTextColor(colors.red)
     end
     print(formatTraceback(err, traceback(), 10))
     if term.isColor() then
         term.setTextColor(colors.white)
     end
-    _G.error()
+    _G.error()]]
 end
 
 function errorHandler(err)
+    --print(err)
     if term.isColor() then
         term.setTextColor(colors.red)
     end
@@ -95,14 +104,21 @@ end
     @return string|table The type identifier if value if primitive, or the class of value if value is an object.
 ]]
 function StandardGlobals.typeof(rt, value)
+    --print(type(value))
     if type(value) == "table" then
-        return value.__type or "table"
+        if getmetatable(value) == rt.classMT then
+            return rawget(value, "__class")
+        end
+        return "table"
     end
     return type(value)
 end
 
-function StandardGlobals.isprimitive(rt, t)
-    return type(t) ~= "table" or not t.__type
+function StandardGlobals.isprimitive(rt, value)
+    if type(value) == "table" then
+        return getmetatable(value) ~= rt.classMT
+    end
+    return true
 end
 
 --[[
@@ -119,9 +135,9 @@ function StandardGlobals.cast(rt, value, castType)
     if type(castType) == "string" then
         -- Casting to primitive.
         if castType == "string" then
-            if type(value) ~= "table" or not value.__type then
+            if StandardGlobals.isprimitive(rt, value) then
                 return tostring(value)
-            elseif value.__type then
+            else
                 return value:toString():lstr()
             end
         else
@@ -131,12 +147,12 @@ function StandardGlobals.cast(rt, value, castType)
         if castType.__cast then
             return castType.__cast(value)
         else
-            StandardGlobals.throw(rt, rt:loadClassFromAny("see.rt.CastException").new(StandardGlobals.typeof(rt, value), castType))
+            StandardGlobals.throw(rt, rt:loadClassFromAny("see.rt.CastException"):new(StandardGlobals.typeof(rt, value), castType))
         end
         -- Casting to Object.
         -- TODO
     else
-        --StandardGlobals.throw(rt, rt:loadClassFromAny("see.rt.CastException").new())
+        --StandardGlobals.throw(rt, rt:loadClassFromAny("see.rt.CastException"):new())
     end
 end
 
@@ -159,7 +175,7 @@ function StandardGlobals.throw(rt, exception)
     if exception then
         rt:throw(exception)
     else
-        rt:throw(rt:loadClassFromAny("see.rt.RuntimeException").new("Invalid argument to throw."))
+        rt:throw(rt:loadClassFromAny("see.rt.RuntimeException"):new("Invalid argument to throw."))
     end
 end
 
@@ -172,7 +188,7 @@ end
 function StandardGlobals.try(rt, tryFunc, catchFunc)
     local suc, err = pcall(tryFunc)
     if suc then return end
-    --if err then rt.lastException = rt:loadClassFromAny("see.rt.RuntimeException").new(err) end
+    if err then rt.lastException = rt:loadClassFromAny("see.rt.RuntimeException"):new(err) end
     catchFunc(rt.lastException)
 end
 
@@ -181,7 +197,7 @@ end
     @param see.base.String... Strings to concatenate.
 ]]
 function StandardGlobals.STR(rt, ...)
-    return rt.base.String.new(...)
+    return rt.base.String:new(...)
 end
 
 SeeRT = { }
@@ -209,30 +225,111 @@ function SeeRT.new(natives, seePath)
         self.standardGlobals[k] = function(...) return StandardGlobals[k](self, ...) end
     end
 
-    self.base = { }
-    self.rt = { }
-    self.event = { }
-    self.classes = { }
-    self.natives = natives
+    self.base          = { }
+    self.rt            = { }
+    self.event         = { }
+    self.classes       = { }
+    self.classLookup   = { }
+    self.classTables   = { }
+    self.natives       = natives
     self.natives.error = error
-    self.archives = { }
-    self.classPaths = { }
-    self.base.Object = self:loadClassFromAny("see.base.Object")
-    self.rt.Class = self:loadClassFromAny("see.rt.Class")
-    self.base.Exception = self:loadClassFromAny("see.base.Exception")
-    self.base.System = self:loadClassFromAny("see.base.System")
-    self.base.Iterators = self:loadClassFromAny("see.base.Iterators")
-    self.base.Array  = self:loadClassFromAny("see.base.Array")
-    self.base.String = self:loadClassFromAny("see.base.String")
-    self.event.Events = self:loadClassFromAny("see.event.Events")
-    self.event.UnknownEvent = self:loadClassFromAny("see.event.impl.UnknownEvent")
+    self.archives      = { }
+    self.classPaths    = { }
+
+    local rt = self
+    function self.index(t, k)
+        -- Class access.
+        if rt.classLookup[t] then
+            --print(rt.classTables[t].name .. "[" .. k .. "]")
+            local v = rt.classTables[rt.rt.Class][k]
+            if v then
+                return v
+            end
+            v = rt.classTables[rt.base.Object][k]
+            if v then
+                return v
+            end
+            return rt.classTables[t][k]
+        end
+
+        -- Instance access.
+        if k == "__class" then
+            return nil
+        end
+        local oi
+        local class = rawget(t, "__class")
+        --print("[" .. k .. "]")
+        repeat
+            --print(rt.classTables[class].__name .. ", super: " .. (self.classTables[class].__super and self.classTables[self.classTables[class].__super].__name or ""))
+            local v = rt.classTables[class][k]
+            if v then
+                return v
+            end
+            if not oi then
+                oi = rt.classTables[class].opIndex
+            end
+            class = self.classTables[class].__super
+        until not class
+
+        if oi then
+            return oi(t, k)
+        end
+    end
+
+    function self.newindex(t, k, v)
+        if rt.classTables[t] then
+            rt.classTables[t][k] = v
+        else
+            local oni = rawget(t, "opNewIndex")
+            if not oni or not oni(t, k, v) then
+                rawset(t, k, v)
+            end
+        end
+    end
+
+    self.metaMethodMap = {
+        opAdd    = "__add",
+        opSub    = "__sub",
+        opMul    = "__mul",
+        opDiv    = "__div",
+        opMod    = "__mod",
+        opPow    = "__pow",
+        opNeg    = "__unm",
+        opConcat = "__concat",
+        opEq     = "__eq",
+        opLT     = "__lt",
+        opLE     = "__le",
+        opCall   = "__call"
+    }
+
+    self.opMap = { }
+
+    self.classMT = { __index = self.index, __newindex = self.newindex }
+
+    for k, v in pairs(self.metaMethodMap) do
+        self.opMap[v] = k
+        self.classMT[v] = function(t, ...)
+            return t[k](t, ...)
+        end
+    end
+
+    self:loadClassFromAny("see.base.Object")
+    self:loadClassFromAny("see.rt.Class")
+    self.base.Exception      = self:loadClassFromAny("see.base.Exception")
+    self.base.System         = self:loadClassFromAny("see.base.System")
+    self.base.Iterators      = self:loadClassFromAny("see.base.Iterators")
+    self.base.Array          = self:loadClassFromAny("see.base.Array")
+    self.base.String         = self:loadClassFromAny("see.base.String")
+    self.event.Events        = self:loadClassFromAny("see.event.Events")
+    self.event.UnknownEvent  = self:loadClassFromAny("see.event.impl.UnknownEvent")
     self.rt.RuntimeException = self:loadClassFromAny("see.rt.RuntimeException")
+
     return self
 end
 
 function SeeRT:throw(exception, level)
     self.lastException = exception
-    _G.error("Uncaught exception " .. exception.__type.__name .. ': "' .. exception.message:lstr() .. '"', level)
+    _G.error("Uncaught exception " .. exception:getClass():getName():lstr() .. ': "' .. exception.message:lstr() .. '"', level)
 end
 
 --[[
@@ -313,25 +410,26 @@ function SeeRT:start(mainClass, ...)
     xpcall(function() (function(mainClass, ...)
         local Events = self.event.Events
         local UnknownEvent = self.event.UnknownEvent
-        local args = self.base.Array.new(...)
+        local args = self.base.Array:new(...)
         local threads = self.threads
         local f = function() mainClass.main(args) end
-        
+
         threads[1] = coroutine.create(function() xpcall(f, errorHandler) end)
-        local t = self:loadClassFromAny("see.concurrent.Thread").new(f)
+        local t = self:loadClassFromAny("see.concurrent.Thread"):new(f)
         t.co = threads[1]
         t.id = 1
+
         self.objThreads[threads[1]] = t
         self.maxThreadID = 1
         self.threadsToIDs[threads[1]] = 1
         self.idsToThreads[1] = threads[1]
-
+        
         local threadFilters = self.threadFilters
         local event
         local isNative
-
         threadFilters[1] = { coroutine.resume(threads[1], args) }
         local cycle = 1
+        
         while true do
             local threadDeaths = { }
             for i = 1, #threads do
@@ -348,7 +446,7 @@ function SeeRT:start(mainClass, ...)
                     local passEvent = false
                     if event[1] ~= "__thread_interrupt" then
                         if event.ident == "terminate" then
-                            self:throw(self.rt.RuntimeException.new("terminated"))
+                            self:throw(self.rt.RuntimeException:new("terminated"))
                         end
 
                         if #threadFilters[i] == 1 then
@@ -424,9 +522,9 @@ function SeeRT:start(mainClass, ...)
                     else
                         local EventClass = Events.getEventClass(eventData[1])
                         if EventClass == UnknownEvent then
-                            xpcall(function() event = EventClass.new(unpack(eventData)) end, errorHandler)
+                            xpcall(function() event = EventClass:new(unpack(eventData)) end, errorHandler)
                         else
-                            xpcall(function() event = EventClass.new(unpack(eventParams)) end, errorHandler)
+                            xpcall(function() event = EventClass:new(unpack(eventParams)) end, errorHandler)
                         end
                     end
                 end
@@ -481,7 +579,7 @@ function SeeRT:executeAnnotation(env, class, annotation)
     local pindex = annotation:find("%s")
 
     if not pindex then
-        error("Failed to execute annotation for class " .. class.__name .. ".")
+        error("Failed to execute annotation for class " .. class.name .. ".")
     end
 
     local aname = annotation:sub(1, pindex - 1)
@@ -519,8 +617,7 @@ function SeeRT:executeAnnotation(env, class, annotation)
     elseif aname == "extends" then
         local name = annotation:sub(pindex + 1):gsub("%s", "")
         local super = env[getPackageName(name)]
-        class.__super = super
-        setmetatable(class, super.__meta)
+        self.classTables[class].__super = super
         return true
     end
     return false
@@ -542,8 +639,8 @@ function SeeRT:executeTableStyleAnnotation(env, class, key, value)
         if type(value) == "string" then
             self:executeAnnotation(env, class, "extends " .. value)
         elseif type(value) == "table" then
-            class.__super = value
-            setmetatable(class, value.__meta)
+            --rawset(self.classTables[class], "__super", value)
+            self.classTables[class].__super = value
             return true
         else
             -- TODO: throw error
@@ -625,39 +722,39 @@ function SeeRT:loadClass(def, annotations, name, refName, env)
     local anon = refName ~= nil
     refName = refName or className
 
-    -- Setup class inheritance model.
     local class = { }
-    class.__meta = { __index = class }
-    class.__name = name
 
-    if not self.rt.Class then
-        class.__type = class
-    else
-        class.__type = self.rt.Class
+    local fdtnl = false
+    if name == "see.base.Object" then
+        self.base.Object = class
+        fdtnl = true
     end
 
-    function class.new(...)
-        if not class.init then error("Could not instantiate class " .. refName .. ". No init method.") end
-        local self = { }
-        setmetatable(self, class.__meta)
-        self.__type = class
-        self:init(...)
-        return self
+    if name == "see.rt.Class" then
+        self.rt.Class = class
+        fdtnl = true
     end
 
-    -- Import base classes.
-    for k, class in pairs(self.base) do
-        env[k] = class
-    end
+    self.classes[name] = class
+    self.classLookup[class] = true
+    self.classTables[class] = { __name = name }
 
-    -- Import Events class for convenience.
-    env["Events"] = self.event.Events
+    setmetatable(class, self.classMT)
+
+    if not fdtnl then
+        -- Import base classes.
+        for k, class in pairs(self.base) do
+            env[k] = class
+        end
+
+        -- Import Events class for convenience.
+        env["Events"] = self.event.Events
+    end
 
     -- Setup class environment.
     env[refName] = class
     setfenv(def, env)
     xpcall(def, errorHandler)
-    self.classes[name] = class
 
     local abool = true
     for k, v in pairs(annotations) do
@@ -673,13 +770,14 @@ function SeeRT:loadClass(def, annotations, name, refName, env)
     end
 
     -- Extend Object by default.
-    if abool and self.base.Object then
-        class.__super = self.base.Object
-        setmetatable(class, self.base.Object.__meta)
+    if abool and self.base.Object and name ~= "see.base.Object" then
+        --rawset(class, "super", self.base.Object)
+        self.classTables[class].__super = self.base.Object
     end
 
-    if class.__static then
-        class.__static()
+    local static = rawget(self.classTables[class], "__static")
+    if static then
+        static()
     end
 
     return class

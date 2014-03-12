@@ -1,8 +1,8 @@
 --@import see.concurrent.Thread
 
 function Task:init(func, ...)
-    local args = Array.new(...)
-    self.thread = Thread.new(function()
+    local args = Array:new(...)
+    self.thread = Thread:new(function()
         self.result = func(args:unpack())
         if self.callback then
             self.callback(self.result)

@@ -3,6 +3,6 @@
 --@extends see.event.Event
 
 function CharEvent:init(char)
-	Event.init(self, "char")
+	self:super(Event).init("char")
 	self.char = char
 end

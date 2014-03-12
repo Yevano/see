@@ -2,11 +2,28 @@
 --@native pairs
 --@native setmetatable
 --@native getmetatable
---@import see.base.String
-
+--@native rawget
+--@native rawequal
+--@native __rt
+ 
 --[[
     The super class for all classes loaded in the SEE Runtime.
 ]]
+
+function Object:super(class)
+    local obj = self
+    return setmetatable({ }, { __index = function(t, k)
+        return function(...)
+            while class do
+                local method = __rt.classTables[class][k]
+                if method then
+                    return method(obj, ...)
+                end
+                class = __rt.classTables[class].__super
+            end
+        end
+    end })
+end
 
 --[[
     Fully copies an object.
@@ -26,32 +43,28 @@ end
     @return table The runtime class.
 ]]
 function Object:getClass()
-    return self.__type
+    return rawget(self, "__class")
 end
 
 function Object:instanceof(type)
-    local objectType = self.__type
+    local objectType = self:getClass()
     while objectType do
         if type == objectType then
             return true
         end
-        objectType = objectType.__super
+        objectType = objectType:getSuper()
     end
     return false
 end
 
 function Object:toString()
-    return String.new(self:getClass().__name, " (", tostring(self):sub(8, -1), ")")
+    return STR(self:getClass():getName(), " (", tostring(self):sub(8, -1), ")")
 end
 
-function Object.__concat(l, r)
-    return cast(l, String):concat(cast(r, String))
-end
-
-function Object.__meta:__eq(other)
+function Object:opEq(other)
     return self:equals(other)
 end
 
 function Object:equals(other)
-    return self == other
+    return rawequal(self, other)
 end

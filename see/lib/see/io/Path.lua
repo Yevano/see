@@ -6,7 +6,7 @@ function Path:init(pathString)
 end
 
 function Path:combine(p)
-    return Path.new(String.new(fs.combine(self.pathString:lstr(), p.pathString:lstr())))
+    return Path:new(String:new(fs.combine(self.pathString:lstr(), p.pathString:lstr())))
 end
 
 function Path:getName()

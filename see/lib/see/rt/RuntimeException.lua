@@ -1,4 +1,5 @@
 --@import see.base.Exception
+
 --@extends see.base.Exception
 
 --[[
@@ -10,5 +11,5 @@
     @param string:message The error message.
 ]]
 function RuntimeException:init(message)
-    Exception.init(self, message)
+    self:super(Exception).init(message)
 end

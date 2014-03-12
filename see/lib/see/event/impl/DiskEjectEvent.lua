@@ -3,6 +3,6 @@
 --@extends see.event.Event
 
 function DiskEjectEvent:init(side)
-	Event.init(self, "disk_eject")
+	self:super(Event).init("disk_eject")
 	self.side = side
 end

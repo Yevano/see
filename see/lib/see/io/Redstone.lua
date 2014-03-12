@@ -25,13 +25,13 @@ function Redstone.getAnalogOutput(side)
 end
 
 function Redstone.getBundledInput(side)
-    return redstone.getAnalogInput(cast(side, "string"))
+    return redstone.getBundledInput(cast(side, "string"))
 end
 
 function Redstone.setBundledOutput(side, colors)
-    redstone.setAnalogOutput(cast(side, "string"), colors)
+    redstone.setBundledOutput(cast(side, "string"), colors)
 end
 
 function Redstone.getBundledOutput(side)
-    return redstone.getAnalogOutput(cast(side, "string"))
+    return redstone.getBundledOutput(cast(side, "string"))
 end

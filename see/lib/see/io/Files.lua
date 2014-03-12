@@ -2,7 +2,7 @@
 --@native unpack
 
 function Files.list(path)
-    return Array.new(unpack(fs.list(path.pathString:lstr())))
+    return Array:new(unpack(fs.list(path.pathString:lstr())))
 end
 
 function Files.exists(path)
@@ -19,7 +19,7 @@ end
 
 function Files.getDrive(path)
     local drive = fs.getDrive(path.pathString:lstr())
-    return drive and String.new(drive) or nil
+    return drive and String:new(drive) or nil
 end
 
 function Files.getSize(path)

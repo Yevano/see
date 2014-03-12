@@ -75,7 +75,7 @@ end
     @return see.base.String The string that was read.
 ]]
 function DataInputStream:readString(len)
-    local ret = String.new()
+    local ret = String:new()
     for i = 1, len do
         ret[i] = self:read()
     end

@@ -1,6 +1,7 @@
 --@native coroutine
 --@native __rt
 --@native os.startTimer
+--@native print
 
 --@import see.event.Events
 

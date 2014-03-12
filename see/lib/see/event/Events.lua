@@ -34,7 +34,7 @@ local nativeEvents
 function Events.__static()
     registeredEvents = { }
     nativeEvents = { }
-
+    
     Events.register("char",              CharEvent)
     Events.register("key",               KeyPressEvent)
     Events.register("timer",             TimerEvent)
@@ -81,8 +81,8 @@ function Events.queue(event)
 end
 
 function Events.pull(...)
-    local args = Array.new(...)
-    local casted = Array.new()
+    local args = Array:new(...)
+    local casted = Array:new()
     for arg in args:iAll() do
         casted:add(cast(arg, "string"))
     end
@@ -91,7 +91,7 @@ function Events.pull(...)
         local ret = Thread.yield(casted:unpack())
 
         if ret == "__thread_interrupt" then
-            throw(InterruptedException.new())
+            throw(InterruptedException:new())
         end
 
         return ret

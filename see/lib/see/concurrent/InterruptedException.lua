@@ -3,5 +3,5 @@
 --@extends see.rt.RuntimeException
 
 function InterruptedException:init()
-    RuntimeException.init(self, "")
+    self:super(RuntimeException).init("Thread interrupted.")
 end

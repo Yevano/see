@@ -23,5 +23,5 @@ function Matcher:find()
 end
 
 function Matcher:matched()
-	return String.new(self.string:sub(self.left, self.right))
+	return String:new(self.string:sub(self.left, self.right))
 end

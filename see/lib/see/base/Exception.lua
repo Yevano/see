@@ -2,8 +2,6 @@
 --@import see.base.String
 --@import see.base.System
 
---@extends see.base.Object
-
 --[[
     Describes any error that occurs.
 ]]

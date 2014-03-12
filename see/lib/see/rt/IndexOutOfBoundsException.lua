@@ -7,5 +7,5 @@
 ]]
 
 function IndexOutOfBoundsException:init(index)
-    RuntimeException.init(self, String.new("Index: " .. index))
+    self:super(RuntimeException).init(STR("Index: ", index))
 end

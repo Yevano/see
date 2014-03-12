@@ -4,7 +4,7 @@
 --@extends see.event.Event
 
 function SignalEvent:init(message)
-    Event.init(self, "signal")
+    self:super(Event).init("signal")
     self.sender = Thread.current()
     self.message = message
 end

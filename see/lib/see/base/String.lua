@@ -28,7 +28,7 @@ function String.__cast(value)
     end
 
     local str = tostring(value)
-    local ret = String.new()
+    local ret = String:new()
 
     for i = 1, #str do
         ret.charArray:add(str:sub(i, i):byte())
@@ -43,7 +43,7 @@ end
     @return see.base.String A string representation of the given bytes.
 ]]
 function String.char(...)
-    return String.new(string.char(...))
+    return String:new(string.char(...))
 end
 
 --[[
@@ -52,41 +52,33 @@ end
 ]]
 function String:init(...)
     local args = {...}
-    self.charArray = Array.new()
+    self.charArray = Array:new()
 
     for i = 1, #args do
         local str = cast(args[i], String)
         if not str then return end
-        if typeof(str) == "string" then
-            for i = 1, #str do
-                self.charArray:add(str:sub(i, i):byte())
-            end
-        elseif typeof(str) == String then
-            for i = 1, str:length() do
-                self.charArray:add(str[i])
-            end
+        for i = 1, str:length() do
+            self.charArray:add(str[i])
         end
     end
 end
 
-local oldindex = String.__meta.__index
-
-function String.__meta:__index(index)
+function String:opIndex(index)
     if typeof(index) == "number" then
         return self.charArray[index]
     end
-    return oldindex[index]
 end
 
-function String.__meta:__newindex(index, value)
-    if typeof(index) == "number" then
-        if typeof(value) == "string" then
-            value = string.byte(value)
-        end
-        self.charArray[index] = value
-        return
+function String:opNewIndex(index, value)
+    if typeof(value) == "string" then
+        value = string.byte(value)
     end
-    rawset(self, index, value)
+
+    if typeof(index) == "number" then
+        self.charArray[index] = value
+        return true
+    end
+    return false
 end
 
 --[[
@@ -109,19 +101,8 @@ function String:length()
     return self.charArray:length()
 end
 
-function String.concat(a, b)
-    a = cast(a, String)
-    b = cast(b, String)
-    local ret = String.new(a)
-    local len = a:length()
-    for i = 1, b:length() do
-        ret[i + len] = b[i]
-    end
-    return ret
-end
-
-function String.__meta.__concat(a, b)
-    return a:concat(b)
+function String:opConcat(other)
+    return STR(self, other)
 end
 
 --[[
@@ -140,9 +121,9 @@ function String:sub(a, b)
 
     if a > b then a, b = b, a end
 
-    local substring = String.new()
+    local substring = String:new()
     for i = a, b do
-        substring[i - a + 1] = self[i]
+        substring:add(string.char(self[i]))
     end
     return substring
 end
@@ -214,14 +195,13 @@ function String:find(str, init)
     end
 end
 
--- TODO: Reimplement as non-native solution.
 --[[
     Formats this String using the native string.format.
     @param native:values... The values to pass to string.format.
     @return see.base.String The formatted string.
 ]]
 function String:format(...)
-    return String.new(self:lstr():format(...))
+    return String:new(self:lstr():format(...))
 end
 
 --[[
@@ -248,7 +228,7 @@ end
     @return see.base.String The lower case string.
 ]]
 function String:lower()
-    local ret = String.new()
+    local ret = String:new()
     for i = 1, self:length() do
         if self[i] >= 65 and self[i] <= 90 then
             ret[i] = self[i] + 32
@@ -264,7 +244,7 @@ end
     @return see.base.String The upper case string.
 ]]
 function String:upper()
-    local ret = String.new()
+    local ret = String:new()
     for i = 1, self:length() do
         if self[i] >= 97 and self[i] <= 122 then
             ret[i] = self[i] - 32
@@ -282,7 +262,7 @@ end
 ]]
 function String:duplicate(n)
     ArgumentUtils.check(1, n, "number")
-    local ret = String.new()
+    local ret = String:new()
     for i = 1, n do
         ret:add(self)
     end
@@ -294,7 +274,7 @@ end
     @return see.base.String A reversed String.
 ]]
 function String:reverse()
-    local ret = String.new()
+    local ret = String:new()
     for i = self:length(), 1, -1 do
         ret:add(String.char(self[i]))
     end
@@ -307,8 +287,8 @@ end
     @return see.base.Array The split strings.
 ]]
 function String:split(sep)
-    local ret = Array.new()
-    local matcher = Matcher.new(sep, self)
+    local ret = Array:new()
+    local matcher = Matcher:new(sep, self)
     local l = 1
     while matcher:find() do
         ret:add(self:sub(l, matcher.left - 1))
@@ -319,7 +299,7 @@ function String:split(sep)
 end
 
 function String:trim()
-    local ret = String.new()
+    local ret = String:new()
     for i = 1, self:length() do
         if self[i] ~= STR(' ')[1] and self[i] ~= STR('\n')[1] and self[i] ~= STR('\t')[1] and self[i] ~= STR('\r')[1] then
             ret:add(String.char(self[i]))
