@@ -14,25 +14,22 @@ function ModemInputStream:init(modem, channel)
 	self.running = true
 	self.thread = Thread:new(function()
 		while self.running do
-			local id = os.startTimer(1/20)
 			local evt 
 			try(function()
-				evt = Events.pull("modem_message", "timer")
+				evt = Events.pull("modem_message")
 			end, function(e) end)
 
 			if evt then
-				if evt.ident == "timer" and evt.id == id then
-					Thread.work() --experimental
-				elseif evt.ident == "modem_message" then
-					if evt.channel == channel then
-						local val = STR(evt.message):toNumber()  --too simple? probably
-						self.buffer:add(val)
-					else
-						--crap, what now... cant just "re-queue" it.. or can we.. hmmmmmm
-						Events.queue(evt) --HIGHLY EXPERIMENTAL, PROBABLY CAUSES HORRIBLE SHIT TO GO DOWN
-						Thread.yield() 
-					end
+				if evt.channel == channel then
+					local val = STR(evt.message):toNumber()  --too simple? probably
+					self.buffer:add(val)
+				else
+					--crap, what now... cant just "re-queue" it.. or can we.. hmmmmmm
+					Events.queue(evt) --HIGHLY EXPERIMENTAL, PROBABLY CAUSES HORRIBLE SHIT TO GO DOWN
+					Thread.yield() 
 				end
+			else
+				Thread.work()
 			end
 		end
 	end)
