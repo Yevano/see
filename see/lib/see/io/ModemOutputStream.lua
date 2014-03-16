@@ -2,9 +2,9 @@
 --@import see.io.OutputStream
 --@import see.util.ArgumentUtils
 
---@abstract flush
-
 --@extends see.io.OutputStream
+
+--@abstract flush
 
 function ModemOutputStream:init(modem, channel, replyChannel)
 	self.modem = modem
