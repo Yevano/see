@@ -41,9 +41,6 @@ function ModemInputStream:init(modem, channel)
 	self.thread:start()
 end
 
---[[
-	Reads a byte
-]]
 function ModemInputStream:read()
 	if self.buffer:length() == 0 then
 		return -1
@@ -52,13 +49,14 @@ function ModemInputStream:read()
 	return self.buffer:remove(1)
 end
 
---[[
-	Returns the number of bytes available
-]]
 function ModemInputStream:available()
 	return self.buffer:length()
 end
 
+--[[
+	Closes the input stream
+	It is very important this is called! If it is not, a thread will be left running!
+]]
 function ModemInputStream:close()
 	Thread:new(function()
 		self.modem:close(self.channel)

@@ -1,16 +1,15 @@
 --@import see.io.Peripheral
 --@import see.util.ArgumentUtils
+--@import see.io.peripheral.AbstractPeripheral
+
+--@extends see.io.peripheral.AbstractPeripheral
 
 --[[
 	Wrapper for modem peripherals
 	@param see.base.String:what side the modem is on (can be on network as well)
 ]]
 function Modem:init(location)
-	if not Peripheral.isPresent(location) then
-		throw(InvalidArgumentException:new(1, "see.base.String: location", "invalid location"))
-	end
-
-	self.location = location
+	self:super(AbstractPeripheral).init(location)
 end
 
 function Modem:isOpen(channel)

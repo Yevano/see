@@ -1,15 +1,14 @@
 --@import see.io.Peripheral
+--@import see.io.peripheral.AbstractPeripheral
+
+--@extends see.io.peripheral.AbstractPeripheral
 
 --[[
 	Wrapper for computer peripherals
 	@param see.base.String:what side the computer is on (can be on network as well)
 ]]
 function Computer:init(location)
-	if not Peripheral.isPresent(location) then
-		throw(InvalidArgumentException:new(1, "see.base.String: location", "invalid location"))
-	end
-
-	self.location = location
+	self:super(AbstractPeripheral).init(location)
 end
 
 function Computer:turnOn()
