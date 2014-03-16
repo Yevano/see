@@ -14,7 +14,7 @@ function ModemInputStream:init(modem, channel)
 	self.running = true
 	self.thread = Thread:new(function()
 		while self.running do
-			local id = os.startTimer(1/80)
+			local id = os.startTimer(1/20)
 			local evt 
 			try(function()
 				evt = Events.pull("modem_message", "timer")
