@@ -28,8 +28,6 @@ function ModemInputStream:init(modem, channel)
 					Events.queue(evt) --HIGHLY EXPERIMENTAL, PROBABLY CAUSES HORRIBLE SHIT TO GO DOWN
 					Thread.yield() 
 				end
-			else
-				Thread.work()
 			end
 		end
 	end)
