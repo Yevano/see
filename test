@@ -1,1 +1,0 @@
-shell.run("/see/bin/see", "-r", "/see/test/", "see.dev.Test")
