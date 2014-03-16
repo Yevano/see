@@ -1,9 +1,0 @@
-local tArgs = { ... }
-if #tArgs ~= 3 then
-	error("Usage: build <src> <mainClass> <target>")
-end
-
-fs.delete(tArgs[3])
-shell.run("see", "-p", tArgs[1], tArgs[1] .. "_p")
-shell.run("rgen", tArgs[1] .. "_p", tArgs[2], tArgs[3])
-fs.delete(tArgs[1] .. "_p")
