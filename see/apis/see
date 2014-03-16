@@ -614,6 +614,12 @@ function SeeRT:executeAnnotation(env, class, annotation)
             lk = key
         end
         lw[lk] = v
+    elseif aname == "abstract" then
+        local name = annotation:sub(pindex + 1):gsub("%s", "")
+
+        self.classTables[class][name] = function()
+            self:throw(self:loadClassFromAny("see.rt.UnimplementedMethodException"):new("Method \"" .. name .. "\" is not implemented!"))
+        end
     elseif aname == "extends" then
         local name = annotation:sub(pindex + 1):gsub("%s", "")
         local super = env[getPackageName(name)]
@@ -631,7 +637,7 @@ end
     @param any:value The value of the annotation.
 ]]
 function SeeRT:executeTableStyleAnnotation(env, class, key, value)
-    if key == "import" or key == "native" then
+    if key == "import" or key == "native" or key == "abstract" then
         for i = 1, #value do
             self:executeAnnotation(env, class, key .. " " .. value[i])
         end

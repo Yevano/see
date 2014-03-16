@@ -5,6 +5,8 @@
 
 --@extends see.io.InputStream
 
+--@abstract flush
+
 --@native os.startTimer
 
 function ModemInputStream:init(modem, channel)

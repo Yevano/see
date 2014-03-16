@@ -2,6 +2,8 @@
 --@import see.io.OutputStream
 --@import see.util.ArgumentUtils
 
+--@abstract flush
+
 --@extends see.io.OutputStream
 
 function ModemOutputStream:init(modem, channel, replyChannel)
