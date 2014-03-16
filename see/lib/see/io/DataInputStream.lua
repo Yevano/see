@@ -77,7 +77,7 @@ end
 function DataInputStream:readString(len)
     local ret = String:new()
     for i = 1, len do
-        ret[i] = self:read()
+        ret = ret .. String.char(self:read()) --string opNewIndex wasnt working? hmm
     end
     return ret
 end
