@@ -7,8 +7,6 @@
 
 --@abstract flush
 
---@native os.startTimer
-
 function ModemInputStream:init(modem, channel)
 	self.modem = modem
 	self.channel = channel
