@@ -1,6 +1,7 @@
 --@import see.io.peripheral.Modem
 --@import see.io.OutputStream
 --@import see.util.ArgumentUtils
+--@import see.concurrent.Thread
 
 --@extends see.io.OutputStream
 
