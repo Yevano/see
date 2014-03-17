@@ -54,6 +54,15 @@ end
 ]]
 function Thread:init(func)
     self.func = func
+    self.daemon = false
+end
+
+function Thread:setDaemon(b)
+    self.daemon = b or true
+end
+
+function Thread:isDaemon()
+    return self.daemon
 end
 
 --[[
