@@ -1,5 +1,6 @@
 --@native __rt
 --@native rawget
+--@native rawset
 --@native setmetatable
 
 --@import see.base.String
@@ -12,6 +13,17 @@ function Class:new(...)
     local instance = setmetatable({ __class = self }, __rt.classMT)
     instance:init(...)
     return instance
+end
+
+function Class:isAssignableFrom(class)
+	local objectType = self
+    while objectType do
+        if class == objectType then
+            return true
+        end
+        objectType = objectType:getSuper()
+    end
+    return false
 end
 
 function Class:getSuper()

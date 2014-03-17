@@ -2,6 +2,7 @@
 --@import see.io.InputStream
 --@import see.util.ArgumentUtils
 --@import see.concurrent.Thread
+--@import see.event.impl.ModemMessageEvent
 
 --@extends see.io.InputStream
 
@@ -16,7 +17,7 @@ function ModemInputStream:init(modem, channel)
 		while self.running do
 			local evt 
 			try(function()
-				evt = Events.pull("modem_message")
+				evt = Events.pull(ModemMessageEvent)
 			end, function(e) end)
 
 			if evt then
