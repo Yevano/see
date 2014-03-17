@@ -103,3 +103,19 @@ function BinaryHeap:swap(a, b)
 	self.array[a] = self.array[b]
 	self.array[b] = tmp
 end
+
+function BinaryHeap:rebuild()
+	local tmpArray = { }
+	local length = self:length()
+
+	for i = 1, length do
+		tmpArray[i] = self:remove()
+	end
+
+	self.array = { }
+	self.size = 0
+
+	for i = 1, length do
+		self:add(tmpArray[i])
+	end
+end
