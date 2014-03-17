@@ -1,16 +1,24 @@
 local config = { }
 local _, err = pcall(function(...)
-    local USAGE = "Usage: rgen <classArchive> <mainClass> <target>"
+    local USAGE = "Usage: rgen <mainClass> <target> <classArchives>"
 
     local args = { ... }
     if #args < 3 then print(USAGE) end
-    local classArchive = "/" .. shell.resolve(args[1])
-    local mainClass = args[2]
-    local target = "/" .. shell.resolve(args[3])
+    local mainClass = args[1]
+    local target = "/" .. shell.resolve(args[2])
 
-    local archiveHandle = fs.open(classArchive, "r")
-    local archiveBytes = archiveHandle.readAll()
-    archiveHandle.close()
+    local classArchives = { }
+    for i = 3, #args do
+        table.insert(classArchives, args[i])
+    end
+
+    local archivesBytes = { }
+    for i = 1, #classArchives do
+        local archiveHandle = fs.open(classArchives[i], "r")
+        local archiveBytes = archiveHandle.readAll()
+        archiveHandle.close()
+        table.insert(archivesBytes, archiveBytes)
+    end
 
     -- Insert $ in places to pass arguments.
     local code =
@@ -20,9 +28,9 @@ local _, err = pcall(function(...)
     local CONFIG_FAIL = "Failed load /.see config file. Reinstall SEE or replace the file with correct info."
     local apiPath, rt
     local args = {...}
-    local archiveBytes = '$'
+    local archivesBytes = $
     local mainClassName = '$'
-    local classPath = "FROM_MEMORY"
+    local classPaths = $
 
     local natives = { }
     for k, v in pairs(_G) do
@@ -49,9 +57,13 @@ local _, err = pcall(function(...)
     apiPath = fs.combine(config.install_dir, "apis/see")
     os.loadAPI(apiPath)
     rt = see.SeeRT.new(natives, config.install_dir)
-    table.insert(rt.classPaths, classPath)
 
-    rt.archives[classPath] = archiveBytes
+    for i = 1, #classPaths do
+        local classPath = classPaths[i]
+        table.insert(rt.classPaths, classPath)
+        rt.archives[classPath] = archivesBytes[i]
+    end
+    
     local MainClass = rt:loadClassFromAny(mainClassName)
     if not MainClass then error("Main class not found! ") end
     if not MainClass.main then error("Main method not found!") end
@@ -65,41 +77,74 @@ if err then
 end
 ]]
 
-    local escaped
-    local archiveTable = { }
-    local strSize = 0
-    for i = 1, #archiveBytes do
-        local b = archiveBytes:sub(i, i):byte()
-        if b < 32 or b > 126 or b == 34 or b == 39 or b == 92 then
-            escaped = true
-            archiveTable[i] = "\\" .. b
-        else
-            if escaped then
-                escaped = false
-                if b > 47 and b < 57 then
-                    archiveTable[i] ="'..'" .. string.char(b);
+    local archivesConverted = { }
+    for i = 1, #archivesBytes do 
+        local archiveBytes = archivesBytes[i]
+
+        local escaped
+        local archiveTable = { }
+        local strSize = 0
+        for i = 1, #archiveBytes do
+            local b = archiveBytes:sub(i, i):byte()
+            if b < 32 or b > 126 or b == 34 or b == 39 or b == 92 then
+                escaped = true
+                archiveTable[i] = "\\" .. b
+            else
+                if escaped then
+                    escaped = false
+                    if b > 47 and b < 57 then
+                        archiveTable[i] ="'..'" .. string.char(b);
+                    else
+                        archiveTable[i] = string.char(b)
+                    end
                 else
                     archiveTable[i] = string.char(b)
                 end
+            end
+
+            if strSize >= 500 then
+                archiveTable[i] = archiveTable[i] .. "'..'"
+                strSize = 0
             else
-                archiveTable[i] = string.char(b)
+                strSize = strSize + 1
             end
         end
 
-        if strSize >= 500 then
-            archiveTable[i] = archiveTable[i] .. "'..'"
-            strSize = 0
-        else
-            strSize = strSize + 1
-        end
+        local archiveConverted = table.concat(archiveTable)
+        table.insert(archivesConverted, archiveConverted)
     end
 
-    local archiveConverted = table.concat(archiveTable)
+    local add = "{"
+    for i = 1, #archivesConverted do
+        local archiveConverted = archivesConverted[i]
+
+        add = add .. "'" .. archiveConverted .. "'"
+
+        if i ~= #archivesConverted then
+            add = add .. ','
+        end
+    end
+    add = add .. '}'
 
     local f = code:find("$", 1, true)
-    code = code:sub(1, f - 1) .. archiveConverted .. code:sub(f + 1)
-    f = code:find("$", f + #archiveConverted, true)
+    code = code:sub(1, f - 1) .. add .. code:sub(f + 1)
+    f = code:find("$", f + #add, true)
     code = code:sub(1, f - 1) .. mainClass .. code:sub(f + 1)
+
+    add = "{"
+    for i = 1, #classArchives do
+        local classArchive = classArchives[i]
+
+        add = add .. "'" .. classArchive .. "'"
+
+        if i ~= #classArchives then
+            add = add .. ','
+        end
+    end
+    add = add .. '}'
+
+    f = code:find("$", f + #add, true)
+    code = code:sub(1, f - 1) .. add .. code:sub(f + 1)
 
     local out = fs.open(target, "w")
     out.write(code)
