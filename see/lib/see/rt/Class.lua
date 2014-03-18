@@ -11,7 +11,9 @@
 
 function Class:new(...)
     local instance = setmetatable({ __class = self }, __rt.classMT)
-    instance:init(...)
+    if instance.init then
+        instance:init(...)
+    end
     return instance
 end
 
