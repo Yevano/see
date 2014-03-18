@@ -18,17 +18,8 @@ local function copy(t)
     return r
 end
 
-local function getPackageName(package, del)
-    if not del then del = "." end
-    for i = #package, 0, -1 do
-        if i == 0 or package:sub(i, i) == del then
-            return package:sub(i + 1)
-        end
-    end
-end
-
 function DefaultClassLoader:loadClass(def, annotations, name, refName, env)
-	local className = getPackageName(name)
+	local className = ClassLoader.getPackageName(name)
 
     if __rt.classes[name] then
         return __rt.classes[name]

@@ -1,3 +1,4 @@
+--@import see.rt.ClassLoader
 --@import see.rt.DefaultClassLoader
 --@import see.net.HTTP
 --@import see.net.URL
@@ -6,14 +7,6 @@
 --@native loadstring
 
 --@extends see.rt.DefaultClassLoader
-
-local function getAnnotations(code)
-    local annotations = { }
-    for annotation in code:gmatch("%-%-@[^\n]*") do
-        FastArray.insert(annotations, annotation:sub(4))
-    end
-    return annotations
-end
 
 function HTTPClassLoader:loadClass(url, name)
 	local response = HTTP.sync(url)
@@ -28,5 +21,5 @@ function HTTPClassLoader:loadClass(url, name)
 		throw(RuntimeException:new("Could not load class!"))
 	end
 
-	return self:super(DefaultClassLoader).loadClass(def, getAnnotations(code), name)
+	return self:super(DefaultClassLoader).loadClass(def, ClassLoader.getAnnotations(code), name)
 end
