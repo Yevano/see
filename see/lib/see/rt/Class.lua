@@ -37,3 +37,7 @@ end
 function Class:toString()
     return self:getName()
 end
+
+function Class.forName(name)
+    return __rt:loadClassFromAny(name)
+end
