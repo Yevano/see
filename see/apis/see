@@ -387,6 +387,10 @@ function SeeRT.new(natives, seePath)
             static()
         end
 
+        if not rawget(self.classTables[class], "init") then
+            rawset(self.classTables[class], "init", function() end)
+        end
+
         return class
     end
 

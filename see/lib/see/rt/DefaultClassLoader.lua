@@ -6,6 +6,7 @@
 --@native setfenv
 --@native xpcall
 --@native rawget
+--@native rawset
 
 --@extends see.rt.ClassLoader
 
@@ -96,6 +97,10 @@ function DefaultClassLoader:loadClass(def, annotations, name, refName, env)
     local static = rawget(__rt.classTables[class], "__static")
     if static then
         static()
+    end
+
+    if not rawget(__rt.classTables[class], "init") then
+        rawset(__rt.classTables[class], "init", function() end)
     end
 
     return class
