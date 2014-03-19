@@ -397,13 +397,11 @@ function SeeRT.new(natives, seePath)
     self:loadClassFromAny("see.base.Object")
     self:loadClassFromAny("see.rt.Class")
 
-    self:loadClassFromAny("see.rt.ClassLoader")
     local DefaultClassLoader = self:loadClassFromAny("see.rt.DefaultClassLoader")
-
-    self.loadClass = nil --cheating? probably... but hey, it works a charm.
     self.classLoader = DefaultClassLoader:new()
 
-    --
+    --start using a real ClassLoader ASAP
+    self.loadClass = nil
 
     self.base.Exception      = self:loadClassFromAny("see.base.Exception")
     self.base.System         = self:loadClassFromAny("see.base.System")
@@ -413,6 +411,11 @@ function SeeRT.new(natives, seePath)
     self.event.Events        = self:loadClassFromAny("see.event.Events")
     self.event.UnknownEvent  = self:loadClassFromAny("see.event.impl.UnknownEvent")
     self.rt.RuntimeException = self:loadClassFromAny("see.rt.RuntimeException")
+
+    local FileClassLoader = self:loadClassFromAny("see.rt.FileClassLoader")
+    local ArchiveClassLoader = self:loadClassFromAny("see.rt.ArchiveClassLoader")
+    self.fileClassLoader = FileClassLoader:new()
+    self.archiveClassLoader = ArchiveClassLoader:new()
 
     return self
 end
@@ -765,22 +768,39 @@ end
     @return string Error message, or nil if successful.
 ]]
 function SeeRT:loadClassFromFile(path, name)
-    local fileHandle = fs.open(path, "r")
-    if not fileHandle then
-        return nil, "Could not read file."
-    end
-    local code = fileHandle.readAll()
-    fileHandle.close()
+    if self.fileClassLoader then
+        return self.fileClassLoader:loadClass(path, name)
+    elseif self.classLoader then
+        local fileHandle = fs.open(path, "r")
+        if not fileHandle then
+            return nil, "Could not read file."
+        end
+        local code = fileHandle.readAll()
+        fileHandle.close()
 
-    -- Setup class execution environment
-    local def, err = loadstring(code, name)
-    if not def then
-        return nil, err
+        -- Setup class execution environment
+        local def, err = loadstring(code, name)
+        if not def then
+            return nil, err
+        end
+        return self.classLoader:loadClass(def, getAnnotations(code), name)
+    else
+        local fileHandle = fs.open(path, "r")
+        if not fileHandle then
+            return nil, "Could not read file."
+        end
+        local code = fileHandle.readAll()
+        fileHandle.close()
+
+        -- Setup class execution environment
+        local def, err = loadstring(code, name)
+        if not def then
+            return nil, err
+        end
+        if not self.classLoader then
+            return self.loadClass(def, getAnnotations(code), name)
+        end
     end
-    if not self.classLoader then
-        return self.loadClass(def, getAnnotations(code), name)
-    end
-    return self.classLoader:loadClass(def, getAnnotations(code), name)
 end
 
 -- TODO: Make file offset table. Currently, it takes O(N) time to find each file where N is its position in the file.
@@ -793,21 +813,37 @@ end
     @return string Error message, or nil if successful.
 ]]
 function SeeRT:loadClassFromArchive(archiveBytes, path, name)
-    local loc = archiveBytes:find("F" .. path .. "\0", 1, true)
-    if not loc then
-        return nil, "Could not find class " .. name .. " in archive path " .. path .. "."
-    end
-    loc = loc + #path + 2
-    local fin = archiveBytes:find("\0", loc) - 1
-    local code = archiveBytes:sub(loc, fin)
+    if self.archiveClassLoader then
+        self.archiveClassLoader:loadClass(archiveBytes, path, name)
+    elseif self.classLoader then
+        local loc = archiveBytes:find("F" .. path .. "\0", 1, true)
+        if not loc then
+            return nil, "Could not find class " .. name .. " in archive path " .. path .. "."
+        end
+        loc = loc + #path + 2
+        local fin = archiveBytes:find("\0", loc) - 1
+        local code = archiveBytes:sub(loc, fin)
 
-    -- Setup class execution environment
-    local def, err = loadstring(code, name)
-    if not def then
-        return nil, err
-    end
-    if not self.classLoader then
+        -- Setup class execution environment
+        local def, err = loadstring(code, name)
+        if not def then
+            return nil, err
+        end
+        return self.classLoader:loadClass(def, getAnnotations(code), name)
+    else
+        local loc = archiveBytes:find("F" .. path .. "\0", 1, true)
+        if not loc then
+            return nil, "Could not find class " .. name .. " in archive path " .. path .. "."
+        end
+        loc = loc + #path + 2
+        local fin = archiveBytes:find("\0", loc) - 1
+        local code = archiveBytes:sub(loc, fin)
+
+        -- Setup class execution environment
+        local def, err = loadstring(code, name)
+        if not def then
+            return nil, err
+        end
         return self.loadClass(def, getAnnotations(code), name)
     end
-    return self.classLoader:loadClass(def, getAnnotations(code), name)
 end

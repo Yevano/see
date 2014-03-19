@@ -1,9 +1,11 @@
+--@native table
+
 --@abstract loadClass
 
 function ClassLoader.getAnnotations(code)
     local annotations = { }
     for annotation in code:gmatch("%-%-@[^\n]*") do
-        FastArray.insert(annotations, annotation:sub(4))
+        table.insert(annotations, annotation:sub(4))
     end
     return annotations
 end
