@@ -401,7 +401,13 @@ function SeeRT.new(natives, seePath)
     self.classLoader = DefaultClassLoader:new()
 
     --start using a real ClassLoader ASAP
+    --not technically needed, but loadClass was intended to be a temporary thing ONLY for setting up a ClassLoader
     self.loadClass = nil
+
+    local FileClassLoader = self:loadClassFromAny("see.rt.FileClassLoader")
+    local ArchiveClassLoader = self:loadClassFromAny("see.rt.ArchiveClassLoader")
+    self.fileClassLoader = FileClassLoader:new()
+    self.archiveClassLoader = ArchiveClassLoader:new()
 
     self.base.Exception      = self:loadClassFromAny("see.base.Exception")
     self.base.System         = self:loadClassFromAny("see.base.System")
@@ -411,11 +417,6 @@ function SeeRT.new(natives, seePath)
     self.event.Events        = self:loadClassFromAny("see.event.Events")
     self.event.UnknownEvent  = self:loadClassFromAny("see.event.impl.UnknownEvent")
     self.rt.RuntimeException = self:loadClassFromAny("see.rt.RuntimeException")
-
-    local FileClassLoader = self:loadClassFromAny("see.rt.FileClassLoader")
-    local ArchiveClassLoader = self:loadClassFromAny("see.rt.ArchiveClassLoader")
-    self.fileClassLoader = FileClassLoader:new()
-    self.archiveClassLoader = ArchiveClassLoader:new()
 
     return self
 end
