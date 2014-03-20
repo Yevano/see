@@ -60,12 +60,15 @@ fileHandle.write("install_dir = \"" .. installDir .. "\"")
 fileHandle.close()
 
 for k, v in pairs(fileList.dirs) do
+    print("Creating directory " .. v[2])
     fs.makeDir(v[2])
 end
 
 for k, v in pairs(fileList.files) do
     local url = v[1]
     local path = installDir .. "/" .. string.sub(v[2], 4)
+
+    print("Downloading " .. path)
 
     local h = http.get(url)
     if not h then
