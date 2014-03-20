@@ -394,8 +394,8 @@ function SeeRT.new(natives, seePath)
         return class
     end
 
-    local Object = self:loadClassFromAny("see.base.Object")
-    local Class = self:loadClassFromAny("see.rt.Class")
+    self:loadClassFromAny("see.base.Object")
+    self:loadClassFromAny("see.rt.Class")
 
     local DefaultClassLoader = self:loadClassFromAny("see.rt.DefaultClassLoader")
     self.classLoader = DefaultClassLoader:new()
