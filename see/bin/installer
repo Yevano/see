@@ -65,7 +65,7 @@ end
 
 for k, v in pairs(fileList.files) do
     local url = v[1]
-    local path = installDir .. "/" .. string.sub(4, v[2])
+    local path = installDir .. "/" .. string.sub(v[2], 4)
 
     local h = http.get(url)
     if not h then
