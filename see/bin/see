@@ -14,16 +14,7 @@ local _, err = pcall(function(...)
     local rt
     local classPath
 
-    local function runFromPath(classPath, mainClassName, args)
-        local MainClass = rt:loadClassFromAny(mainClassName)
-        if not MainClass then error("Main class not found! ") end
-        rt:start(MainClass, unpack(args))
-    end
-
-    local function runFromArchive(classPath, mainClassName, args)
-        local fileHandle = fs.open(classPath, "r")
-        rt.archives[classPath] = fileHandle.readAll()
-        fileHandle.close()
+    local function runFromAny(mainClassName, args)
         local MainClass = rt:loadClassFromAny(mainClassName)
         if not MainClass then error("Main class not found! ") end
         rt:start(MainClass, unpack(args))
@@ -104,7 +95,7 @@ local _, err = pcall(function(...)
         readHandle.close()
     end
 
-    local USAGE = "Usage: see <-r <classPath> <mainClass> <args>>|<-p <src> <dest>>|<-u <src> <dest>>|<-help>"
+    local USAGE = "Usage: see <-r <mainClass> <args> -cp <classPaths>>|<-p <src> <dest>>|<-u <src> <dest>>|<-help>"
     local CONFIG_FAIL = "Failed load /.see config file. Reinstall SEE or replace the file with correct info."
     local args = {...}
     local op = args[1]
@@ -115,7 +106,7 @@ local _, err = pcall(function(...)
     end
 
     if op == "-r" then
-        if #args < 3 then
+        if #args < 4 then
             print(USAGE)
             return
         end
@@ -140,24 +131,37 @@ local _, err = pcall(function(...)
         apiPath = fs.combine(config.install_dir, "apis/see")
         os.loadAPI(apiPath)
         rt = see.SeeRT.new(natives, config.install_dir)
-        classPath = shell.resolve(args[2])
-        if not fs.exists(classPath) then
-            print("No such archive or folder \"" .. classPath .. "\".")
-            return
+
+        local tClassPaths = { }
+        local start = 0
+
+        for i = 1, #args do
+            if args[i] == "-cp" then
+                start = i + 1
+                break   
+            end
         end
-        table.insert(rt.classPaths, classPath)
+
+        for i = start, #args do
+            table.insert(tClassPaths, args[i])
+        end
+
+        for i = 1, #tClassPaths do
+            local classPath = shell.resolve(tClassPaths[i])
+            if not fs.exists(classPath) then
+                print("No such archive or folder \"" .. classPath .. "\".")
+                return
+            end
+            table.insert(rt.classPaths, classPath)
+        end
         
-        local mainClassName = args[3]
+        local mainClassName = args[2]
         local programArgs = { }
-        for i = 4, #args do
+        for i = 3, start - 1 do
             table.insert(programArgs, args[i])
         end
 
-        if fs.isDir(classPath) then
-            runFromPath(classPath, mainClassName, programArgs)
-        else
-            runFromArchive(classPath, mainClassName, programArgs)
-        end
+        runFromAny(mainClassName, programArgs)
     elseif op == "-p" then
         -- Pack option.
         if #args < 3 then

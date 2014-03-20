@@ -1,15 +1,14 @@
 --@import see.io.Peripheral
+--@import see.io.peripheral.AbstractPeripheral
+
+--@extends see.io.peripheral.AbstractPeripheral
 
 --[[
 	Wrapper for command block peripherals
 	@param see.base.String:what side the command block is on (can be on network as well)
 ]]
 function CommandBlock:init(location)
-	if not Peripheral.isPresent(location) then
-		throw(InvalidArgumentException:new(1, "see.base.String: location", "invalid location"))
-	end
-
-	self.location = location
+	self:super(AbstractPeripheral).init(location)
 end
 
 function CommandBlock:getCommand()

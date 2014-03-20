@@ -16,6 +16,7 @@ local MAKE_PATHS = {
     "lib/see/net/",
     "lib/see/rt/",
     "lib/see/util/",
+    "lib/see/io/peripheral"
 }
 
 local DL_PATHS = {
@@ -89,6 +90,27 @@ local DL_PATHS = {
     "lib/see/util/Matcher.lua",
     "lib/see/util/Math.lua",
     "lib/see/util/VarArgs.lua",
+    "lib/see/rt/ClassLoader.lua",
+    "lib/see/rt/DefaultClassLoader.lua",
+    "lib/see/rt/FileClassLoader.lua",
+    "lib/see/rt/ArchiveClassLoader.lua",
+    "lib/see/rt/HTTPClassLoader.lua",
+    "lib/see/util/Comparator.lua",
+    "lib/see/util/BinaryComparator.lua",
+    "lib/see/util/BinaryHeap.lua",
+    "lib/see/util/EmptyStackException.lua",
+    "lib/see/util/Stack.lua",
+    "lib/see/util/Timer.lua",
+    "lib/see/rt/UnimplementedMethodException.lua",
+    "lib/see/io/ModemInputStream.lua",
+    "lib/see/io/ModemOutputStream.lua",
+    "lib/see/io/peripheral/AbstractPeripheral.lua",
+    "lib/see/io/peripheral/CommandBlock.lua",
+    "lib/see/io/Computer.lua",
+    "lib/see/io/Disk.lua",
+    "lib/see/io/Modem.lua",
+    "lib/see/io/Monitor.lua",
+    "lib/see/io/Printer.lua"
 }
 
 local function fail(err)

@@ -4,6 +4,8 @@
 --@import see.net.HTTPResponse
 --@import see.net.URL
 --@import see.util.ArgumentUtils
+--@import see.event.impl.HTTPSuccessEvent
+--@import see.event.impl.HTTPFailureEvent
 
 --[[
     Makes a blocking HTTP request.
@@ -24,7 +26,7 @@ function HTTP.sync(url, postData)
     
     HTTP.async(url, postData)
 
-    local event = Events.pull("http_success", "http_failure")
+    local event = Events.pull(HTTPSuccessEvent, HTTPFailureEvent)
     if event.ident == "http_success" then
         return event.response
     else

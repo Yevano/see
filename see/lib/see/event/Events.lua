@@ -1,10 +1,11 @@
---@native os.queueEvent
-
 --@import see.concurrent.Thread
 --@import see.concurrent.InterruptedException
 
 --@import see.util.VarArgs
 
+--@import see.rt.InvalidArgumentException
+
+--@import see.event.Event
 --@import see.event.impl.CharEvent
 --@import see.event.impl.KeyPressEvent
 --@import see.event.impl.TimerEvent
@@ -28,11 +29,15 @@
 --@import see.event.impl.UnknownEvent
 --@import see.event.impl.SignalEvent
 
+--@native os.queueEvent
+
 local registeredEvents
+local registeredEventsReverse
 local nativeEvents
 
 function Events.__static()
     registeredEvents = { }
+    registeredEventsReverse = { }
     nativeEvents = { }
     
     Events.register("char",              CharEvent)
@@ -70,6 +75,7 @@ end
 
 function Events.register(ident, eventClass)
     registeredEvents[cast(ident, "string")] = eventClass
+    registeredEventsReverse[eventClass] = cast(ident, "string")
 end
 
 function Events.getEventClass(ident)
@@ -83,8 +89,13 @@ end
 function Events.pull(...)
     local args = Array:new(...)
     local casted = Array:new()
-    for arg in args:iAll() do
-        casted:add(cast(arg, "string"))
+    for i = 1, args:length() do
+        local arg = args:get(i)
+        if arg:isAssignableFrom(Event) then
+            casted:add(registeredEventsReverse[arg])
+        else
+            throw(InvalidArgumentException:new(i, "Event", arg))
+        end
     end
 
     while true do

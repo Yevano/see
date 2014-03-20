@@ -71,14 +71,6 @@ function errorHandler(err)
     end
 end
 
-local function copy(t)
-    local r = { }
-    for k, v in pairs(t) do
-        r[k] = v
-    end
-    return r
-end
-
 StandardGlobals = { }
 
 --[[
@@ -200,6 +192,17 @@ function StandardGlobals.STR(rt, ...)
     return rt.base.String:new(...)
 end
 
+--[[
+    Create a copy of a table
+]]
+local function copy(t)
+    local r = { }
+    for k, v in pairs(t) do
+        r[k] = v
+    end
+    return r
+end
+
 SeeRT = { }
 SeeRT.__index = SeeRT
 
@@ -313,8 +316,112 @@ function SeeRT.new(natives, seePath)
         end
     end
 
-    self:loadClassFromAny("see.base.Object")
+    --temporary loadClass function to load see.base.Object, see.rt.Class and a DefaultClassLoader
+    self.loadClass = function(def, annotations, name, refName, env)
+        local className = getPackageName(name)
+
+        if self.classes[name] then
+            return self.classes[name]
+        end
+
+        if not refName then
+            env = copy(self.standardGlobals)
+        end
+
+        local anon = refName ~= nil
+        refName = refName or className
+
+        local class = { }
+
+        local fdtnl = false
+        if name == "see.base.Object" then
+            self.base.Object = class
+            fdtnl = true
+        end
+
+        if name == "see.rt.Class" then
+            self.rt.Class = class
+            fdtnl = true
+        end
+
+        self.classes[name] = class
+        self.classLookup[class] = true
+        self.classTables[class] = { __name = name }
+
+        setmetatable(class, self.classMT)
+
+        if not fdtnl then
+            -- Import base classes.
+            for k, class in pairs(self.base) do
+                env[k] = class
+            end
+
+            -- Import Events class for convenience.
+            env["Events"] = self.event.Events
+        end
+
+        -- Setup class environment.
+        env[refName] = class
+        setfenv(def, env)
+        xpcall(def, errorHandler)
+
+        local abool = true
+        for k, v in pairs(annotations) do
+            local ret
+            if anon then
+                ret = self:executeTableStyleAnnotation(env, class, k, v)
+            else
+                ret = self:executeAnnotation(env, class, v)
+            end
+            if ret then
+                abool = false
+            end
+        end
+
+        -- Extend Object by default.
+        if abool and self.base.Object and name ~= "see.base.Object" then
+            --rawset(class, "super", self.base.Object)
+            self.classTables[class].__super = self.base.Object
+        end
+
+        local static = rawget(self.classTables[class], "__static")
+        if static then
+            static()
+        end
+
+        if not rawget(self.classTables[class], "init") then
+            rawset(self.classTables[class], "init", function() end)
+        end
+
+        return class
+    end
+
+    --use loadClass to load see.base.Object and see.rt.Class
+    --then set up a real ClassLoader
+    self:loadClassFromAny("see.base.Object") 
     self:loadClassFromAny("see.rt.Class")
+
+    --start with a class loader to load other classes and class loaders (File and Archive)
+    local DefaultClassLoader = self:loadClassFromAny("see.rt.DefaultClassLoader")
+    self.classLoader = DefaultClassLoader:new()
+
+    --doesnt technically matter.. but it may confuse a user to call getClassLoader on a class and get nil.. so prevent it
+    for className, class in pairs(self.classes) do
+        if not self.classTables[class].__classLoader then
+            self.classTables[class].__classLoader = self.classLoader
+        end
+    end
+
+    --start using a real ClassLoader ASAP
+    --again, not technically needed, but loadClass was intended to be a temporary thing ONLY for setting up a ClassLoader
+    self.loadClass = nil
+
+    local FileClassLoader = self:loadClassFromAny("see.rt.FileClassLoader")
+    local ArchiveClassLoader = self:loadClassFromAny("see.rt.ArchiveClassLoader")
+    self.fileClassLoader = FileClassLoader:new()
+    self.archiveClassLoader = ArchiveClassLoader:new()
+
+    --load some base classes
     self.base.Exception      = self:loadClassFromAny("see.base.Exception")
     self.base.System         = self:loadClassFromAny("see.base.System")
     self.base.Iterators      = self:loadClassFromAny("see.base.Iterators")
@@ -389,6 +496,9 @@ function getAnnotations(code)
     return annotations
 end
 
+--[[
+    Spawn a thread
+]]
 function SeeRT:spawnThread(func, obj)
     local thread = coroutine.create(function() xpcall(func, errorHandler) end)
     self.objThreads[thread] = obj
@@ -401,10 +511,16 @@ function SeeRT:spawnThread(func, obj)
     return thread
 end
 
+--[[
+    Interrupt a thread
+]]
 function SeeRT:interruptThread(thread)
     os.queueEvent("__thread_interrupt", thread.id)
 end
 
+--[[
+    Start the SEE runtime
+]]
 function SeeRT:start(mainClass, ...)
     local args = { ... }
     xpcall(function() (function(mainClass, ...)
@@ -490,6 +606,17 @@ function SeeRT:start(mainClass, ...)
 
                     if coroutine.status(threads[i]) == "dead" then
                         table.insert(threadDeaths, i)
+
+                        local foundNonDaemon = false
+                        for i = 1, #self.objThreads do
+                            if not self.objThreads[i]:isDaemon() then
+                                foundNonDaemon = true
+                            end
+                        end
+                        if not foundNonDaemon then
+                            return
+                        end
+
                         self.objThreads[threads[i]] = nil
                     end
                 end
@@ -614,6 +741,12 @@ function SeeRT:executeAnnotation(env, class, annotation)
             lk = key
         end
         lw[lk] = v
+    elseif aname == "abstract" then
+        local name = annotation:sub(pindex + 1):gsub("%s", "")
+
+        self.classTables[class][name] = function()
+            self:throw(self:loadClassFromAny("see.rt.UnimplementedMethodException"):new("Method \"" .. name .. "\" is not implemented!"))
+        end
     elseif aname == "extends" then
         local name = annotation:sub(pindex + 1):gsub("%s", "")
         local super = env[getPackageName(name)]
@@ -631,7 +764,7 @@ end
     @param any:value The value of the annotation.
 ]]
 function SeeRT:executeTableStyleAnnotation(env, class, key, value)
-    if key == "import" or key == "native" then
+    if key == "import" or key == "native" or key == "abstract" then
         for i = 1, #value do
             self:executeAnnotation(env, class, key .. " " .. value[i])
         end
@@ -658,19 +791,28 @@ end
     @return string Error message, or nil if successful.
 ]]
 function SeeRT:loadClassFromFile(path, name)
-    local fileHandle = fs.open(path, "r")
-    if not fileHandle then
-        return nil, "Could not read file."
-    end
-    local code = fileHandle.readAll()
-    fileHandle.close()
+    if self.fileClassLoader then
+        return self.fileClassLoader:loadClass(path, name)
+    else
+        local fileHandle = fs.open(path, "r")
+        if not fileHandle then
+            return nil, "Could not read file."
+        end
+        local code = fileHandle.readAll()
+        fileHandle.close()
 
-    -- Setup class execution environment
-    local def, err = loadstring(code, name)
-    if not def then
-        return nil, err
+        -- Setup class execution environment
+        local def, err = loadstring(code, name)
+        if not def then
+            return nil, err
+        end
+
+        if self.classLoader then 
+            return self.classLoader:loadClass(def, getAnnotations(code), name)
+        else
+            return self.loadClass(def, getAnnotations(code), name)
+        end
     end
-    return self:loadClass(def, getAnnotations(code), name)
 end
 
 -- TODO: Make file offset table. Currently, it takes O(N) time to find each file where N is its position in the file.
@@ -683,102 +825,27 @@ end
     @return string Error message, or nil if successful.
 ]]
 function SeeRT:loadClassFromArchive(archiveBytes, path, name)
-    local loc = archiveBytes:find("F" .. path .. "\0", 1, true)
-    if not loc then
-        return nil, "Could not find class " .. name .. " in archive path " .. path .. "."
-    end
-    loc = loc + #path + 2
-    local fin = archiveBytes:find("\0", loc) - 1
-    local code = archiveBytes:sub(loc, fin)
+    if self.archiveClassLoader then
+        self.archiveClassLoader:loadClass(archiveBytes, path, name)
+    elseif self.classLoader then
+        local loc = archiveBytes:find("F" .. path .. "\0", 1, true)
+        if not loc then
+            return nil, "Could not find class " .. name .. " in archive path " .. path .. "."
+        end
+        loc = loc + #path + 2
+        local fin = archiveBytes:find("\0", loc) - 1
+        local code = archiveBytes:sub(loc, fin)
 
-    -- Setup class execution environment
-    local def, err = loadstring(code, name)
-    if not def then
-        return nil, err
-    end
-    return self:loadClass(def, getAnnotations(code), name)
-end
-
---[[
-    Load a class from a definition function.
-    @param function:def Class definition for loading.
-    @param table[string]:annotations Table of annotation strings.
-    @param string:name The name of this class, including the full package.
-    @param string:refName The name to use in the class' global table for the class. If given, annotations will be
-    processed as an anonymous class annotation.
-    @param table:env Environment to use for the class definition.
-]]
-function SeeRT:loadClass(def, annotations, name, refName, env)
-    local className = getPackageName(name)
-
-    if self.classes[name] then
-        return self.classes[name]
-    end
-
-    if not refName then
-        env = copy(self.standardGlobals)
-    end
-
-    local anon = refName ~= nil
-    refName = refName or className
-
-    local class = { }
-
-    local fdtnl = false
-    if name == "see.base.Object" then
-        self.base.Object = class
-        fdtnl = true
-    end
-
-    if name == "see.rt.Class" then
-        self.rt.Class = class
-        fdtnl = true
-    end
-
-    self.classes[name] = class
-    self.classLookup[class] = true
-    self.classTables[class] = { __name = name }
-
-    setmetatable(class, self.classMT)
-
-    if not fdtnl then
-        -- Import base classes.
-        for k, class in pairs(self.base) do
-            env[k] = class
+        -- Setup class execution environment
+        local def, err = loadstring(code, name)
+        if not def then
+            return nil, err
         end
 
-        -- Import Events class for convenience.
-        env["Events"] = self.event.Events
-    end
-
-    -- Setup class environment.
-    env[refName] = class
-    setfenv(def, env)
-    xpcall(def, errorHandler)
-
-    local abool = true
-    for k, v in pairs(annotations) do
-        local ret
-        if anon then
-            ret = self:executeTableStyleAnnotation(env, class, k, v)
+        if self.classLoader then
+            return self.classLoader:loadClass(def, getAnnotations(code), name)
         else
-            ret = self:executeAnnotation(env, class, v)
-        end
-        if ret then
-            abool = false
+            return self.loadClass(def, getAnnotations(code), name)
         end
     end
-
-    -- Extend Object by default.
-    if abool and self.base.Object and name ~= "see.base.Object" then
-        --rawset(class, "super", self.base.Object)
-        self.classTables[class].__super = self.base.Object
-    end
-
-    local static = rawget(self.classTables[class], "__static")
-    if static then
-        static()
-    end
-
-    return class
 end

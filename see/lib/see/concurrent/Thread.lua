@@ -3,6 +3,7 @@
 --@native os.startTimer
 --@native print
 
+--@import see.event.impl.TimerEvent
 --@import see.event.Events
 
 Thread.SUSPENDED = "suspended"
@@ -44,7 +45,7 @@ end
 ]]
 function Thread.sleep(s)
     local id = os.startTimer(s or 0)
-    while id ~= Events.pull("timer").id do end
+    while id ~= Events.pull(TimerEvent).id do end
 end
 
 --[[
@@ -53,6 +54,15 @@ end
 ]]
 function Thread:init(func)
     self.func = func
+    self.daemon = false
+end
+
+function Thread:setDaemon(b)
+    self.daemon = b or true
+end
+
+function Thread:isDaemon()
+    return self.daemon
 end
 
 --[[
