@@ -172,7 +172,7 @@ while true do
             url = REPO_URL .. DL_PATHS[i]
             print("Downloading " .. DL_PATHS[i])
             local readHandle = http.get(url)
-            if readHandle.getResponseCode() ~= 200 then
+            if not readHandle or readHandle.getResponseCode() ~= 200 then
                 httpFail = true
                 break
             end
