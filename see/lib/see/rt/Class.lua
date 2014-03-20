@@ -26,6 +26,10 @@ function Class:isAssignableFrom(class)
     return false
 end
 
+function Class:getClassLoader()
+    return __rt.classTables[self].__classLoader
+end
+
 function Class:getSuper()
     return __rt.classTables[self].__super
 end

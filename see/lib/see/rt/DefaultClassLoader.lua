@@ -85,6 +85,8 @@ function DefaultClassLoader:loadClass(def, annotations, name, refName, env)
         __rt.classTables[class].__super = __rt.base.Object
     end
 
+    __rt.classTables[class].__classLoader = self --give classes a reference to their class loader
+
     local static = rawget(__rt.classTables[class], "__static")
     if static then
         static()
