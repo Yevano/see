@@ -10,7 +10,7 @@ end
 
 local function getGithubContents(sPath)
     local type, path, name, checkPath = {}, {}, {}, {}
-    local response = http.get("https://api.github.com/repos/yevano/see/contents/" .. sPath .. "?client_id=9ce3246b4e1382a6b8c5&client_secret=21a70b3ddc3745798318de01135ded79931aeca2")
+    local response = http.get("https://api.github.com/repos/yevano/see/contents/" .. sPath)
     if response then
         response = response.readAll()
         if response ~= nil then
