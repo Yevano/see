@@ -3,118 +3,74 @@ local SUPPORTS_COLOR = term.isColor()
 
 local args = { ... }
 
-local MAKE_PATHS = {
-    "apis/",
-    "bin/",
-    "lib/",
-    "lib/see/",
-    "lib/see/base/",
-    "lib/see/concurrent/",
-    "lib/see/event/",
-    "lib/see/event/impl/",
-    "lib/see/io/",
-    "lib/see/net/",
-    "lib/see/rt/",
-    "lib/see/util/",
-}
-
-local DL_PATHS = {
-    "apis/see",
-    "bin/see",
-    "bin/installer",
-    "bin/igen",
-    "bin/rgen",
-    "bin/wgen",
-    "lib/see/base/Array.lua",
-    "lib/see/base/Exception.lua",
-    "lib/see/base/Iterators.lua",
-    "lib/see/base/Object.lua",
-    "lib/see/base/String.lua",
-    "lib/see/base/System.lua",
-    "lib/see/concurrent/InterruptedException.lua",
-    "lib/see/concurrent/Task.lua",
-    "lib/see/concurrent/Thread.lua",
-    "lib/see/event/Event.lua",
-    "lib/see/event/Events.lua",
-    "lib/see/event/impl/CharEvent.lua",
-    "lib/see/event/impl/KeyPressEvent.lua",
-    "lib/see/event/impl/TimerEvent.lua",
-    "lib/see/event/impl/AlarmEvent.lua",
-    "lib/see/event/impl/RedstoneEvent.lua",
-    "lib/see/event/impl/TerminateEvent.lua",
-    "lib/see/event/impl/DiskInsertEvent.lua",
-    "lib/see/event/impl/DiskEjectEvent.lua",
-    "lib/see/event/impl/PeripheralAttachEvent.lua",
-    "lib/see/event/impl/PeripheralDetachEvent.lua",
-    "lib/see/event/impl/RednetMessageEvent.lua",
-    "lib/see/event/impl/ModemMessageEvent.lua",
-    "lib/see/event/impl/HTTPSuccessEvent.lua",
-    "lib/see/event/impl/HTTPFailureEvent.lua",
-    "lib/see/event/impl/MousePressEvent.lua",
-    "lib/see/event/impl/MouseScrollEvent.lua",
-    "lib/see/event/impl/MouseDragEvent.lua",
-    "lib/see/event/impl/MonitorTouchEvent.lua",
-    "lib/see/event/impl/MonitorResizeEvent.lua",
-    "lib/see/event/impl/TurtleInventoryEvent.lua",
-    "lib/see/event/impl/SignalEvent.lua",
-    "lib/see/event/impl/UnknownEvent.lua",
-    "lib/see/io/ArrayInputStream.lua",
-    "lib/see/io/ArrayOutputStream.lua",
-    "lib/see/io/DataInputStream.lua",
-    "lib/see/io/DataOutputStream.lua",
-    "lib/see/io/FileInputStream.lua",
-    "lib/see/io/FileOutputStream.lua",
-    "lib/see/io/Files.lua",
-    "lib/see/io/InputStream.lua",
-    "lib/see/io/IOException.lua",
-    "lib/see/io/OutputStream.lua",
-    "lib/see/io/Path.lua",
-    "lib/see/io/Peripheral.lua",
-    "lib/see/io/Redstone.lua",
-    "lib/see/io/Terminal.lua",
-    "lib/see/net/HTTP.lua",
-    "lib/see/net/HTTPResponse.lua",
-    "lib/see/net/URL.lua",
-    "lib/see/rt/CastException.lua",
-    "lib/see/rt/Class.lua",
-    "lib/see/rt/IndexOutOfBoundsException.lua",
-    "lib/see/rt/InvalidArgumentException.lua",
-    "lib/see/rt/NoSuchElementException.lua",
-    "lib/see/rt/RuntimeException.lua",
-    "lib/see/rt/UnsupportedOperationException.lua",
-    "lib/see/util/ArgumentUtils.lua",
-    "lib/see/util/Bit.lua",
-    "lib/see/util/Color.lua",
-    "lib/see/util/FastArray.lua",
-    "lib/see/util/Matcher.lua",
-    "lib/see/util/Math.lua",
-    "lib/see/util/VarArgs.lua",
-}
-
-local function fail(err)
-    if SUPPORTS_COLOR then
-        term.setTextColor(colors.red)
-    end
-
-    print(err)
-
-    if SUPPORTS_COLOR then
-        term.setTextColor(colors.white)
-    end
-
-    while true do
-        write("Retry installation? (y/n): ")
-        local response = read()
-        if string.lower(response):gsub("%s", "") == "y" then
-            print("")
-            return true
-        elseif string.lower(response):gsub("%s", "") == "n" then
-            return false
+local function getGithubContents(sPath)
+    local type, path, name, checkPath = {}, {}, {}, {}
+    local response = http.get("https://api.github.com/repos/yevano/see/contents/" .. sPath)
+    if response then
+        response = response.readAll()
+        if response ~= nil then
+            for str in response:gmatch('"type":"(%w+)"') do table.insert(type, str) end
+            for str in response:gmatch('"path":"([^\"]+)"') do table.insert(path, str) end
+            for str in response:gmatch('"name":"([^\"]+)"') do table.insert(name, str) end
         end
-        print("Invalid input.")
+    end
+    return type, path, name
+end
+
+local fileList = {dirs={}, files={}}
+
+function loadDownloads(path)
+    local type, fPath, name = getGithubContents(path)
+    for i, data in pairs(type) do
+        if data == "file" then
+            local resp = http.get("https://raw.github.com/yevano/see/master/" .. fPath[i])
+            if resp == nil then
+                fPath[i] = fPath[i] .. "/" .. name[i]
+            end
+
+            local path = fPath[i]
+            if gPath ~= nil then path = gPath .. "/yevano/" .. fPath[i] end
+            if not fileList.files[path] then
+                fileList.files[path] = {"https://raw.github.com/yevano/see/master/" .. fPath[i], fPath[i]}
+            end
+        end
+    end
+
+    for i, data in pairs(type) do
+        if data == "dir" then
+            local path = fPath[i]
+            if gPath ~= nil then path = gPath .. "/yevano/" .. fPath[i] and string.sub(path, 1, math.min(#path, 8)) ~= "see/test" end
+            if not fileList.dirs[path] then
+                fileList.dirs[path] = {"https://raw.github.com/yevano/see/master/" .. fPath[i], fPath[i]}
+                loadDownloads(fPath[i])
+            end
+        end
     end
 end
 
+loadDownloads("see")
+
+for k, v in pairs(fileList.dirs) do
+    fs.makeDir(v[2])
+end
+
+for k, v in pairs(fileList.files) do
+    local url = v[1]
+    local path = v[2]
+
+    local h = http.get(url)
+    if not h then
+        print("Failed to download " .. path)
+    end
+    local code = h.readAll()
+    h.close()
+
+    local fileHandle = fs.open(path, "w")
+    fileHandle.write(code) 
+    fileHandle.close()
+end
+
+--[[
 while true do
     while true do
         local downloaded = 0
@@ -176,3 +132,4 @@ while true do
         return
     end
 end
+]]--
