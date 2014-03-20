@@ -192,6 +192,9 @@ function StandardGlobals.STR(rt, ...)
     return rt.base.String:new(...)
 end
 
+--[[
+    Create a copy of a table
+]]
 local function copy(t)
     local r = { }
     for k, v in pairs(t) do
@@ -313,8 +316,7 @@ function SeeRT.new(natives, seePath)
         end
     end
 
-    --load see.base.Object and see.rt.Class then set up DefaultClassLoader
-
+    --temporary loadClass function to load see.base.Object, see.rt.Class and a DefaultClassLoader
     self.loadClass = function(def, annotations, name, refName, env)
         local className = getPackageName(name)
 
@@ -394,17 +396,19 @@ function SeeRT.new(natives, seePath)
         return class
     end
 
-    self:loadClassFromAny("see.base.Object")
+    --use loadClass to load see.base.Object and see.rt.Class
+    --then set up a real ClassLoader
+    self:loadClassFromAny("see.base.Object") 
     self:loadClassFromAny("see.rt.Class")
 
+    --start with a class loader to load other classes and class loaders (File and Archive)
     local DefaultClassLoader = self:loadClassFromAny("see.rt.DefaultClassLoader")
     self.classLoader = DefaultClassLoader:new()
 
     --doesnt technically matter.. but it may confuse a user to call getClassLoader on a class and get nil.. so prevent it
-    for className in pairs(self.classes) do
-        local clazz = self.classes[className]
-        if not self.classTables[clazz].__classLoader then
-            self.classTables[clazz].__classLoader = self.classLoader
+    for className, class in pairs(self.classes) do
+        if not self.classTables[class].__classLoader then
+            self.classTables[class].__classLoader = self.classLoader
         end
     end
 
@@ -417,6 +421,7 @@ function SeeRT.new(natives, seePath)
     self.fileClassLoader = FileClassLoader:new()
     self.archiveClassLoader = ArchiveClassLoader:new()
 
+    --load some base classes
     self.base.Exception      = self:loadClassFromAny("see.base.Exception")
     self.base.System         = self:loadClassFromAny("see.base.System")
     self.base.Iterators      = self:loadClassFromAny("see.base.Iterators")
@@ -491,6 +496,9 @@ function getAnnotations(code)
     return annotations
 end
 
+--[[
+    Spawn a thread
+]]
 function SeeRT:spawnThread(func, obj)
     local thread = coroutine.create(function() xpcall(func, errorHandler) end)
     self.objThreads[thread] = obj
@@ -503,10 +511,16 @@ function SeeRT:spawnThread(func, obj)
     return thread
 end
 
+--[[
+    Interrupt a thread
+]]
 function SeeRT:interruptThread(thread)
     os.queueEvent("__thread_interrupt", thread.id)
 end
 
+--[[
+    Start the SEE runtime
+]]
 function SeeRT:start(mainClass, ...)
     local args = { ... }
     xpcall(function() (function(mainClass, ...)
