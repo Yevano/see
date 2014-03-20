@@ -55,7 +55,7 @@ end
 
 loadDownloads("see")
 
-local fileHandle = fs.open(".see")
+local fileHandle = fs.open(".see", "w")
 fileHandle.write("install_dir = \"" .. installDir .. "\"")
 fileHandle.close()
 
