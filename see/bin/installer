@@ -106,11 +106,11 @@ local DL_PATHS = {
     "lib/see/io/ModemOutputStream.lua",
     "lib/see/io/peripheral/AbstractPeripheral.lua",
     "lib/see/io/peripheral/CommandBlock.lua",
-    "lib/see/io/Computer.lua",
-    "lib/see/io/Disk.lua",
-    "lib/see/io/Modem.lua",
-    "lib/see/io/Monitor.lua",
-    "lib/see/io/Printer.lua"
+    "lib/see/io/peripheral/Computer.lua",
+    "lib/see/io/peripheral/Disk.lua",
+    "lib/see/io/peripheral/Modem.lua",
+    "lib/see/io/peripheral/Monitor.lua",
+    "lib/see/io/peripheral/Printer.lua"
 }
 
 local function fail(err)
