@@ -19,7 +19,7 @@ function HTTP.sync(url, postData)
     --[[if postData then postData = cast(postData, "string") end
     local f = postData and http.post or http.get
     local handle = f(url.string:lstr(), postData)
-    return HttpResponse:new(String:new(handle.readAll()), handle.getResponseCode())]]
+    return HttpResponse.new(String.new(handle.readAll()), handle.getResponseCode())]]
 
     ArgumentUtils.check(1, url, URL)
     if postData then postData = cast(postData, "string") end
