@@ -3,6 +3,7 @@
 
 --@native fs
 --@native loadstring
+--@native print
 
 --@extends see.rt.DefaultClassLoader
 
@@ -17,6 +18,7 @@ function FileClassLoader:loadClass(path, name)
     -- Setup class execution environment
     local def, err = loadstring(code, name)
     if not def then
+        print(err)
         return nil, "Could not load class."
     end
 
