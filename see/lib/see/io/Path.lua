@@ -10,9 +10,9 @@ function Path:combine(p)
 end
 
 function Path:getName()
-    return String.new(fs.getName(self.pathString:lstr()))
+    return String:new(fs.getName(self.pathString:lstr()))
 end
 
 function Path:toString()
-    return String.new(self.pathString)
+    return String:new(self.pathString)
 end
