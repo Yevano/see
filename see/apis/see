@@ -307,7 +307,7 @@ function SeeRT:new(natives, seePath)
 
     self.opMap = { }
 
-    self.classMT = { __index = self.index, __newindex = self.newindex }
+    self.classMT = { __index = self.index, __newindex = self:newindex }
 
     for k, v in pairs(self.metaMethodMap) do
         self.opMap[v] = k
