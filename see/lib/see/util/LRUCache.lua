@@ -66,6 +66,10 @@ function LRUCache:cleanup()
 		end
 
 		for k in pairs(remove) do
+			if self.entryEvicted then
+				self.entryEvicted(oldest.key, self.values[oldest.key])
+			end
+
 			self:remove(k)
 		end
 	end
@@ -75,8 +79,14 @@ function LRUCache:cleanup()
 
 		while self:length() > self.size do
 			local oldest = sorted[1]
-			self:remove(oldest.key)
+
 			self.evicts = self.evicts + 1
+
+			if self.entryEvicted then
+				self.entryEvicted(oldest.key, self.values[oldest.key])
+			end
+
+			self:remove(oldest.key)
 		end
 	end
 end
