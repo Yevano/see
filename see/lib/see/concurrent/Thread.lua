@@ -1,7 +1,6 @@
 --@native coroutine
 --@native __rt
 --@native os.startTimer
---@native print
 
 --@import see.event.impl.TimerEvent
 --@import see.event.Events
@@ -58,7 +57,11 @@ function Thread:init(func)
 end
 
 function Thread:setDaemon(b)
-    self.daemon = b or true
+    if b == nil then
+        self.daemon = true
+    else
+        self.daemon = b 
+    end
 end
 
 function Thread:isDaemon()

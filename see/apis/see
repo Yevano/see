@@ -422,7 +422,7 @@ function SeeRT.new(natives, seePath)
     self.fileClassLoader            = FileClassLoader:new()
     self.archiveClassLoader         = ArchiveClassLoader:new()
 
-    --load some base classes
+    --load some more classes
     self.base.Exception             = self:loadClassFromAny("see.base.Exception")
     self.base.System                = self:loadClassFromAny("see.base.System")
     self.base.Iterators             = self:loadClassFromAny("see.base.Iterators")

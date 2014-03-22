@@ -52,15 +52,13 @@ function LRUCache:cleanup()
 		end
 	end
 
-	if self.size == nil then
-		return
-	end
+	if self.size ~= nil then
+		local sorted = self:sort(self.accessTimes)
 
-	local sorted = self:sort(self.accessTimes)
-
-	while self:length() > self.size do
-		local oldest = sorted[1]
-		self:remove(oldest.key)
+		while self:length() > self.size do
+			local oldest = sorted[1]
+			self:remove(oldest.key)
+		end
 	end
 end
 
