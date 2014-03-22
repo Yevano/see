@@ -1,7 +1,12 @@
+--@import see.util.ArgumentUtils
+
 --@native pairs
 --@native table
 
 function LRUCache:init(size, expire)
+	if size then ArgumentUtils.check(1, size, "number") end
+	if expire then ArgumentUtils.check(2, expire, "number") end
+
 	self.size = size
 	self.expire = expire
 
@@ -11,6 +16,8 @@ function LRUCache:init(size, expire)
 end
 
 function LRUCache:set(key, value, expireTime)
+	if expireTime then ArgumentUtils.check(1, expireTime, "number") end
+
 	local t = System.clock()
 	self.values[key] = value
 	if expireTime then
@@ -63,6 +70,7 @@ function LRUCache:cleanup()
 end
 
 function LRUCache:sort(t)
+	ArgumentUtils.check(1, t, "table")
 	local array = { }
 	for k, v in pairs(t) do
 		table.insert(array, {key = k, access = v})
