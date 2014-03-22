@@ -3,12 +3,18 @@
 --@native pairs
 --@native table
 
-function LRUCache:init(size, expire)
+function LRUCache:init(size, expire, entryEvicted)
 	if size then ArgumentUtils.check(1, size, "number") end
 	if expire then ArgumentUtils.check(2, expire, "number") end
 
 	self.size = size
 	self.expire = expire
+	self.entryEvicted = entryEvicted
+
+	self.puts = 0
+	self.hits = 0
+	self.misses = 0
+	self.evicts = 0
 
 	self.values = { }
 	self.expireTimes = { }
@@ -17,6 +23,8 @@ end
 
 function LRUCache:set(key, value, expireTime)
 	if expireTime then ArgumentUtils.check(1, expireTime, "number") end
+
+	self.puts = self.puts + 1
 
 	local t = System.clock()
 	self.values[key] = value
@@ -33,9 +41,12 @@ function LRUCache:get(key)
 	local t = System.clock()
 	self:cleanup()
 	if self.values[key] then
+		self.hits = self.hits + 1
 		self.accessTimes[key] = t
 		return self.values[key]
 	end
+
+	self.misses = self.misses + 1
 	return nil
 end	
 
@@ -65,6 +76,7 @@ function LRUCache:cleanup()
 		while self:length() > self.size do
 			local oldest = sorted[1]
 			self:remove(oldest.key)
+			self.evicts = self.evicts + 1
 		end
 	end
 end
@@ -85,8 +97,29 @@ function LRUCache:length()
 	return count
 end
 
-function LRUCache:clear()
+function LRUCache:reset()
+	self.puts = 0
+	self.hits = 0
+	self.misses = 0
+	self.evicts = 0
+
 	self.values = { }
 	self.expireTimes = { }
 	self.accessTimes = { }
+end
+
+function LRUCache:getHits()
+	return self.hits
+end
+
+function LRUCache:getMisses()
+	return self.misses
+end
+
+function LRUCache:getPuts()
+	return self.puts
+end
+
+function LRUCache:getEvicts()
+	return self.evicts
 end
