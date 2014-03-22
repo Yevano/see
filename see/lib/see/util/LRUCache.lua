@@ -10,10 +10,14 @@ function LRUCache:init(size, expire)
 	self.accessTimes = { }
 end
 
-function LRUCache:set(key, value)
+function LRUCache:set(key, value, expireTime)
 	local t = System.clock()
 	self.values[key] = value
-	self.expireTimes[key] = t + self.expire
+	if expireTime then
+		self.expireTimes[key] = t + expireTime
+	else
+		self.expireTimes[key] = t + self.expire
+	end
 	self.accessTimes[key] = t
 	self:cleanup()
 end
