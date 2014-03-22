@@ -67,7 +67,7 @@ function LRUCache:cleanup()
 
 		for k in pairs(remove) do
 			if self.entryEvicted then
-				self.entryEvicted(oldest.key, self.values[oldest.key])
+				self.entryEvicted(k, self.values[k])
 			end
 
 			self:remove(k)
