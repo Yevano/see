@@ -74,3 +74,9 @@ function LRUCache:length()
 	for _ in pairs(self.values) do count = count + 1 end
 	return count
 end
+
+function LRUCache:clear()
+	self.values = { }
+	self.expireTimes = { }
+	self.accessTimes = { }
+end
