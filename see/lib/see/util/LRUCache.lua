@@ -70,6 +70,7 @@ function LRUCache:cleanup()
 				self.entryEvicted(k, self.values[k])
 			end
 
+			self.evicts = self.evicts + 1
 			self:remove(k)
 		end
 	end
