@@ -68,18 +68,30 @@ function System.resolve(path)
     return Path:new(shell.resolve(path.pathString:lstr()))
 end
 
+--[[
+    Run a command in shell
+]]
 function System.run(cmd)
     shell.run(cast(cmd, "string"))
 end
 
+--[[
+    Get this computer's ID
+]]
 function System.getID()
     return os.getComputerID()
 end
 
+--[[
+    Get the system clock value
+]]
 function System.clock()
     return os.clock()
 end
 
+--[[
+    Get the system time value
+]]
 function System.time()
     return os.time()
 end

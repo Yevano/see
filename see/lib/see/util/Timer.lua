@@ -30,6 +30,12 @@ function Timer.__static()
 	timerThread:setDaemon()
 end
 
+--[[
+	Creates a new timer
+	@param number delay
+	@param number the funciton to call
+	@param boolean timer repeat
+]]
 function Timer:init(delay, func, _repeat)
 	self.delay = delay
 	self.func = func
@@ -39,6 +45,9 @@ function Timer:init(delay, func, _repeat)
 	end
 end
 
+--[[
+	Start the timer
+]]
 function Timer:start()
 	if not init then
 		init = true
@@ -51,6 +60,9 @@ function Timer:start()
 	end
 end
 
+--[[
+	Stop the timer
+]]
 function Timer:stop()
 	if timers[self.timerID] then
 		timers[self.timerID] = nil

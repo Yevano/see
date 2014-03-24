@@ -1,5 +1,8 @@
 --@import see.concurrent.Thread
 
+--[[
+    Create a new task
+]]
 function Task:init(func, ...)
     local args = Array:new(...)
     self.thread = Thread:new(function()
@@ -11,6 +14,9 @@ function Task:init(func, ...)
     self.thread:start()
 end
 
+--[[
+    Set this task's callback
+]]
 function Task:setCallback(callback)
     if self:isFinished() then
         callback(self.result)

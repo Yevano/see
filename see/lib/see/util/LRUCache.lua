@@ -3,6 +3,12 @@
 --@native pairs
 --@native table
 
+--[[
+	Creates a new LRU cache
+	@param number max size of the cache (unlimited if nil)
+	@param number expire time (unlimited if nil)
+	@param function entry evict callback (params key,value)
+]]
 function LRUCache:init(size, expire, entryEvicted)
 	if size then ArgumentUtils.check(1, size, "number") end
 	if expire then ArgumentUtils.check(2, expire, "number") end
@@ -11,7 +17,7 @@ function LRUCache:init(size, expire, entryEvicted)
 	self.expire = expire
 	self.entryEvicted = entryEvicted
 
-	self.puts = 0
+	self.sets = 0
 	self.hits = 0
 	self.misses = 0
 	self.evicts = 0
@@ -21,10 +27,16 @@ function LRUCache:init(size, expire, entryEvicted)
 	self.accessTimes = { }
 end
 
+--[[
+	Sets a key to a value
+	@param any the key
+	@param any the value
+	@param number custom expire time for this key, uses cache's default expire time if nil
+]]
 function LRUCache:set(key, value, expireTime)
 	if expireTime then ArgumentUtils.check(1, expireTime, "number") end
 
-	self.puts = self.puts + 1
+	self.sets = self.sets + 1
 
 	local t = System.clock()
 	self.values[key] = value
@@ -37,6 +49,10 @@ function LRUCache:set(key, value, expireTime)
 	self:cleanup()
 end
 
+--[[
+	Get the value of a key in the cache
+	@param any the key
+]]
 function LRUCache:get(key)
 	local t = System.clock()
 	self:cleanup()
@@ -50,12 +66,19 @@ function LRUCache:get(key)
 	return nil
 end	
 
+--[[
+	Remove a value in the cache
+	@param any the key
+]]
 function LRUCache:remove(key)
 	self.values[key] = nil
 	self.expireTimes[key] = nil
 	self.accessTimes[key] = nil
 end
 
+--[[
+	Removes any values that have expired and removes least recently used values until size < max size
+]]
 function LRUCache:cleanup()
 	if self.expire ~= nil then
 		local remove = { }
@@ -75,6 +98,15 @@ function LRUCache:cleanup()
 		end
 	end
 
+	local function sort(t)
+		local array = { }
+		for k, v in pairs(t) do
+			table.insert(array, {key = k, access = v})
+		end
+		table.sort(array, function(a, b) return a.access < b.access end)
+		return array
+	end
+
 	if self.size ~= nil then
 		local sorted = self:sort(self.accessTimes)
 
@@ -92,24 +124,20 @@ function LRUCache:cleanup()
 	end
 end
 
-function LRUCache:sort(t)
-	ArgumentUtils.check(1, t, "table")
-	local array = { }
-	for k, v in pairs(t) do
-		table.insert(array, {key = k, access = v})
-	end
-	table.sort(array, function(a, b) return a.access < b.access end)
-	return array
-end
-
+--[[
+	Returns the current size of the cache
+]]
 function LRUCache:length()
 	local count = 0
 	for _ in pairs(self.values) do count = count + 1 end
 	return count
 end
 
+--[[
+	Reset and clear the cache
+]]
 function LRUCache:reset()
-	self.puts = 0
+	self.sets = 0
 	self.hits = 0
 	self.misses = 0
 	self.evicts = 0
@@ -119,18 +147,30 @@ function LRUCache:reset()
 	self.accessTimes = { }
 end
 
+--[[
+	Returns the current number of hits
+]]
 function LRUCache:getHits()
 	return self.hits
 end
 
+--[[
+	Returns the current number of misses
+]]
 function LRUCache:getMisses()
 	return self.misses
 end
 
-function LRUCache:getPuts()
-	return self.puts
+--[[
+	Returns the current number of sets
+]]
+function LRUCache:getSets()
+	return self.sets
 end
 
+--[[
+	Returns the current number of evicts
+]]
 function LRUCache:getEvicts()
 	return self.evicts
 end

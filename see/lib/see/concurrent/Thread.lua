@@ -20,6 +20,9 @@ function Thread.yield(...)
     return coroutine.yield(...)
 end
 
+--[[
+    Get the current running thread
+]]
 function Thread.current()
     return __rt.objThreads[coroutine.running()]
 end

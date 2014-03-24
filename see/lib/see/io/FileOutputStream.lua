@@ -19,6 +19,7 @@ end
     @throw see.util.InvalidArgumentException if the args are incorrect.
 ]]
 function FileOutputStream:write(b)
+    ArgumentUtils.check(1, b, "number")
     try (function()
         self.handle.write(b)
     end, function(e)
