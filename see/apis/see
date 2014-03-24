@@ -384,13 +384,13 @@ function SeeRT.new(natives, seePath)
             self.classTables[class].__super = self.base.Object
         end
 
+        if not rawget(self.classTables[class], "init") then
+            rawset(self.classTables[class], "init", function() end)
+        end
+
         local static = rawget(self.classTables[class], "__static")
         if static then
             static()
-        end
-
-        if not rawget(self.classTables[class], "init") then
-            rawset(self.classTables[class], "init", function() end)
         end
 
         return class

@@ -87,13 +87,13 @@ function DefaultClassLoader:loadClass(def, annotations, name, refName, env)
 
     __rt.classTables[class].__classLoader = self --give classes a reference to their class loader
 
+    if not rawget(__rt.classTables[class], "init") then
+        rawset(__rt.classTables[class], "init", function() end)
+    end
+
     local static = rawget(__rt.classTables[class], "__static")
     if static then
         static()
-    end
-
-    if not rawget(__rt.classTables[class], "init") then
-        rawset(__rt.classTables[class], "init", function() end)
     end
 
     return class
