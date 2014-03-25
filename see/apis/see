@@ -611,25 +611,27 @@ function SeeRT:start(mainClass, ...)
 
                     if coroutine.status(threads[i]) == "dead" then
                         table.insert(threadDeaths, i)
-
-                        local foundNonDaemon = false
-                        for i = 1, #self.objThreads do
-                            if not self.objThreads[i]:isDaemon() then
-                                foundNonDaemon = true
-                            end
-                        end
-                        if not foundNonDaemon then
-                            return
-                        end
-
                         self.objThreads[threads[i]] = nil
                     end
                 end
             end
 
+            local death = false
             for i = #threadDeaths, 1, -1 do
                 table.remove(threads, threadDeaths[i])
                 table.remove(threadFilters, threadDeaths[i])
+                death = true
+            end
+            if death then
+                local foundNonDaemon = false
+                for i = 1, #self.objThreads do
+                    if not self.objThreads[i]:isDaemon() then
+                        foundNonDaemon = true
+                    end
+                end
+                if not foundNonDaemon then
+                    return
+                end
             end
 
             if #threads == 0 then break end

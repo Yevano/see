@@ -59,6 +59,9 @@ function Thread:init(func)
     self.daemon = false
 end
 
+--[[
+    Set thread to daemon (or not)
+]]
 function Thread:setDaemon(b)
     if b == nil then
         self.daemon = true
@@ -67,6 +70,9 @@ function Thread:setDaemon(b)
     end
 end
 
+--[[
+    Checks if this thread is a daemon 
+]]
 function Thread:isDaemon()
     return self.daemon
 end

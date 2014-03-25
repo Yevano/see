@@ -108,7 +108,7 @@ function LRUCache:cleanup()
 	end
 
 	if self.size ~= nil then
-		local sorted = self:sort(self.accessTimes)
+		local sorted = sort(self.accessTimes)
 
 		while self:length() > self.size do
 			local oldest = sorted[1]
