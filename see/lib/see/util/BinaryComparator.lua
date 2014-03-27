@@ -2,6 +2,12 @@
 
 --@extends see.util.Comparator
 
+--[[
+	Return 
+	0  - a == b
+	-1 - a <  b
+	1  - a >  b
+]]
 function BinaryComparator:compareTo(a, b)
 	if a == b then 
 		return 0

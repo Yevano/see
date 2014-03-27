@@ -7,6 +7,9 @@ local timerThread
 local timers
 local init = false
 
+--[[
+	Create the timer update thread
+]]
 function Timer.__static()
 	timers = { }
 	timerThread = Thread:new(function()

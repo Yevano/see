@@ -6,6 +6,11 @@
 
 --@extends see.rt.DefaultClassLoader
 
+--[[
+    Load a class from a file
+    @param see.io.Path the file path
+    @param see.base.String the class name
+]]
 function FileClassLoader:loadClass(path, name)
 	local fileHandle = fs.open(path, "r")
     if not fileHandle then

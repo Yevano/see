@@ -18,6 +18,14 @@ local function copy(t)
     return r
 end
 
+--[[
+    Load a class
+    @param function the class definition
+    @param table the annotations
+    @param string name of class
+    @param refName the refName of the class
+    @param table the env
+]]
 function DefaultClassLoader:loadClass(def, annotations, name, refName, env)
 	local className = ClassLoader.getPackageName(name)
 
