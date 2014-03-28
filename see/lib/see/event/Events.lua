@@ -28,6 +28,7 @@
 --@import see.event.impl.TurtleInventoryEvent
 --@import see.event.impl.UnknownEvent
 --@import see.event.impl.SignalEvent
+--@import see.event.impl.TerminalResizeEvent
 
 --@native os.queueEvent
 
@@ -61,6 +62,7 @@ function Events.__static()
     Events.register("monitor_resize",    MonitorResizeEvent)
     Events.register("turtle_inventory",  TurtleInventoryEvent)
     Events.register("signal",            SignalEvent)
+    Events.register("term_resize",       TerminalResizeEvent)
 
     Events.registerNative("op_tick_sync")
 end

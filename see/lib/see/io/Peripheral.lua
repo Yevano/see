@@ -32,3 +32,7 @@ function Peripheral.getNames()
     end
     return names
 end
+
+function Peripheral.find(type)
+    return peripheral.find(type)
+end
