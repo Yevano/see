@@ -33,8 +33,8 @@ function Terminal.redirect(monitor)
     term.redirect(monitor)
 end
 
-function Terminal.restore()
-    term.restore()
+function Terminal.current()
+    term.current()
 end
 
 function Terminal.setTextScale(scale)
