@@ -295,6 +295,7 @@ function SeeRT.new(natives, seePath)
         end
     end
 
+    --metamethods mapped to easier method names
     self.metaMethodMap = {
         opAdd    = "__add",
         opSub    = "__sub",
