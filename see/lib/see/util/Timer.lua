@@ -3,9 +3,9 @@
 
 --@native os.startTimer
 
-local timerThread
-local timers
-local init = false
+local timerThread			--the global timer update thread
+local timers				--the list of timers
+local init = false			--set once the global update thread is started, used to make sure start is only called once
 
 --[[
 	Create the timer update thread
