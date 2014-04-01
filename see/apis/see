@@ -106,6 +106,11 @@ function StandardGlobals.typeof(rt, value)
     return type(value)
 end
 
+--[[
+    Checks if an object is a primitive lua object or a SEE object
+    @param SeeRT the SEE rt
+    @param any the object to check 
+]]
 function StandardGlobals.isprimitive(rt, value)
     if type(value) == "table" then
         return getmetatable(value) ~= rt.classMT
@@ -290,6 +295,7 @@ function SeeRT.new(natives, seePath)
         end
     end
 
+    --metamethods mapped to easier method names
     self.metaMethodMap = {
         opAdd    = "__add",
         opSub    = "__sub",
@@ -384,13 +390,13 @@ function SeeRT.new(natives, seePath)
             self.classTables[class].__super = self.base.Object
         end
 
+        if not rawget(self.classTables[class], "init") then
+            rawset(self.classTables[class], "init", function() end)
+        end
+
         local static = rawget(self.classTables[class], "__static")
         if static then
             static()
-        end
-
-        if not rawget(self.classTables[class], "init") then
-            rawset(self.classTables[class], "init", function() end)
         end
 
         return class
@@ -402,8 +408,8 @@ function SeeRT.new(natives, seePath)
     self:loadClassFromAny("see.rt.Class")
 
     --start with a class loader to load other classes and class loaders (File and Archive)
-    local DefaultClassLoader = self:loadClassFromAny("see.rt.DefaultClassLoader")
-    self.classLoader = DefaultClassLoader:new()
+    local DefaultClassLoader        = self:loadClassFromAny("see.rt.DefaultClassLoader")
+    self.classLoader                = DefaultClassLoader:new()
 
     --doesnt technically matter.. but it may confuse a user to call getClassLoader on a class and get nil.. so prevent it
     for className, class in pairs(self.classes) do
@@ -416,20 +422,21 @@ function SeeRT.new(natives, seePath)
     --again, not technically needed, but loadClass was intended to be a temporary thing ONLY for setting up a ClassLoader
     self.loadClass = nil
 
-    local FileClassLoader = self:loadClassFromAny("see.rt.FileClassLoader")
-    local ArchiveClassLoader = self:loadClassFromAny("see.rt.ArchiveClassLoader")
-    self.fileClassLoader = FileClassLoader:new()
-    self.archiveClassLoader = ArchiveClassLoader:new()
+    --start using a FileClassLoader and an ArchiveClassLoader 
+    local FileClassLoader           = self:loadClassFromAny("see.rt.FileClassLoader")
+    local ArchiveClassLoader        = self:loadClassFromAny("see.rt.ArchiveClassLoader")
+    self.fileClassLoader            = FileClassLoader:new()
+    self.archiveClassLoader         = ArchiveClassLoader:new()
 
     --load some base classes
-    self.base.Exception      = self:loadClassFromAny("see.base.Exception")
-    self.base.System         = self:loadClassFromAny("see.base.System")
-    self.base.Iterators      = self:loadClassFromAny("see.base.Iterators")
-    self.base.Array          = self:loadClassFromAny("see.base.Array")
-    self.base.String         = self:loadClassFromAny("see.base.String")
-    self.event.Events        = self:loadClassFromAny("see.event.Events")
-    self.event.UnknownEvent  = self:loadClassFromAny("see.event.impl.UnknownEvent")
-    self.rt.RuntimeException = self:loadClassFromAny("see.rt.RuntimeException")
+    self.base.Exception             = self:loadClassFromAny("see.base.Exception")
+    self.base.System                = self:loadClassFromAny("see.base.System")
+    self.base.Iterators             = self:loadClassFromAny("see.base.Iterators")
+    self.base.Array                 = self:loadClassFromAny("see.base.Array")
+    self.base.String                = self:loadClassFromAny("see.base.String")
+    self.event.Events               = self:loadClassFromAny("see.event.Events")
+    self.event.UnknownEvent         = self:loadClassFromAny("see.event.impl.UnknownEvent")
+    self.rt.RuntimeException        = self:loadClassFromAny("see.rt.RuntimeException")
 
     return self
 end
@@ -544,7 +551,6 @@ function SeeRT:start(mainClass, ...)
         local event
         local isNative
         threadFilters[1] = { coroutine.resume(threads[1], args) }
-        local cycle = 1
         
         while true do
             local threadDeaths = { }
@@ -606,25 +612,27 @@ function SeeRT:start(mainClass, ...)
 
                     if coroutine.status(threads[i]) == "dead" then
                         table.insert(threadDeaths, i)
-
-                        local foundNonDaemon = false
-                        for i = 1, #self.objThreads do
-                            if not self.objThreads[i]:isDaemon() then
-                                foundNonDaemon = true
-                            end
-                        end
-                        if not foundNonDaemon then
-                            return
-                        end
-
                         self.objThreads[threads[i]] = nil
                     end
                 end
             end
 
+            local death = false
             for i = #threadDeaths, 1, -1 do
                 table.remove(threads, threadDeaths[i])
                 table.remove(threadFilters, threadDeaths[i])
+                death = true
+            end
+            if death then
+                local foundNonDaemon = false
+                for i = 1, #self.objThreads do
+                    if not self.objThreads[i]:isDaemon() then
+                        foundNonDaemon = true
+                    end
+                end
+                if not foundNonDaemon then
+                    return
+                end
             end
 
             if #threads == 0 then break end

@@ -7,6 +7,11 @@
 
 --@extends see.rt.DefaultClassLoader
 
+--[[
+	Load a class via HTTP
+	@param URL the url
+	@param see.base.String the class name
+]]
 function HTTPClassLoader:loadClass(url, name)
 	local response = HTTP.sync(url)
 	if response.responseCode ~= 200 then

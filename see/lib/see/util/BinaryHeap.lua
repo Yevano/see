@@ -1,6 +1,10 @@
 --@import see.util.Math
 --@import see.util.BinaryComparator
 
+--[[
+	Creates a new bimary heap
+	@param see.util.Comparator the comparator for the heap
+]]
 function BinaryHeap:init(comp)
 	self.comp = comp
 	if not self.comp then
@@ -10,6 +14,10 @@ function BinaryHeap:init(comp)
 	self.size = 0
 end
 
+--[[
+	Add a value to the heap
+	@param any the value to add
+]]
 function BinaryHeap:add(value)
 	self.size = self.size + 1
 	self.array[self.size] = value
@@ -17,10 +25,16 @@ function BinaryHeap:add(value)
 	self:bubbleUp()
 end
 
+--[[
+	Peek a value from the heap
+]]
 function BinaryHeap:peek()
 	return self.array[1]
 end
 
+--[[
+	Remove a value fromt he heap
+]]
 function BinaryHeap:remove()
 	local value = self:peek()
 
@@ -33,10 +47,16 @@ function BinaryHeap:remove()
 	return value
 end
 
+--[[
+	Returns the current length of the heap
+]]
 function BinaryHeap:length()
 	return #self.array
 end
 
+--[[
+	Checks if the heap is empty
+]]
 function BinaryHeap:isEmpty()
 	return self:length() == 0
 end

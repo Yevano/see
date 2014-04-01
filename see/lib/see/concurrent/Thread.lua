@@ -1,7 +1,6 @@
 --@native coroutine
 --@native __rt
 --@native os.startTimer
---@native print
 
 --@import see.event.impl.TimerEvent
 --@import see.event.Events
@@ -21,6 +20,9 @@ function Thread.yield(...)
     return coroutine.yield(...)
 end
 
+--[[
+    Get the current running thread
+]]
 function Thread.current()
     return __rt.objThreads[coroutine.running()]
 end
@@ -57,10 +59,20 @@ function Thread:init(func)
     self.daemon = false
 end
 
+--[[
+    Set thread to daemon (or not)
+]]
 function Thread:setDaemon(b)
-    self.daemon = b or true
+    if b == nil then
+        self.daemon = true
+    else
+        self.daemon = b 
+    end
 end
 
+--[[
+    Checks if this thread is a daemon 
+]]
 function Thread:isDaemon()
     return self.daemon
 end

@@ -3,10 +3,13 @@
 
 --@native os.startTimer
 
-local timerThread
-local timers
-local init = false
+local timerThread			--the global timer update thread
+local timers				--the list of timers
+local init = false			--set once the global update thread is started, used to make sure start is only called once
 
+--[[
+	Create the timer update thread
+]]
 function Timer.__static()
 	timers = { }
 	timerThread = Thread:new(function()
@@ -30,6 +33,12 @@ function Timer.__static()
 	timerThread:setDaemon()
 end
 
+--[[
+	Creates a new timer
+	@param number delay
+	@param number the funciton to call
+	@param boolean timer repeat
+]]
 function Timer:init(delay, func, _repeat)
 	self.delay = delay
 	self.func = func
@@ -39,6 +48,9 @@ function Timer:init(delay, func, _repeat)
 	end
 end
 
+--[[
+	Start the timer
+]]
 function Timer:start()
 	if not init then
 		init = true
@@ -51,6 +63,9 @@ function Timer:start()
 	end
 end
 
+--[[
+	Stop the timer
+]]
 function Timer:stop()
 	if timers[self.timerID] then
 		timers[self.timerID] = nil

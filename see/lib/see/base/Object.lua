@@ -46,6 +46,9 @@ function Object:getClass()
     return rawget(self, "__class")
 end
 
+--[[
+    Checks if this object is an instance of type (see.rt.Class)
+]]
 function Object:instanceof(type)
     local objectType = self:getClass()
     while objectType do

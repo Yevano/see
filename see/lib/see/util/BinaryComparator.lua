@@ -2,10 +2,12 @@
 
 --@extends see.util.Comparator
 
-function BinaryComparator:init()
-	self:super(Comparator).init()
-end
-
+--[[
+	Return 
+	0  - a == b
+	-1 - a <  b
+	1  - a >  b
+]]
 function BinaryComparator:compareTo(a, b)
 	if a == b then 
 		return 0

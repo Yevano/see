@@ -28,6 +28,7 @@
 --@import see.event.impl.TurtleInventoryEvent
 --@import see.event.impl.UnknownEvent
 --@import see.event.impl.SignalEvent
+--@import see.event.impl.TerminalResizeEvent
 
 --@native os.queueEvent
 
@@ -61,31 +62,52 @@ function Events.__static()
     Events.register("monitor_resize",    MonitorResizeEvent)
     Events.register("turtle_inventory",  TurtleInventoryEvent)
     Events.register("signal",            SignalEvent)
+    Events.register("term_resize",       TerminalResizeEvent)
 
     Events.registerNative("op_tick_sync")
 end
 
+--[[
+    Register a native event
+]]
 function Events.registerNative(ident)
     nativeEvents[ident] = true
 end
 
+--[[
+    Checks if an event ident is native
+]]
 function Events.isNativeEvent(ident)
     return nativeEvents[ident]
 end
 
+--[[
+    Registers an event
+    @param see.base.String / string event identifier
+    @param see.rt.Class the class of the event
+]]
 function Events.register(ident, eventClass)
     registeredEvents[cast(ident, "string")] = eventClass
     registeredEventsReverse[eventClass] = cast(ident, "string")
 end
 
+--[[
+    Gets an event class by its identifier
+]]
 function Events.getEventClass(ident)
     return registeredEvents[cast(ident, "string")] or UnknownEvent
 end
 
+--[[
+    Queue an event
+]]
 function Events.queue(event)
     os.queueEvent(cast(event.ident, "string"), event)
 end
 
+--[[
+    Pulls an event
+]]
 function Events.pull(...)
     local args = Array:new(...)
     local casted = Array:new()

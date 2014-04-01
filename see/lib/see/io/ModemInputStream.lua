@@ -27,7 +27,7 @@ function ModemInputStream:init(modem, channel)
 				else
 					--crap, what now... cant just "re-queue" it.. or can we.. hmmmmmm
 					Events.queue(evt) --HIGHLY EXPERIMENTAL, PROBABLY CAUSES HORRIBLE SHIT TO GO DOWN
-					Thread.yield() 
+					Thread.yield() --not necessary?  this thread code needs to be looked over..
 				end
 			end
 		end

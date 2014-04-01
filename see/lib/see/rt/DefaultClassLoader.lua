@@ -18,6 +18,14 @@ local function copy(t)
     return r
 end
 
+--[[
+    Load a class
+    @param function the class definition
+    @param table the annotations
+    @param string name of class
+    @param refName the refName of the class
+    @param table the env
+]]
 function DefaultClassLoader:loadClass(def, annotations, name, refName, env)
 	local className = ClassLoader.getPackageName(name)
 
@@ -87,13 +95,13 @@ function DefaultClassLoader:loadClass(def, annotations, name, refName, env)
 
     __rt.classTables[class].__classLoader = self --give classes a reference to their class loader
 
+    if not rawget(__rt.classTables[class], "init") then
+        rawset(__rt.classTables[class], "init", function() end)
+    end
+
     local static = rawget(__rt.classTables[class], "__static")
     if static then
         static()
-    end
-
-    if not rawget(__rt.classTables[class], "init") then
-        rawset(__rt.classTables[class], "init", function() end)
     end
 
     return class
