@@ -11,7 +11,7 @@
     Makes a blocking HTTP request.
     @param see.net.Url:url The URL to request from.
     @param see.base.String:postData Post data to send if this is a POST request.
-    @param see.base.Array Custom HTTP headers to send
+    @param table Custom HTTP headers to send
     @return see.base.String The body of the response.
     @throw see.util.InvalidArgumentException if the args are incorrect.
     @throw see.io.IOException If the request fails.
@@ -40,7 +40,7 @@ end
     Makes an asynchronous HTTP request.
     @param see.net.Url:url The URL to request from.
     @param see.base.String:postData Post data to send if this is a POST request.
-    @param see.base.Array Custom HTTP headers to send
+    @param table Custom HTTP headers to send
     @throw see.util.InvalidArgumentException if the args are incorrect.
 ]]
 function HTTP.async(url, postData, headers)
