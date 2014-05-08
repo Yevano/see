@@ -1,3 +1,4 @@
+--@import see.base.Array
 --@import see.concurrent.Thread
 --@import see.concurrent.InterruptedException
 
