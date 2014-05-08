@@ -96,7 +96,7 @@ function System.read(replaceChar, history)
             elseif event.key == keys.up or event.key == keys.down then
                 -- Up or down
                 if history then
-                    redraw(STR(" "))
+                    Terminal.clearLine()
                     if event.key == keys.up then
                         -- Up
                         if historyPos == nil then
@@ -126,26 +126,26 @@ function System.read(replaceChar, history)
             elseif event.key == keys.backspace then
                 -- Backspace
                 if pos > 0 then
-                    redraw(STR(" "))
+                    Terminal.clearLine()
                     line:remove(pos, 1)
                     pos = pos - 1                 
                     redraw()
                 end
             elseif event.key == keys.home then
                 -- Home
-                redraw(STR(" "))
+                Terminal.clearLine()
                 pos = 0
                 redraw()        
             elseif event.key == keys.delete then
                 -- Delete
                 if pos < line:length() then
-                    redraw(STR(" "))
+                    Terminal.clearLine()
                     line:remove(pos+1, 1)
                     redraw()
                 end
             elseif event.key == keys["end"] then
                 -- End
-                redraw(STR(" "))
+                Terminal.clearLine()
                 pos = line:length()
                 redraw()
             end
