@@ -7,10 +7,46 @@
 
 --@import see.base.String
 --@import see.io.Path
+--@import see.util.Properties
+--@import see.rt.SecurityManager
 
 --[[
     A utility class for useful system operations.
 ]]
+
+local systemProperties = nil
+local securityManager = nil
+
+function System.__static()
+    systemProperties = Properties:new()
+    securityManager = SecurityManager:new()
+end
+
+--[[
+    Gets a system property
+    @param see.base.String key 
+    @return see.base.String the value of the system property
+]]
+function System.getProperty(key)
+    return systemProperties:getProperty(key)
+end
+
+--[[
+    Sets a system property
+    @param see.base.String key
+    @param see.base.String value
+]]
+function System.setProperty(key, value)
+    systemProperties:setProperty(key, value)
+end
+
+--[[
+    Gets the system security manager
+    @return see.rt.SecurityManager 
+]]
+function System.getSecurityManager()
+    return securityManager
+end
 
 --[[
     Reads a line from the shell.
