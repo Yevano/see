@@ -71,14 +71,14 @@ end
 --[[
 	Receive from Rednet
 	@param see.base.String:protocol Protocol to lookup
-	@param see.base.String:name Name of user to filter to
+	@param see.base.String:hostname Name of user to filter to
 	@param number:timeout Time period to wait for responses (defaults to 2)
 	@return see.base.Array[see.io.RednetConnection] List of matching connections, 
 		or see.io.RednetConnection if hostname is specified.
 ]]
-function Rednet.lookup(protocol, name, timeout)
+function Rednet.lookup(protocol, hostname, timeout)
 	protocol = cast(protocol, "string")
-	if name then name = cast(name, "string") end
+	if hostname then hostname = cast(hostname, "string") end
 	if timeout then
 		ArgumentUtils.check(3, timeout, "number")
 	else
@@ -103,7 +103,7 @@ function Rednet.lookup(protocol, name, timeout)
 				if event.message.sProtocol == protocol then
 					if hostname == nil then
 						results:add(RednetConnection:new(event.sender, STR(protocol), STR(event.message.sHostname)))
-					elseif tMessage.hostname == hostname then
+					elseif event.message.sHostname == hostname then
 						return RednetConnection:new(event.sender, STR(protocol), STR(event.message.SHostname))
 					end
 				end
