@@ -448,6 +448,7 @@ function SeeRT.new(natives, seePath)
     sys.setProperty("file.separator", "/")
     sys.setProperty("line.separator", "\n")
     sys.setProperty("path.separator", ":")
+    sys.setProperty("os.arch", "cc64")
     sys.setProperty("os.name", "CraftOS") --todo automate 
     sys.setProperty("os.version", "1.6") --todo automate
 
