@@ -675,11 +675,11 @@ end
 ]]
 function SeeRT:loadClassFromAny(name)
     local class = self.classes[name]
-    local err
 
     if class then return class end
 
     -- Load from the standard library.
+    local err
     local p = name:gsub("%.", "/")
     class, err = self:loadClassFromFile(fs.combine(fs.combine(self.seePath, "/lib/"), p) .. ".lua", name)
     local lerr = err
@@ -701,7 +701,9 @@ function SeeRT:loadClassFromAny(name)
     end
 
     if not class then
-        error("Could not load class " .. name .. ". " .. err)
+        local RuntimeException = self:loadClassFromAny("see.rt.RuntimeException")
+        self:throw(RuntimeException:new("Could not load class " .. name .. ". " .. err))
+        --error("Could not load class " .. name .. ". " .. err)
     end
 end
 
