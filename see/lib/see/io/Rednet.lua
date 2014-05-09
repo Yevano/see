@@ -53,7 +53,7 @@ function Rednet.receive(protocol, timeout, sender)
 			if (protocol == nil or protocol == event.protocol) and (sender == nil or sender == event.sender) then
 				return event
 			end
-		elseif event.ident == "timer" and event.sender == timer then
+		elseif event.ident == "timer" and event.id == timer then
 			-- Return nil if we timeout
 			return nil
 		end
@@ -104,7 +104,7 @@ function Rednet.lookup(protocol, hostname, timeout)
 					if hostname == nil then
 						results:add(RednetConnection:new(event.sender, STR(protocol), STR(event.message.sHostname)))
 					elseif event.message.sHostname == hostname then
-						return RednetConnection:new(event.sender, STR(protocol), STR(event.message.SHostname))
+						return RednetConnection:new(event.sender, STR(protocol), STR(event.message.sHostname))
 					end
 				end
 			end

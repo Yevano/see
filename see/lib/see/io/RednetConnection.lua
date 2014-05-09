@@ -1,3 +1,4 @@
+--@import see.base.String
 --@import see.io.Rednet
 --@import see.util.ArgumentUtils
 
@@ -13,8 +14,8 @@
 ]]
 function RednetConnection:init(id, protocol, hostname)
 	ArgumentUtils.check(1, id, "number")
-	if protocol then ArgumentUtils.check(2, protocol, String) end
-	if hostname then ArgumentUtils.check(3, hostname, String) end
+	if protocol then cast(protocol, String) end
+	if hostname then cast(hostname, String) end
 
 	self.id = id
 	self.protocol = protocol
@@ -24,9 +25,14 @@ end
 --[[
 	Receive from connection's id (with protocol if needed)
 	@param number:timeout Timeout before returning if no message received
+	@return see.base.String The received message, or nil on error
 ]]
 function RednetConnection:receive(timeout)
-	return Rednet.receive(self.protocol, timeout, self.id).message
+	local message = Rednet.receive(self.protocol, timeout, self.id)
+	if message then
+		return STR(message.message)
+	end
+	return nil
 end
 
 --[[
