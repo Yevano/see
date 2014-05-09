@@ -26,7 +26,7 @@ end
 	@param number:timeout Timeout before returning if no message received
 ]]
 function RednetConnection:receive(timeout)
-	return Rednet.receive(self.protocol, timeout, self.id)
+	return Rednet.receive(self.protocol, timeout, self.id).message
 end
 
 --[[
