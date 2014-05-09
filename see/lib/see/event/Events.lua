@@ -1,3 +1,4 @@
+--@import see.base.Array
 --@import see.concurrent.Thread
 --@import see.concurrent.InterruptedException
 
@@ -8,6 +9,7 @@
 --@import see.event.Event
 --@import see.event.impl.CharEvent
 --@import see.event.impl.KeyPressEvent
+--@import see.event.impl.PasteEvent
 --@import see.event.impl.TimerEvent
 --@import see.event.impl.AlarmEvent
 --@import see.event.impl.RedstoneEvent
@@ -43,6 +45,7 @@ function Events.__static()
     
     Events.register("char",              CharEvent)
     Events.register("key",               KeyPressEvent)
+    Events.register("paste",             PasteEvent)
     Events.register("timer",             TimerEvent)
     Events.register("alarm",             AlarmEvent)
     Events.register("redstone",          RedstoneEvent)
