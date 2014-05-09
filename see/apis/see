@@ -442,7 +442,14 @@ function SeeRT.new(natives, seePath)
     self.event.UnknownEvent         = self:loadClassFromAny("see.event.impl.UnknownEvent")
     self.rt.RuntimeException        = self:loadClassFromAny("see.rt.RuntimeException")
 
-    self.base.System.setProperty("see.home", self.seePath)
+    local sys = self.base.System
+    sys.setProperty("see.home", self.seePath)
+    sys.setProperty("see.version", "420") --todo versions
+    sys.setProperty("file.separator", "/")
+    sys.setProperty("line.separator", "\n")
+    sys.setProperty("path.separator", ":")
+    sys.setProperty("os.name", "CraftOS") --todo automate 
+    sys.setProperty("os.version", "1.6") --todo automate
 
     return self
 end
