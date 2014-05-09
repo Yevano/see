@@ -159,7 +159,11 @@ end
     @param see.base.Object value
 ]]
 function StandardGlobals.reinterpret_cast(rt, value, castType)
-    if type(value) ~= "table" or not value.__type then error("Cannot use reinterpret_cast to cast a primitive type.") end
+    if type(value) ~= "table" or not value.__type then 
+        local RuntimeException = self:loadClassFromAny("see.rt.RuntimeException")
+        self:throw(RuntimeException:new("Cannot use reinterpret_cast to cast a primitive type."))
+        --error("Cannot use reinterpret_cast to cast a primitive type.") 
+    end
     setmetatable(value, castType.__meta)
 end
 
@@ -716,7 +720,9 @@ function SeeRT:executeAnnotation(env, class, annotation)
     local pindex = annotation:find("%s")
 
     if not pindex then
-        error("Failed to execute annotation for class " .. class.name .. ".")
+        local RuntimeException = self:loadClassFromAny("see.rt.RuntimeException")
+        self:throw(RuntimeException:new("Failed to execute annotation for class " .. class.name .. "."))
+        --error("Failed to execute annotation for class " .. class.name .. ".")
     end
 
     local aname = annotation:sub(1, pindex - 1)
@@ -724,7 +730,11 @@ function SeeRT:executeAnnotation(env, class, annotation)
     if aname == "import" then
         local name = annotation:sub(pindex + 1):gsub("%s", "")
         local class = self:loadClassFromAny(name)
-        if not class then error("Failed to import class.") end
+        if not class then 
+            local RuntimeException = self:loadClassFromAny("see.rt.RuntimeException")
+            self:throw(RuntimeException:new("Failed to import class."))
+            --error("Failed to import class.") 
+        end
         env[getPackageName(name)] = class
     elseif aname == "native" then
         local name = annotation:sub(pindex + 1):gsub("%s", "")
@@ -741,7 +751,11 @@ function SeeRT:executeAnnotation(env, class, annotation)
         local nativeValue = ""
         for _, key in pairs(keys) do
             nativeValue = nativeValue .. key .. "."
-            if not v[key] then error("Could not find native value " .. nativeValue) end
+            if not v[key] then 
+                local RuntimeException = self:loadClassFromAny("see.rt.RuntimeException")
+                self:throw(RuntimeException:new("Could not find native value " .. nativeValue))
+                --error("Could not find native value " .. nativeValue) 
+            end
             v = v[key]
             if not w[key] or type(w) ~= "table" then
                 w[key] = { }
