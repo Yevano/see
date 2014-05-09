@@ -7,10 +7,25 @@
 
 --@import see.base.String
 --@import see.io.Path
+--@import see.util.Properties
 
 --[[
     A utility class for useful system operations.
 ]]
+
+local systemProperties = nil
+
+function System.__static()
+    systemProperties = Properties:new()
+end
+
+function System.getProperty(key)
+    return systemProperties:getProperty(key)
+end
+
+function System.setProperty(key, value)
+    systemProperties:setProperty(key, value)
+end
 
 --[[
     Reads a line from the shell.

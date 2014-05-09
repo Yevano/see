@@ -442,6 +442,8 @@ function SeeRT.new(natives, seePath)
     self.event.UnknownEvent         = self:loadClassFromAny("see.event.impl.UnknownEvent")
     self.rt.RuntimeException        = self:loadClassFromAny("see.rt.RuntimeException")
 
+    self.base.System.setProperty("see.home", self.seePath)
+
     return self
 end
 
