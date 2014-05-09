@@ -8,15 +8,18 @@
 --@import see.base.String
 --@import see.io.Path
 --@import see.util.Properties
+--@import see.rt.SecurityManager
 
 --[[
     A utility class for useful system operations.
 ]]
 
 local systemProperties = nil
+local securityManager = nil
 
 function System.__static()
     systemProperties = Properties:new()
+    securityManager = SecurityManager:new()
 end
 
 function System.getProperty(key)
@@ -25,6 +28,10 @@ end
 
 function System.setProperty(key, value)
     systemProperties:setProperty(key, value)
+end
+
+function System.getSecurityManager()
+    return securityManager
 end
 
 --[[
