@@ -15,11 +15,9 @@
 ]]
 
 local systemProperties = nil
-local securityManager = nil
 
 function System.__static()
     systemProperties = Properties:new()
-    securityManager = SecurityManager:new()
 end
 
 --[[
@@ -38,14 +36,6 @@ end
 ]]
 function System.setProperty(key, value)
     systemProperties:setProperty(key, value)
-end
-
---[[
-    Gets the system security manager
-    @return see.rt.SecurityManager 
-]]
-function System.getSecurityManager()
-    return securityManager
 end
 
 --[[
