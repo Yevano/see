@@ -86,7 +86,7 @@ function StandardGlobals.class(rt, name, annotations, def)
     local useG = setmetatable({ }, { __index = g })
     local anonName = "__anon[" .. tostring(rt.nAnonClasses) .. "]"
     rt.nAnonClasses = rt.nAnonClasses + 1
-    return rt:loadClass(def, annotations, anonName, name, useG)
+    return rt.classLoader:loadClass(def, annotations, anonName, name, useG)
 end
 
 --[[
