@@ -113,5 +113,8 @@ function Rednet.lookup(protocol, hostname, timeout)
 		end
 	end
 	
-	return results
+	if hostname == nil then
+		return results
+	end
+	return nil
 end
