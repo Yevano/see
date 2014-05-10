@@ -14,7 +14,7 @@ function SecurityManager.check(permission, ...)
             local policies = manager.policies[permission]
             for policy in policies:iAll() do
                 if not policy:check(...) then
-                    throw(SecurityException:new("")) --TODO exception message
+                    throw(SecurityException:new("Permission denied (" .. cast(policy:toString(), "string") .. "): " .. policy:denyMessage(...))) --TODO exception message
                 end
             end
         end
