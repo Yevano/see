@@ -1,7 +1,7 @@
---@import linknet.packet.Packet
---@import linknet.net.LinknetProtocol
+--@import see.linknet.packet.Packet
+--@import see.linknet.net.LinknetProtocol
 
---@extends linknet.packet.Packet
+--@extends see.linknet.packet.Packet
 
 function RequestDiscoveryPacket.__static()
     Packet.register(LinknetProtocol.REQUEST_DISCOVERY, RequestDiscoveryPacket)
@@ -16,6 +16,6 @@ function RequestDiscoveryPacket:read(stream)
 end
 
 function RequestDiscoveryPacket:write(stream)
-    Packet.write(self, stream)
+    self:super(Packet).write(stream)
     stream:writeUnsignedInt(self.uid, 4)
 end

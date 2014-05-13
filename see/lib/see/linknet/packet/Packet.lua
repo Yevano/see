@@ -3,7 +3,6 @@ local idsToPackets = { }
 local packetsToIDs = { }
 
 function Packet.read(stream)
-    if stream:length() < 5 then return end
     local magic = stream:readUnsignedInt(4)
     if magic ~= Packet.MAGIC then return end
     local id = stream:readUnsignedInt(1)

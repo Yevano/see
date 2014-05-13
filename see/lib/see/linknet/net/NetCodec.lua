@@ -13,6 +13,7 @@ function NetCodec.encodeRednetBinary(raw)
 end
 
 function NetCodec.decodeRednetBinary(enc)
+    enc = cast(enc, String)
     if enc:length() % 2 == 1 then return end
     local raw = String:new()
     for i = 1, enc:length(), 2 do

@@ -1,4 +1,8 @@
+--@import see.base.String
+--@import see.base.System
+
 --@import see.io.OutputStream
+
 --@import see.util.Math
 
 --@extends see.io.OutputStream

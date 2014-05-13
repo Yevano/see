@@ -1,7 +1,7 @@
---@import linknet.packet.Packet
---@import linknet.net.LinknetProtocol
+--@import see.linknet.packet.Packet
+--@import see.linknet.net.LinknetProtocol
 
---@extends linknet.packet.Packet
+--@extends see.linknet.packet.Packet
 
 function ReplyDiscoveryPacket.__static()
     Packet.register(LinknetProtocol.REPLY_DISCOVERY, ReplyDiscoveryPacket)
@@ -18,7 +18,7 @@ function ReplyDiscoveryPacket:read(stream)
 end
 
 function ReplyDiscoveryPacket:write(stream)
-    Packet.write(self, stream)
+    self:super(Packet).write(stream)
     stream:writeUnsignedInt(self.uid, 4)
     stream:writeUnsignedInt(self.address, 4)
 end
