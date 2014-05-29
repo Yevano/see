@@ -129,16 +129,15 @@ local function fail(err)
 
     while true do
         write("Retry installation? (y/n): ")
-        local response = read()
-        if string.lower(response):gsub("%s", "") == "y" then
+        local event, param1 = os.pullEvent("key")
+        
+        if param1 == "y" then
             print("")
             return true
-        elseif string.lower(response):gsub("%s", "") == "n" then
+        elseif param1 == "n" then
+            print("")
             return false
         end
-        print("Invalid input.")
-    end
-end
 
 while true do
     while true do
