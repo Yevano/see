@@ -1,203 +1,262 @@
-local REPO_URL = "https://raw.github.com/Yevano/see/master/see/"
-local SUPPORTS_COLOR = term.isColor()
+--JSON functions
 
-local args = { ... }
+--Credit goes to http://www.computercraft.info/forums2/index.php?/topic/5854-json-api-v201-for-computercraft/
+------------------------------------------------------------------ utils
+local controls = {["\n"]="\\n", ["\r"]="\\r", ["\t"]="\\t", ["\b"]="\\b", ["\f"]="\\f", ["\""]="\\\"", ["\\"]="\\\\"}
 
-local MAKE_PATHS = {
-    "apis/",
-    "bin/",
-    "lib/",
-    "lib/see/",
-    "lib/see/base/",
-    "lib/see/concurrent/",
-    "lib/see/event/",
-    "lib/see/event/impl/",
-    "lib/see/io/",
-    "lib/see/net/",
-    "lib/see/rt/",
-    "lib/see/util/",
-    "lib/see/io/peripheral"
+
+local whites = {['\n']=true; ['r']=true; ['\t']=true; [' ']=true; [',']=true; [':']=true}
+function removeWhite(str)
+	while whites[str:sub(1, 1)] do
+		str = str:sub(2)
+	end
+	return str
+end
+
+------------------------------------------------------------------ decoding
+
+function jsonParseBoolean(str)
+	if str:sub(1, 4) == "true" then
+		return true, removeWhite(str:sub(5))
+	else
+		return false, removeWhite(str:sub(6))
+	end
+end
+
+function jsonParseNull(str)
+	return nil, removeWhite(str:sub(5))
+end
+
+local numChars = {['e']=true; ['E']=true; ['+']=true; ['-']=true; ['.']=true}
+function jsonParseNumber(str)
+	local i = 1
+	while numChars[str:sub(i, i)] or tonumber(str:sub(i, i)) do
+		i = i + 1
+	end
+	local val = tonumber(str:sub(1, i - 1))
+	str = removeWhite(str:sub(i))
+	return val, str
+end
+
+function jsonParseString(str)
+	local i,j = str:find('^".-[^\\]"')
+	local s = str:sub(i + 1,j - 1)
+
+	for k,v in pairs(controls) do
+		s = s:gsub(v, k)
+	end
+	str = removeWhite(str:sub(j + 1))
+	return s, str
+end
+
+function jsonParseArray(str)
+	str = removeWhite(str:sub(2))
+	
+	local val = {}
+	local i = 1
+	while str:sub(1, 1) ~= "]" do
+		local v = nil
+		v, str = jsonParseValue(str)
+		val[i] = v
+		i = i + 1
+		str = removeWhite(str)
+	end
+	str = removeWhite(str:sub(2))
+	return val, str
+end
+
+function jsonParseObject(str)
+	str = removeWhite(str:sub(2))
+	
+	local val = {}
+	while str:sub(1, 1) ~= "}" do
+		local k, v = nil, nil
+		k, v, str = jsonParseMember(str)
+		val[k] = v
+		str = removeWhite(str)
+	end
+	str = removeWhite(str:sub(2))
+	return val, str
+end
+
+function jsonParseMember(str)
+	local k = nil
+	k, str = jsonParseValue(str)
+	local val = nil
+	val, str = jsonParseValue(str)
+	return k, val, str
+end
+
+function jsonParseValue(str)
+	local fchar = str:sub(1, 1)
+	if fchar == "{" then
+		return jsonParseObject(str)
+	elseif fchar == "[" then
+		return jsonParseArray(str)
+	elseif tonumber(fchar) ~= nil or numChars[fchar] then
+		return jsonParseNumber(str)
+	elseif str:sub(1, 4) == "true" or str:sub(1, 5) == "false" then
+		return jsonParseBoolean(str)
+	elseif fchar == "\"" then
+		return jsonParseString(str)
+	elseif str:sub(1, 4) == "null" then
+		return jsonParseNull(str)
+	end
+	return nil
+end
+
+function jsonDecode(str)
+	str = removeWhite(str)
+	t = jsonParseValue(str)
+	return t
+end
+
+function downloadJson(url)
+	local file = http.get(url)
+	if not file then
+		return nil
+	end
+	return jsonDecode(file.readAll())
+end
+
+local GitHubRepo = "Yevano/see" -- Change to user/repo
+local GitHubBranch = "master"	-- Change to needed branch
+local installPath = "/see/"
+
+
+local GitHubRef = "refs/heads/"..GitHubBranch
+local GitHubRaw = 'https://raw.github.com/'..GitHubRepo..'/'..GitHubBranch..'/'
+local args = {...}
+ 
+local blacklist = {
+	'.gitignore',
+	'README.md'
 }
 
-local DL_PATHS = {
-    "lib/see/base/Array.lua",
-    "lib/see/base/Exception.lua",
-    "lib/see/base/Iterators.lua",
-    "lib/see/base/Object.lua",
-    "lib/see/base/String.lua",
-    "lib/see/base/System.lua",
-    "lib/see/concurrent/InterruptedException.lua",
-    "lib/see/concurrent/Task.lua",
-    "lib/see/concurrent/Thread.lua",
-    "lib/see/event/Event.lua",
-    "lib/see/event/Events.lua",
-    "lib/see/event/impl/AlarmEvent.lua",
-    "lib/see/event/impl/CharEvent.lua",
-    "lib/see/event/impl/DiskEjectEvent.lua",
-    "lib/see/event/impl/DiskInsertEvent.lua",
-    "lib/see/event/impl/HTTPFailureEvent.lua",
-    "lib/see/event/impl/HTTPSuccessEvent.lua",
-    "lib/see/event/impl/KeyPressEvent.lua",
-    "lib/see/event/impl/ModemMessageEvent.lua",
-    "lib/see/event/impl/MonitorResizeEvent.lua",
-    "lib/see/event/impl/MonitorTouchEvent.lua",
-    "lib/see/event/impl/MouseDragEvent.lua",
-    "lib/see/event/impl/MousePressEvent.lua",
-    "lib/see/event/impl/MouseScrollEvent.lua",
-    "lib/see/event/impl/PeripheralAttachEvent.lua",
-    "lib/see/event/impl/PeripheralDetachEvent.lua",
-    "lib/see/event/impl/RednetMessageEvent.lua",
-    "lib/see/event/impl/RedstoneEvent.lua",
-    "lib/see/event/impl/SignalEvent.lua",
-    "lib/see/event/impl/TerminalResizeEvent.lua",
-    "lib/see/event/impl/TerminateEvent.lua",
-    "lib/see/event/impl/TimerEvent.lua",
-    "lib/see/event/impl/TurtleInventoryEvent.lua",
-    "lib/see/event/impl/UnknownEvent.lua",
-    "lib/see/io/ArrayInputStream.lua",
-    "lib/see/io/ArrayOutputStream.lua",
-    "lib/see/io/DataInputStream.lua",
-    "lib/see/io/DataOutputStream.lua",
-    "lib/see/io/FileInputStream.lua",
-    "lib/see/io/FileOutputStream.lua",
-    "lib/see/io/Files.lua",
-    "lib/see/io/InputStream.lua",
-    "lib/see/io/IOException.lua",
-    "lib/see/io/ModemInputStream.lua",
-    "lib/see/io/ModemOutputStream.lua",
-    "lib/see/io/OutputStream.lua",
-    "lib/see/io/Path.lua",
-    "lib/see/io/peripheral/AbstractPeripheral.lua",
-    "lib/see/io/peripheral/CommandBlock.lua",
-    "lib/see/io/peripheral/Computer.lua",
-    "lib/see/io/peripheral/Disk.lua",
-    "lib/see/io/peripheral/Modem.lua",
-    "lib/see/io/peripheral/Monitor.lua",
-    "lib/see/io/peripheral/Printer.lua",
-    "lib/see/io/Peripheral.lua",
-    "lib/see/io/Rednet.lua",
-    "lib/see/io/Redstone.lua",
-    "lib/see/io/Terminal.lua",
-    "lib/see/net/HTTP.lua",
-    "lib/see/net/HTTPResponse.lua",
-    "lib/see/net/URL.lua",
-    "lib/see/rt/ArchiveClassLoader.lua",
-    "lib/see/rt/CastException.lua",
-    "lib/see/rt/Class.lua",
-    "lib/see/rt/ClassLoader.lua",
-    "lib/see/rt/DefaultClassLoader.lua",
-    "lib/see/rt/FileClassLoader.lua",
-    "lib/see/rt/HTTPClassLoader.lua",
-    "lib/see/rt/IndexOutOfBoundsException.lua",
-    "lib/see/rt/InvalidArgumentException.lua",
-    "lib/see/rt/NoSuchElementException.lua",
-    "lib/see/rt/RuntimeException.lua",
-    "lib/see/rt/UnimplementedMethodException.lua",
-    "lib/see/rt/UnsupportedOperationException.lua",
-    "lib/see/util/ArgumentUtils.lua",
-    "lib/see/util/BinaryComparator.lua",
-    "lib/see/util/BinaryHeap.lua",
-    "lib/see/util/Bit.lua",
-    "lib/see/util/Color.lua",
-    "lib/see/util/Comparator.lua",
-    "lib/see/util/EmptyStackException.lua",
-    "lib/see/util/FastArray.lua",
-    "lib/see/util/LRUCache.lua",
-    "lib/see/util/Matcher.lua",
-    "lib/see/util/Math.lua",
-    "lib/see/util/Stack.lua",
-    "lib/see/util/Timer.lua",
-    "lib/see/util/VarArgs.lua",
-    "bin/igen",
-    "bin/installer",
-    "bin/rgen",
-    "bin/see",
-    "bin/wgen",
-    "apis/see"
-}
+function isBlacklisted(path)
+	for i, item in ipairs(blacklist) do
+		if item == path then
+			return true
+		end
+	end
+	return false
+end
+
+local failed = {}
+
+function downloadBlob(v)
+	if isBlacklisted(v.path) then
+			return
+	end
+	--Make dir if needed
+	if v.type == 'tree' then
+		fs.makeDir(installPath..v.path)
+	else
+		--Start download
+		local url = (GitHubRaw..v.path):gsub(' ','%%20')
+		local f = http.get(url)
+
+		--If couldn't download then add to failed
+		if not f then
+			table.insert(failed,v)
+			return
+		end
+
+		--Write file
+		local h = fs.open(installPath..v.path, 'w')
+		h.write(f.readAll())
+		h.close()
+	end
+end
 
 local function fail(err)
-    if SUPPORTS_COLOR then
-        term.setTextColor(colors.red)
-    end
+	printError(err)
 
-    print(err)
+	while true do
+		write("Retry installation? (y/n): ")
+		local response = read()
+		if string.lower(response):gsub("%s", "") == "y" then
+			return true
+		elseif string.lower(response):gsub("%s", "") == "n" then
+			return false
+		end
+		print("Invalid input.")
+	end
+end
 
-    if SUPPORTS_COLOR then
-        term.setTextColor(colors.white)
-    end
+--Get install directory
+while true do
+	if #args == 1 then
+		installPath = args[1]
+	else
+		write("Choose an install path: ")
+		installPath = "/" .. shell.resolve(read())
+	end
 
-    while true do
-        write("Retry installation? (y/n): ")
-        local response = read()
-        if string.lower(response):gsub("%s", "") == "y" then
-            print("")
-            return true
-        elseif string.lower(response):gsub("%s", "") == "n" then
-            return false
-        end
-        print("Invalid input.")
-    end
+	local configHandle = fs.open("/.see", "w")
+	configHandle.write('install_dir = "' .. installPath .. '/see"')
+	configHandle.close()
+
+	local suc, err = pcall(fs.makeDir, installPath)
+	if not suc then
+		if not fail("Could not create installation directory.") then error("Exiting") end
+	else
+		break
+	end
+end
+
+installPath = installPath .. '/'
+local tree = {}
+local latestSha = ''
+
+--Get latest commit
+while true do
+	--Get sha for specific branch
+	local refs = downloadJson('https://api.github.com/repos/'..GitHubRepo..'/git/refs')
+
+	if refs == nil then
+		if not fail("Could not fetch branches") then error("Exiting") end
+	else
+		for i, v in ipairs(refs) do
+			if v.ref == GitHubRef then
+				latestSha = v.object.sha
+				break
+			end
+		end
+		break
+	end
+end
+--Get tree
+while true do 
+	--Download file list
+	tree = downloadJson('https://api.github.com/repos/'..GitHubRepo..'/git/trees/'..latestSha..'?recursive=1').tree
+
+	if tree == nil then
+		if not fail("Could not fetch tree") then error("Exiting") end
+	else
+		break
+	end
+end
+
+--Prepare file download
+local downloads = {}
+for i, v in ipairs(tree) do
+	table.insert(downloads, function()downloadBlob(v)end)
 end
 
 while true do
-    while true do
-        local downloaded = 0
+	parallel.waitForAll(unpack(downloads))
 
-        local installPath
-        if #args == 1 then
-            installPath = args[1]
-        else
-            write("Choose an install path: ")
-            installPath = "/" .. shell.resolve(read())
-        end
+	if #failed > 0 then
+		if not fail("Not all files downloaded. Retry?") then error("Exiting") end
 
-        local configHandle = fs.open("/.see", "w")
-        configHandle.write('install_dir = "' .. installPath .. '"')
-        configHandle.close()
-
-        local suc, err = pcall(fs.makeDir, installPath)
-        if not suc then
-            if fail("Could not create installation directory.") then break end
-            return
-        end
-
-        print("Setting up directory structure.")
-
-        for i = 1, #MAKE_PATHS do
-            fs.makeDir(fs.combine(installPath, MAKE_PATHS[i]))
-        end
-
-        print("Downloading SEE files from repository.")
-
-        local url, httpFail
-        for i = 1, #DL_PATHS do
-            url = REPO_URL .. DL_PATHS[i]
-            print("Downloading " .. DL_PATHS[i])
-            local readHandle = http.get(url)
-            if not readHandle or readHandle.getResponseCode() ~= 200 then
-                httpFail = true
-                break
-            end
-
-            local _, relativePathStart = url:find(REPO_URL, 1, true)
-            local writePath = fs.combine(installPath, url:sub(relativePathStart + 1))
-
-            local writeHandle = fs.open(writePath, "w")
-            writeHandle.write(readHandle.readAll())
-
-            readHandle.close()
-            writeHandle.close()
-        end
-
-        if httpFail then
-            if fail("File download failed for url " .. url .. ".") then
-                break
-            end
-        else
-            print("SEE was installed successfully.")
-        end
-
-        return
-    end
+		downloads = {}
+		for i, v in ipairs(failed) do
+			print("Retrying "..v.path)
+			table.insert(downloads, function()downloadBlob(v)end)
+		end
+		failed = {}
+	else
+		break
+	end	
 end
