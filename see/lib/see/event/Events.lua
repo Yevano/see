@@ -123,13 +123,11 @@ function Events.pull(...)
         end
     end
 
-    while true do
-        local ret = Thread.yield(casted:unpack())
+    local ret = Thread.yield(casted:unpack())
 
-        if ret == "__thread_interrupt" then
-            throw(InterruptedException:new())
-        end
-
-        return ret
+    if ret == "__thread_interrupt" then
+        throw(InterruptedException:new())
     end
+
+    return ret
 end
