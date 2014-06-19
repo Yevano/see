@@ -1,3 +1,4 @@
+--@import see.base.String
 --@import see.io.Peripheral
 --@import see.io.peripheral.AbstractPeripheral
 
@@ -12,11 +13,11 @@ function CommandBlock:init(location)
 end
 
 function CommandBlock:getCommand()
-	return Peripheral.call(self.location, "getCommand")
+	return STR(Peripheral.call(self.location, "getCommand"))
 end
 
 function CommandBlock:setCommand(command)
-	Peripheral.call(self.location, "setCommand", command)
+	Peripheral.call(self.location, "setCommand", cast(command, "string"))
 end
 
 function CommandBlock:runCommand()
