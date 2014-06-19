@@ -22,7 +22,16 @@ end
 
 function Peripheral.call(side, method, ...)
     if not Peripheral.isPresent(side) then throw(IOException:new("No connected peripheral on " .. side .. " side.")) end
-    return peripheral.call(cast(side, "string"), cast(method, "string"), ...)
+
+    local args = Array:new(...)
+
+    for i = 1, args:length() do
+        if typeof(args[i]) == String then
+            args[i] = cast(args[i], "string")
+        end
+    end
+
+    return peripheral.call(cast(side, "string"), cast(method, "string"), args:unpack())
 end
 
 function Peripheral.getNames()
@@ -33,6 +42,6 @@ function Peripheral.getNames()
     return names
 end
 
-function Peripheral.find(type)
-    return peripheral.find(type)
+function Peripheral.find(type, func)
+    return peripheral.find(type, func)
 end
