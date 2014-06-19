@@ -1,6 +1,8 @@
 --@native fs
 --@native unpack
 
+--@import see.io.IOException
+
 function Files.list(path)
     return Array:new(unpack(fs.list(path.pathString:lstr())))
 end
@@ -47,8 +49,13 @@ function Files.delete(path)
 end
 
 function Files.readAll(path)
-    local handle = fs.open(path.pathString:lstr(), "r")
-    local ret = cast(handle.readAll(), String)
-    handle.close()
-    return ret
+    local handle, err = fs.open(path.pathString:lstr(), "r")
+
+    if not handle then
+        throw(IOException:new("Could not open file (" .. path.pathString .. "): " .. err))
+    else
+        local ret = cast(handle.readAll(), String)
+        handle.close()
+        return ret
+    end
 end
