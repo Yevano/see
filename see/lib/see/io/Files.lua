@@ -52,6 +52,7 @@ function Files.readAll(path)
     local handle, err = fs.open(path.pathString:lstr(), "r")
 
     if not handle then
+        handle.close()
         throw(IOException:new("Could not open file (" .. path.pathString .. "): " .. err))
     else
         local ret = cast(handle.readAll(), String)
