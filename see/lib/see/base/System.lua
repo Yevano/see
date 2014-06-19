@@ -210,9 +210,8 @@ end
 function System.write(...)
     local args = {...}
     for i = 1, #args do
-        args[i] = cast(args[i], "string")
+        write(cast(args[i], "string"))
     end
-    write(unpack(args))
 end
 
 --[[
