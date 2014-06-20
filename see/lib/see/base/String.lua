@@ -63,6 +63,10 @@ function String:init(...)
     end
 end
 
+function String:opEq(other)
+    return self:equals(other) 
+end
+
 function String:opIndex(index)
     if typeof(index) == "number" then
         return self.charArray[index]
