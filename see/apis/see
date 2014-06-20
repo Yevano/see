@@ -141,7 +141,7 @@ function StandardGlobals.cast(rt, value, castType)
             if StandardGlobals.isprimitive(rt, value) then
                 return tonumber(value)
             else
-                return tonumber(value:toString():lstr())
+                return value:toString():toNumber()
             end
         else
             -- TODO
