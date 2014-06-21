@@ -29,16 +29,12 @@ function Terminal.setCursorBlink(blink)
     term.setCursorBlink(blink)
 end
 
-function Terminal.redirect(monitor)
-    term.redirect(monitor)
+function Terminal.redirect(object)
+    return term.redirect(object)
 end
 
 function Terminal.current()
-    term.current()
-end
-
-function Terminal.setTextScale(scale)
-    term.setTextScale(scale)
+    return term.current()
 end
 
 function Terminal.setPos(x, y)
@@ -52,4 +48,8 @@ end
 
 function Terminal.isColor()
     return term.isColor()
+end
+
+function Terminal.isColour()
+    return term.isColour()
 end
